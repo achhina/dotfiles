@@ -13,7 +13,7 @@ return {
     cond = function()
       return vim.fn.executable 'make' == 1
     end,
-    },
+
     config = function ()
         -- [[ Configure Telescope ]]
         -- See `:help telescope` and `:help telescope.setup()`
@@ -56,4 +56,5 @@ return {
         vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
         vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
     end
+  }
 }
