@@ -46,6 +46,12 @@ function M.load_options()
 
     -- Enable spellcheck
     vim.opt.spelllang = 'en_us'
+
+    -- Relative line numbers
+    vim.wo.relativenumber = true
+
+    -- Keep text centred vertically
+    vim.wo.scrolloff = 999
 end
 
 return M
