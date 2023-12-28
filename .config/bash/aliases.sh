@@ -3,6 +3,10 @@
 alias v="nvim"
 alias vi="nvim" 
 
+##### Multiplexers #####
+
+alias t="tmux"
+
 ##### Python #####
 
 alias pip="python3 -m pip"
