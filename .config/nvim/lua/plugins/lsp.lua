@@ -43,7 +43,7 @@ return {
 
           -- See `:help K` for why this keymap
           nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-          nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+          nmap('<leader>k', vim.lsp.buf.signature_help, 'Signature Documentation')
 
           -- Lesser used LSP functionality
           nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -80,6 +80,23 @@ return {
 
         -- Setup neovim lua configuration
         require('neodev').setup()
+
+        -- Testing pyscribe
+        -- local server_config = require('lspconfig.configs')
+        -- local root_pattern = require('lspconfig.util').root_pattern
+        --
+        -- server_config.pyscribe = {
+        --     default_config = {
+        --         cmd = {'pyscribe'},
+        --         name = 'pyscribe',
+        --         filetypes = {
+        --             'python'
+        --         },
+        --         root_dir = root_pattern('pyscribe')
+        --     }
+        -- }
+        --
+        -- require('lspconfig').pyscribe.setup({})
 
         -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
         local capabilities = vim.lsp.protocol.make_client_capabilities()
