@@ -6,6 +6,7 @@ alias vi="nvim"
 ##### Multiplexers #####
 
 alias t="tmux"
+alias ta="tmux attach"
 
 ##### Python #####
 
@@ -16,9 +17,13 @@ alias pip3="pip"
 
 # exa - https://the.exa.website/
 if where exa &> /dev/null; then
-    alias ls="exa --header"
-    alias lst="exa --tree"
-    alias lsg="exa --header --long --git"
+    function exa_lst {
+        exa --tree --all --level ${1:-1}
+    }
+
+    alias ls="exa --header --all"
+    alias lst="exa_lst"
+    alias lsg="exa --header --all --long --git"
 fi
 
 ##### Custom #####
