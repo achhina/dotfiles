@@ -3,7 +3,7 @@ local rose_pine = {
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'rose-pine'
+        vim.cmd.colorscheme 'rose-pine'
     end,
 }
 
@@ -12,7 +12,7 @@ local night_owl = {
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'night-owl'
+        vim.cmd.colorscheme 'night-owl'
     end,
 }
 
