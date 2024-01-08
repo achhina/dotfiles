@@ -4,16 +4,16 @@ vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl 
 return {
     -- debugger support
     {
-        'mfussenegger/nvim-dap',
+        "mfussenegger/nvim-dap",
         config = function()
-            local dap = require('dap')
-            local dapui = require('dapui')
+            local dap = require("dap")
+            local dapui = require("dapui")
 
             local nmap = function(keys, func, desc)
                 if desc then
-                    desc = '[D]AP: ' .. desc
+                    desc = "[D]AP: " .. desc
                 end
-                vim.keymap.set('n', keys, func, { silent = true, desc = desc })
+                vim.keymap.set("n", keys, func, { silent = true, desc = desc })
             end
 
             nmap("<leader>ds", dap.step_into, "[S]tep into")
@@ -43,19 +43,19 @@ return {
 
     -- provides nice ui
     {
-        'rcarriga/nvim-dap-ui',
-        dependencies = 'mfussenegger/nvim-dap',
+        "rcarriga/nvim-dap-ui",
+        dependencies = "mfussenegger/nvim-dap",
         config = function()
-            local dap = require('dap')
-            local dapui = require('dapui')
+            local dap = require("dap")
+            local dapui = require("dapui")
             dapui.setup()
-            dap.listeners.after.event_initialized['dapui_config'] = function()
+            dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
-            dap.listeners.before.event_terminated['dapui_config'] = function()
+            dap.listeners.before.event_terminated["dapui_config"] = function()
                 dapui.close()
             end
-            dap.listeners.before.event_exited['dapui_config'] = function()
+            dap.listeners.before.event_exited["dapui_config"] = function()
                 dapui.close()
             end
         end
@@ -63,17 +63,17 @@ return {
 
     -- python debugger
     {
-        'mfussenegger/nvim-dap-python',
-        ft           = 'python',
+        "mfussenegger/nvim-dap-python",
+        ft           = "python",
         dependencies = {
-            'mfussenegger/nvim-dap',
-            'rcarriga/nvim-dap-ui',
+            "mfussenegger/nvim-dap",
+            "rcarriga/nvim-dap-ui",
         },
         config       = function()
-            require('dap-python').setup('~/venv/debugpy/bin/python')
+            require("dap-python").setup("~/venv/debugpy/bin/python")
 
             -- Add configuration overrides
-            local configurations = require('dap').configurations.python
+            local configurations = require("dap").configurations.python
             for _, configuration in pairs(configurations) do
                 configuration.justMyCode = false
             end
@@ -82,11 +82,11 @@ return {
 
     -- virtual text support
     {
-        'theHamsta/nvim-dap-virtual-text',
-        ft = 'python',
+        "theHamsta/nvim-dap-virtual-text",
+        ft = "python",
         dependencies = {
-            'mfussenegger/nvim-dap',
-            'rcarriga/nvim-dap-ui',
+            "mfussenegger/nvim-dap",
+            "rcarriga/nvim-dap-ui",
         },
         config = function()
             require("nvim-dap-virtual-text").setup {
