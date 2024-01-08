@@ -61,7 +61,7 @@ return {
             vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
             -- Spell Check Keymaps
-            vim.keymap.set("n", "<leader>s", require("telescope.builtin").spell_suggest, { desc = "[S]pell Suggestions" })
+            vim.keymap.set("n", "<leader>ss", require("telescope.builtin").spell_suggest, { desc = "[S]pell Suggestions" })
         end
     }
 }
