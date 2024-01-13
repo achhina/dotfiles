@@ -1,5 +1,4 @@
-# Default Theme
-# If changes made here does not take effect, then try to re-create the tmux session to force reload.
+#!/bin/bash
 
 # Rose pine dawn color scheme from:
 # https://github.com/rose-pine/tmux/blob/main/rose-pine.tmux
@@ -40,7 +39,7 @@ TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SEPARATOR=${TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SE
 # See man tmux.conf for additional formatting options for the status line.
 # The `format regular` and `format inverse` functions are provided as conveniences
 
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_CURRENT ]; then
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_CURRENT" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_CURRENT=(
 		"#[$(format inverse)]" \
 		"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR" \
@@ -52,18 +51,18 @@ if [ -z $TMUX_POWERLINE_WINDOW_STATUS_CURRENT ]; then
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_STYLE ]; then
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_STYLE" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_STYLE=(
 		"$(format regular)"
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_FORMAT ]; then
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_FORMAT" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_FORMAT=(
 		"#[$(format regular)]" \
-		# "  #I#{?window_flags,#F, } " \
 		"$TMUX_POWERLINE_SEPARATOR_RIGHT_THIN" \
 		" #W "
+		#"  #I#{?window_flags,#F, } "
 	)
 fi
 
@@ -94,39 +93,39 @@ fi
 # separator_foreground_color options must still be specified so that appropriate index
 # of options to support the spacing_disable and separator_disable features can be used
 
-if [ -z $TMUX_POWERLINE_LEFT_STATUS_SEGMENTS ]; then
+if [ -z "$TMUX_POWERLINE_LEFT_STATUS_SEGMENTS" ]; then
 	TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 		"tmux_session_info $thm_hl_low $thm_gold" \
 		"hostname $thm_love $thm_text" \
-		# "ifstat 30 255" \
 		"ifstat_sys $thm_pine $thm_gold" \
-		# "lan_ip $thm_pine $thm_gold" \
-		# "wan_ip $thm_hl_high $thm_text" \
-		# "vcs_branch 29 88" \
-		#"vcs_compare 60 255" \
-		#"vcs_staged 64 255" \
-		#"vcs_modified 9 255" \
-		#"vcs_others 245 0" \
+		# "ifstat 30 255"
+		#"lan_ip $thm_pine $thm_gold"
+		#"wan_ip $thm_hl_high $thm_text"
+		#"vcs_branch 29 88"
+		#"vcs_compare 60 255"
+		#"vcs_staged 64 255"
+		#"vcs_modified 9 255"
+		#"vcs_others 245 0"
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS ]; then
+if [ -z "$TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS" ]; then
 	TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(
-		#"earthquake 3 0" \
-		# "pwd 89 211" \
-		#"macos_notification_count 29 255" \
-		#"mailcount 9 255" \
-		# "now_playing 234 37" \
-		#"cpu 240 136" \
-		# "load 237 167" \
 		"tmux_mem_cpu_load 234 136" \
-		# "battery 137 127" \
-		# "weather 37 255" \
-		#"rainbarf 0 ${TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR}" \
-		#"xkb_layout 125 117" \
-		# "date_day 235 136" \
-		# "date 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}" \
-		# "time 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}" \
-		#"utc_time 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}" \
+		#"earthquake 3 0"
+		#"pwd 89 211"
+		#"macos_notification_count 29 255"
+		#"mailcount 9 255"
+		#"now_playing 234 37"
+		#"cpu 240 136"
+		#"load 237 167"
+		#"battery 137 127"
+		#"weather 37 255"
+		#"rainbarf 0 ${TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR}"
+		#"xkb_layout 125 117"
+		#"date_day 235 136"
+		#"date 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}"
+		#"time 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}"
+		#"utc_time 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}"
 	)
 fi

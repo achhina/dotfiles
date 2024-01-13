@@ -1,7 +1,4 @@
-# Default configuration file for tmux-powerline.
-# Modeline {
- # vi: foldmarker={,} foldmethod=marker foldlevel=0 tabstop=4 filetype=sh
-# }
+#!/bin/sh
 
 # General {
 	# Show which segment fails and its exit code.
@@ -221,8 +218,4 @@
 	export TMUX_POWERLINE_SEG_WEATHER_GREP="grep"
 	# Location of the JSON parser, jq
 	export TMUX_POWERLINE_SEG_WEATHER_JSON="jq"
-	# Your location
-	# Latitude and Longtitude for use with yr.no
-	TMUX_POWERLINE_SEG_WEATHER_LAT=""
-	TMUX_POWERLINE_SEG_WEATHER_LON=""
 # }
