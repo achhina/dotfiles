@@ -1,4 +1,4 @@
 return {
-    "MaximilianLloyd/ascii.nvim",
-    dependencies = { "MunifTanjim/nui.nvim" }
+	"MaximilianLloyd/ascii.nvim",
+	dependencies = { "MunifTanjim/nui.nvim" },
 }

@@ -1,57 +1,57 @@
 local M = {}
 
 function M.load_options()
-    -- Set highlight on search
-    vim.o.hlsearch = false
+	-- Set highlight on search
+	vim.o.hlsearch = false
 
-    -- Make line numbers default
-    vim.wo.number = true
+	-- Make line numbers default
+	vim.wo.number = true
 
-    -- Enable mouse mode
-    vim.o.mouse = 'a'
+	-- Enable mouse mode
+	vim.o.mouse = "a"
 
-    -- Sync clipboard between OS and Neovim.
-    --  Remove this option if you want your OS clipboard to remain independent.
-    --  See `:help 'clipboard'`
-    vim.o.clipboard = 'unnamedplus'
+	-- Sync clipboard between OS and Neovim.
+	--  Remove this option if you want your OS clipboard to remain independent.
+	--  See `:help 'clipboard'`
+	vim.o.clipboard = "unnamedplus"
 
-    -- Enable break indent
-    vim.o.breakindent = true
+	-- Enable break indent
+	vim.o.breakindent = true
 
-    -- Save undo history
-    vim.o.undofile = true
+	-- Save undo history
+	vim.o.undofile = true
 
-    -- Case insensitive searching UNLESS /C or capital in search
-    vim.o.ignorecase = true
-    vim.o.smartcase = true
+	-- Case insensitive searching UNLESS /C or capital in search
+	vim.o.ignorecase = true
+	vim.o.smartcase = true
 
-    -- Keep signcolumn on by default
-    vim.wo.signcolumn = 'yes'
+	-- Keep signcolumn on by default
+	vim.wo.signcolumn = "yes"
 
-    -- Decrease update time
-    vim.o.updatetime = 250
-    vim.o.timeout = true
-    vim.o.timeoutlen = 300
+	-- Decrease update time
+	vim.o.updatetime = 250
+	vim.o.timeout = true
+	vim.o.timeoutlen = 300
 
-    -- Set completeopt to have a better completion experience
-    vim.o.completeopt = 'menuone,noselect'
+	-- Set completeopt to have a better completion experience
+	vim.o.completeopt = "menuone,noselect"
 
-    -- NOTE: You should make sure your terminal supports this
-    vim.o.termguicolors = true
+	-- NOTE: You should make sure your terminal supports this
+	vim.o.termguicolors = true
 
-    -- Set default tab to 4 instead of 8
-    vim.opt.tabstop = 4
-    vim.opt.shiftwidth = 4
-    vim.opt.expandtab = true
+	-- Set default tab to 4 instead of 8
+	vim.opt.tabstop = 4
+	vim.opt.shiftwidth = 4
+	vim.opt.expandtab = true
 
-    -- Enable spellcheck
-    vim.opt.spelllang = 'en_us'
+	-- Enable spellcheck
+	vim.opt.spelllang = "en_us"
 
-    -- Relative line numbers
-    vim.wo.relativenumber = true
+	-- Relative line numbers
+	vim.wo.relativenumber = true
 
-    -- Keep text centred vertically
-    vim.wo.scrolloff = 999
+	-- Keep text centred vertically
+	vim.wo.scrolloff = 999
 end
 
 return M
