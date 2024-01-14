@@ -13,7 +13,7 @@ function M.load_autocmd()
 	})
 
 	-- Exit ephemeral buffers with <ESC>
-	local ephemeral_buffers = { "help", "lspinfo", "man", "checkhealth" }
+	local ephemeral_buffers = { "help", "lspinfo", "man", "checkhealth", "qf", "lazy" }
 	vim.api.nvim_create_autocmd({ "FileType" }, {
 		callback = function()
 			vim.keymap.set("n", "<ESC>", ":bd<CR>", { buffer = true, silent = true })
