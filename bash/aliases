@@ -20,15 +20,20 @@ alias pip3="pip"
 # exa - https://the.exa.website/
 if where exa &> /dev/null; then
     function exa_lst {
-        exa --tree --all --level ${1:-1}
+        TREE_DEPTH="3"
+        if [[ $1 =~ ^[0-9]+$ ]]; then
+            TREE_DEPTH=$1
+            shift
+        fi
+
+        exa --tree --all --level "$TREE_DEPTH" "$@"
     }
 
     alias ls="exa --header --all"
+    alias lsa="exa --header --all --long --git"
     alias lst="exa_lst"
-    alias lsg="exa --header --all --long --git"
 fi
 
 ##### Custom #####
 
-# Manage dotfiles with bare clone
-alias config="/usr/bin/git --git-dir=${HOME}/.cfg/ --work-tree=${HOME}"
+alias config="$XDG_CONFIG_HOME"
