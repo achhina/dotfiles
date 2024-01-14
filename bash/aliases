@@ -24,7 +24,8 @@ fi
 
 select_java_version() {
 	version=$1
-    	export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+    	JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+        export JAVA_HOME
     	java -version
 }
 alias jdk="select_java_version"
@@ -51,4 +52,5 @@ fi
 
 ##### Custom #####
 
+# shellcheck disable=SC2139 # I actually do want expand on define
 alias config="$XDG_CONFIG_HOME"
