@@ -16,21 +16,13 @@ repos:
     rev: v0.0.18
     hooks:
       - id: shellcheck
-        types_or:
-          - bash
-          - shell
-        exclude_types:
-          - csh
-          - perl
-          - python
-          - ruby
   - repo: 'https://github.com/lunarmodules/luacheck'
     rev: v1.1.2
     hooks:
       - id: luacheck
         args:
           - '--globals'
-          - vim
+          - 'vim'
           - '--'
   - repo: 'https://github.com/JohnnyMorganz/StyLua'
     rev: v0.19.1
