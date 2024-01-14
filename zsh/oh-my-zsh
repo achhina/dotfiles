@@ -1,7 +1,11 @@
 #!/bin/bash
+if [[ "${BASH_SOURCE[0]}" -ef "$0" ]] || [[ $ZSH_EVAL_CONTEXT == toplevel ]];
+then
+    echo "This file is meant to be sourced."
+    exit 1
+fi
 
-export ZSH="${XDG_HOME:-HOME}/.oh-my-zsh"
-
+export ZSH="${XDG_HOME:-$HOME}/.oh-my-zsh"
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # shellcheck disable=SC2034 # This is used within oh-my-zsh.sh
@@ -11,7 +15,11 @@ plugins=(
 	zsh-autosuggestions
 )
 
-source "${ZSH}/oh-my-zsh.sh"
-#random change
+OH_MY_ZSH="${ZSH}/oh-my-zsh.sh"
+# shellcheck source=/dev/null
+[[ ! -f "$OH_MY_ZSH" ]] || . "$OH_MY_ZSH"
+
 # To customize prompt, run `p10k configure` or edit ~{XDG_CONFIG_HOME}/.p10k.zsh.
-[[ ! -f "${XDG_CONFIG_HOME}/p10k.zsh" ]] || source "${XDG_CONFIG_HOME}/p10k.zsh"
+P10K="${XDG_CONFIG_HOME}/zsh/p10k.zsh"
+# shellcheck source=/dev/null
+[[ ! -f "$P10K" ]] || . "$P10K"
