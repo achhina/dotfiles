@@ -14,6 +14,9 @@ function M.load_keymaps()
 	-- Window splitting and management keymaps
 	vim.keymap.set("n", "<leader>S", ":split<CR>", { noremap = true, silent = true })
 	vim.keymap.set("n", "<leader>V", ":vsplit<CR>", { noremap = true, silent = true })
+
+	-- Play macro in q register
+	vim.keymap.set("n", "@q", "Q", { noremap = true, silent = true })
 end
 
 return M
