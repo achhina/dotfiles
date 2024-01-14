@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Make VIM the default editor
+export VISUAL=nvim
+export EDITOR="${VISUAL}"
+
+# Set XDG Based Directories
+export XDG_HOME=~
+export XDG_CACHE_HOME="${XDG_HOME}/.cache"
+export XDG_CONFIG_HOME=~/.config
