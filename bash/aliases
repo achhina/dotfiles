@@ -15,6 +15,21 @@ alias ta="tmux attach"
 alias pip="python3 -m pip"
 alias pip3="pip"
 
+# add pyenv shim to path
+if command -v pyenv 1>/dev/null 2>&1; then
+     eval "$(pyenv init -)"
+fi
+
+##### Java #####
+
+select_java_version() {
+	version=$1
+    	export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+    	java -version
+}
+alias jdk="select_java_version"
+
+
 ##### Shell Utils #####
 
 # exa - https://the.exa.website/
@@ -29,9 +44,9 @@ if where exa &> /dev/null; then
         exa --tree --all --level "$TREE_DEPTH" "$@"
     }
 
-    alias ls="exa --header --all"
-    alias lsa="exa --header --all --long --git"
-    alias lst="exa_lst"
+    alias l="exa"
+    alias ll="exa --header --all --long --git"
+    alias lt="exa_lst"
 fi
 
 ##### Custom #####
