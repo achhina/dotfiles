@@ -4,6 +4,7 @@ export ZSH="${XDG_HOME:-HOME}/.oh-my-zsh"
 
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 
+# shellcheck disable=SC2034 # This is used within oh-my-zsh.sh
 plugins=(
 	git
 	zsh-syntax-highlighting
@@ -11,6 +12,6 @@ plugins=(
 )
 
 source "${ZSH}/oh-my-zsh.sh"
-
+#random change
 # To customize prompt, run `p10k configure` or edit ~{XDG_CONFIG_HOME}/.p10k.zsh.
 [[ ! -f "${XDG_CONFIG_HOME}/p10k.zsh" ]] || source "${XDG_CONFIG_HOME}/p10k.zsh"

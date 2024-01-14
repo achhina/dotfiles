@@ -12,16 +12,10 @@ repos:
         args:
           - '--fix'
       - id: ruff-format
-  - repo: local
+  - repo: 'https://github.com/syntaqx/git-hooks'
+    rev: v0.0.18
     hooks:
       - id: shellcheck
-        name: Test shell scripts with shellcheck
-        description: Shell scripts conform to shellcheck
-        entry: shellcheck
-        language: script
-        types: [shell, bash]
-        exclude_types: [csh, perl, python, ruby, tcsh]
-        args: [-e, SC1091]
   - repo: 'https://github.com/lunarmodules/luacheck'
     rev: v1.1.2
     hooks:
