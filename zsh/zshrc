@@ -1,0 +1,13 @@
+#!/bin/bash
+if [[ "${BASH_SOURCE[0]}" -ef "$0" ]] || [[ $ZSH_EVAL_CONTEXT == toplevel ]];
+then
+    echo "This file is meant to be sourced."
+    exit 1
+fi
+
+. "${XDG_CONFIG_HOME:-~/.config}/bash/defaults"
+
+. "${XDG_CONFIG_HOME}/zsh/oh-my-zsh"
+
+# Set aliases last to override oh-my-zsh defaults
+. "${XDG_CONFIG_HOME}/bash/aliases"
