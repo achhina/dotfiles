@@ -6,3 +6,6 @@
 
 # tmux
 tmux/plugins/**
+
+# Backups
+/backup
