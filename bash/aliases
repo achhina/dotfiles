@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 if [[ "${BASH_SOURCE[0]}" -ef "$0" ]] || [[ $ZSH_EVAL_CONTEXT == toplevel ]];
 then
     echo "This file is meant to be sourced."
@@ -40,7 +40,7 @@ alias jdk="select_java_version"
 
 # exa - https://the.exa.website/
 if where exa &> /dev/null; then
-    function exa_lst {
+    exa_lst() {
         TREE_DEPTH="3"
         if [[ $1 =~ ^[0-9]+$ ]]; then
             TREE_DEPTH=$1
@@ -59,3 +59,5 @@ fi
 
 # shellcheck disable=SC2139 # I actually do want expand on define
 alias config="$XDG_CONFIG_HOME"
+
+alias c="clear"

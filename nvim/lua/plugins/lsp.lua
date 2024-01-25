@@ -69,7 +69,7 @@ return {
 			gopls = {},
 			pyright = {},
 			rust_analyzer = {},
-			-- tsserver = {},
+			tsserver = {},
 			lua_ls = {
 				Lua = {
 					workspace = { checkThirdParty = false },
@@ -89,6 +89,7 @@ return {
 					},
 				},
 			},
+			bashls = {},
 		}
 
 		-- Setup neovim lua configuration

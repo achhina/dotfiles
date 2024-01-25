@@ -1,13 +1,30 @@
-#!/bin/bash
+#!/bin/env bash
 if [[ "${BASH_SOURCE[0]}" -ef "$0" ]] || [[ $ZSH_EVAL_CONTEXT == toplevel ]];
 then
     echo "This file is meant to be sourced."
     exit 1
 fi
 
-. "${XDG_CONFIG_HOME:-~/.config}/bash/defaults"
+function prepend_to_path {
+    PATH_ENTRY="$1"
+    PATH="${PATH_ENTRY:+$PATH_ENTRY:}$PATH"
+}
 
-. "${XDG_CONFIG_HOME}/zsh/oh-my-zsh"
+function append_to_path {
+    PATH_ENTRY="$1"
+    PATH="$PATH${PATH_ENTRY:+:$PATH_ENTRY}"
+}
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/bash/defaults"
+
+HOME_DIR="${XDG_HOME:-$HOME}"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+. "${CONFIG_DIR}/zsh/oh-my-zsh"
 
 # Set aliases last to override oh-my-zsh defaults
-. "${XDG_CONFIG_HOME}/bash/aliases"
+. "${CONFIG_DIR}/bash/aliases"
+
+prepend_to_path "${HOME_DIR}/bin"
+
+export PATH

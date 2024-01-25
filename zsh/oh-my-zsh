@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 if [[ "${BASH_SOURCE[0]}" -ef "$0" ]] || [[ $ZSH_EVAL_CONTEXT == toplevel ]];
 then
     echo "This file is meant to be sourced."
