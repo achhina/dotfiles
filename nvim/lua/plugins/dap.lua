@@ -1,35 +1,11 @@
-vim.fn.sign_define("DapBreakpoint", { text = "ß", texthl = "", linehl = "", numhl = "" })
-vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl = "", numhl = "" })
-
 return {
 	-- debugger support
 	{
 		"mfussenegger/nvim-dap",
 		config = function()
-			local dap = require("dap")
-			local dapui = require("dapui")
-
-			local nmap = function(keys, func, desc)
-				if desc then
-					desc = "[D]AP: " .. desc
-				end
-				vim.keymap.set("n", keys, func, { silent = true, desc = desc })
-			end
-
-			nmap("<leader>ds", dap.step_into, "[S]tep into")
-			nmap("<leader>dS", dap.step_back, "[S]tep back")
-			nmap("<leader>dn", dap.step_over, "[N]ext | [S]tep Over")
-			nmap("<leader>dds", dap.step_out, "[D] [S]tep Out")
-			nmap("<leader>dc", dap.continue, "[C]ontinue")
-			nmap("<leader>dr", dap.repl.open, "[R]EPL Open")
-			nmap("<leader>db", dap.toggle_breakpoint, "Toggle [B]reakpoint")
-			nmap("<leader>dB", function()
-				dap.set_breakpoint(vim.fn.input("[DAP] Condition > "))
-			end, "Set [B]reakpoint")
-			nmap("<leader>de", dapui.eval, "[E]valuate")
-			nmap("<leader>dE", function()
-				dapui.eval(vim.fn.input("[DAP] Expression > "))
-			end, "[E]xpression")
+			require("config.keymaps").load_dap_keymaps()
+			vim.fn.sign_define("DapBreakpoint", { text = "ß", texthl = "", linehl = "", numhl = "" })
+			vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl = "", numhl = "" })
 		end,
 	},
 

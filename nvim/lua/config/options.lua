@@ -54,7 +54,7 @@ function M.load_options()
 	vim.wo.scrolloff = 999
 
 	-- Set vertical rulers
-	vim.opt.colorcolumn = "80,120"
+	vim.opt.colorcolumn = "80,88,120"
 end
 
 return M
