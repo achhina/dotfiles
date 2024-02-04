@@ -52,6 +52,9 @@ function M.load_options()
 
 	-- Keep text centred vertically
 	vim.wo.scrolloff = 999
+
+	-- Set vertical rulers
+	vim.opt.colorcolumn = "80,120"
 end
 
 return M
