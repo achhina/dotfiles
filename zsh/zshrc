@@ -5,6 +5,11 @@ then
     exit 1
 fi
 
+if [[ -n "$DEBUG_DOTFILES" ]]; then
+    set -xv
+    PS4='${0}:${LINENO}: '
+fi
+
 function source_dotfile {
     DOTFILE="$1"
     if [ -f "$DOTFILE" ]; then
@@ -37,3 +42,7 @@ source_dotfile "${CONFIG_DIR}/bash/aliases"
 prepend_to_path "${HOME_DIR}/bin"
 
 export PATH
+
+if [[ -n "$DEBUG_DOTFILES" ]]; then
+    set +xv
+fi
