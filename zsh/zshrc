@@ -5,6 +5,13 @@ then
     exit 1
 fi
 
+function source_dotfile {
+    DOTFILE="$1"
+    if [ -f "$DOTFILE" ]; then
+        . "$DOTFILE"
+    fi
+}
+
 function prepend_to_path {
     PATH_ENTRY="$1"
     PATH="${PATH_ENTRY:+$PATH_ENTRY:}$PATH"
@@ -15,15 +22,17 @@ function append_to_path {
     PATH="$PATH${PATH_ENTRY:+:$PATH_ENTRY}"
 }
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/bash/defaults"
+source_dotfile "${XDG_CONFIG_HOME:-$HOME/.config}/bash/defaults"
 
 HOME_DIR="${XDG_HOME:-$HOME}"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
-. "${CONFIG_DIR}/zsh/oh-my-zsh"
+source_dotfile "${CONFIG_DIR}/zsh/oh-my-zsh"
+
+source_dotfile "${CONFIG_DIR}/bash/secrets"
 
 # Set aliases last to override oh-my-zsh defaults
-. "${CONFIG_DIR}/bash/aliases"
+source_dotfile "${CONFIG_DIR}/bash/aliases"
 
 prepend_to_path "${HOME_DIR}/bin"
 
