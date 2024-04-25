@@ -10,6 +10,16 @@ fi
 alias v="nvim"
 alias vi="nvim"
 
+##### Git #####
+
+git_top_level() {
+    TOP_LEVEL=$(git rev-parse --show-toplevel) || return
+    if [ -d "$TOP_LEVEL" ]; then
+        cd "$TOP_LEVEL" || return
+    fi
+}
+alias gcd=git_top_level
+
 ##### Multiplexers #####
 
 alias t="tmux"
