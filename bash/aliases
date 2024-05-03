@@ -71,3 +71,14 @@ fi
 alias config="$XDG_CONFIG_HOME"
 
 alias c="clear"
+
+function man(){
+	MAN="/usr/bin/man"
+	if [ -n "$1" ]; then
+		$MAN "$@"
+		return $?
+	else
+		fd -t f . /usr/share/man/ | sed "s|.*\/||" | sed "s|\..*||" | fzf --reverse --preview="$MAN {}" | xargs $MAN
+		return $?
+	fi
+}
