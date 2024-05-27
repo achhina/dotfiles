@@ -1,7 +1,7 @@
 "
 " Theme
 "
-colourscheme --url  https://raw.githubusercontent.com/dracula/tridactyl/4c988ef06076566e86d2c1e0d6c825e8f8fdad60/dracula.css dracula
+colourscheme --url https://raw.githubusercontent.com/dracula/tridactyl/main/dracula.css dracula
 
 "
 " Binds
@@ -50,7 +50,6 @@ bind gR reader --tab
 
 " Sane hinting mode
 set hintfiltermode vimperator-reflow
-set hintnames numeric
 
 " Defaults to 300ms but I'm a 'move fast and close the wrong tabs' kinda chap
 set hintdelay 100
