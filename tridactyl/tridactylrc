@@ -47,6 +47,8 @@ bind gR reader --tab
 " Bind site specific hints
 bindurl discuss.python.org f hint -x .names>span>a,.trigger-user-card,.reply-to-tab>img,.button-count,.double-button,.topic-notifications-button,.topic-notifications-options,.back-button
 bindurl discuss.python.org F hint -x .names>span>a,.trigger-user-card,.reply-to-tab>img,.button-count,.double-button,.topic-notifications-button,.topic-notifications-options,.back-button
+bindurl www.reddition.com f hint -x div.contents>ul>li>a,div.contents>ul>li>form>button,div.sitetable>div,.arrow,ul.flat-list,ul.flat-list>li,ul.flat-list>:not(li[class="first"])>a,.state-button,.hide-button,.noCtrlF,.domain>a,.userTagLink,.title>a,.linkflairlabel>a,li,.account-activity-box>p>a,.sidebox>div>a,.premium-banner-outer,.premium-banner>button
+bindurl www.reddition.com F hint -x div.contents>ul>li>a,div.contents>ul>li>form>button,div.sitetable>div,.arrow,ul.flat-list,ul.flat-list>li,ul.flat-list>:not(li[class="first"])>a,.state-button,.hide-button,.noCtrlF,.domain>a,.userTagLink,.title>a,.linkflairlabel>a,li,.account-activity-box>p>a,.sidebox>div>a,.premium-banner-outer,.premium-banner>button
 
 "
 " Misc settings
