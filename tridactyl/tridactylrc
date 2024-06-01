@@ -65,8 +65,8 @@ set smoothscroll true
 set scrollduration 300
 
 " Set search engine keywords
-set searchurls gh https://www.github.com/%s
-set searchurls gr https://www.google.com/search?q=site%253Areddit.com+%s
+set searchurls.gh https://www.github.com/%s
+set searchurls.gr https://www.google.com/search?q=site%3Areddit.com+%s
 
 " Find settings
 bind / fillcmdline find
