@@ -18,6 +18,7 @@ outer.bottom = 5
 outer.top = 5
 outer.right = 5
 
+[mode.main.binding]
 alt-h = 'focus left'
 alt-j = 'focus down'
 alt-k = 'focus up'
