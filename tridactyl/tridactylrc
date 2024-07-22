@@ -1,3 +1,6 @@
+" Reset settings before loading config
+sanitise tridactyllocal
+
 "
 " Theme
 "
@@ -31,8 +34,9 @@ bindurl www.google.com F hint -Jbc #search a,#botstuff a
 " bindurl ^https://duckduckgo.com f hint -Jc [data-testid="result-title-a"]
 " bindurl ^https://duckduckgo.com F hint -Jbc [data-testid="result-title-a"]
 
-" Make `gi` on GitHub take you to the search box
+" Make `gi` on GitHub take you to the search/issue box
 bindurl ^https://github.com gi hint -Vc .AppHeader-searchButton
+bindurl ^https://github.com.*/issues$ gi hint -c input[id="js-issues-search"]
 
 " Allow Ctrl-a to select all in the commandline
 unbind --mode=ex <C-a>
@@ -67,6 +71,10 @@ set scrollduration 300
 " Set search engine keywords
 set searchurls.gh https://www.github.com/%s
 set searchurls.gr https://www.google.com/search?q=site%3Areddit.com+%s
+
+" Set sourcegraph queries
+set searchurls.repo https://sourcegraph.com/search?q=%s1:%5E.*blah.*%24+%s2&patternType=regexp&sm=0
+set searchurls.sg https://sourcegraph.com/search?q=%s&patternType=regexp&sm=0
 
 " Find settings
 bind / fillcmdline find
