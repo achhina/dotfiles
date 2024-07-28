@@ -70,7 +70,7 @@ set scrollduration 300
 
 " Set search engine keywords
 set searchurls.gh https://www.github.com/%s
-set searchurls.gr https://www.google.com/search?q=site%3Areddit.com+%s
+set searchurls.gr https://www.google.com/search?q=site:reddit.com+%s
 
 " Set sourcegraph queries
 set searchurls.repo https://sourcegraph.com/search?q=%s1:%5E.*blah.*%24+%s2&patternType=regexp&sm=0
