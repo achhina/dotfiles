@@ -38,6 +38,11 @@ bindurl www.google.com F hint -Jbc #search a,#botstuff a
 bindurl ^https://github.com gi hint -Vc .AppHeader-searchButton
 bindurl ^https://github.com.*/issues$ gi hint -c input[id="js-issues-search"]
 
+" Make `gi` on Sourcegraph take you to the search query editor.
+" This is still not perfect because it will take you to the beginning of the
+" query editor instead of the end.
+bindurl ^https://sourcegraph.com gi hint -c div[class="cm-line"]
+
 " Allow Ctrl-a to select all in the commandline
 unbind --mode=ex <C-a>
 
