@@ -89,3 +89,25 @@ r = ['flatten-workspace-tree', 'mode main'] # reset layout
 f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 enter = 'mode main'
 esc = 'mode main'
+
+# Application specific configs
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+check-further-callbacks = true
+run = ['move-node-to-workspace 4']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+check-further-callbacks = true
+run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.mail'
+check-further-callbacks = true
+run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-id = 'com.hnc.Discord'
+check-further-callbacks = true
+run = ['move-node-to-workspace 5']
