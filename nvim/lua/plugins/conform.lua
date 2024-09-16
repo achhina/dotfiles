@@ -3,7 +3,7 @@ return {
 	opts = {
 		lsp_fallback = true,
 		formatters_by_ft = {
-			lua = { "stylua", lsp_fallback = true },
+			lua = { "stylua" },
 			python = { "ruff_format", "ruff_fix", "ruff_organize_imports" },
 			rust = { "rustfmt" },
 			html = { "prettier" },
