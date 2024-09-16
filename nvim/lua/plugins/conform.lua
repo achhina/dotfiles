@@ -12,6 +12,5 @@ return {
 			jsx = { "prettier" },
 		},
 		notify_on_error = true,
-		log_level = vim.log.levels.DEBUG,
 	},
 }
