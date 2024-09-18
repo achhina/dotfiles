@@ -66,20 +66,11 @@ function M.load_dap_keymaps()
 		vim.keymap.set("n", keys, func, { silent = true, desc = desc })
 	end
 
-	-- We want to reload the launch.json everytime we start our debugger.
-	-- [TODO] Use path relative to workspace of current LSP client.
-	local continue = function()
-		if vim.fn.filereadable(".vscode/launch.json") then
-			dap.ext.vscode.load_launchjs()
-		end
-		return dap.continue
-	end
-
 	nmap("<leader>ds", dap.step_into, "[S]tep into")
 	nmap("<leader>dS", dap.step_back, "[S]tep back")
 	nmap("<leader>dn", dap.step_over, "[N]ext | [S]tep Over")
 	nmap("<leader>dds", dap.step_out, "[D] [S]tep Out")
-	nmap("<leader>dc", continue, "[C]ontinue")
+	nmap("<leader>dc", dap.continue, "[C]ontinue")
 	nmap("<leader>dr", dap.repl.open, "[R]EPL Open")
 	nmap("<leader>db", dap.toggle_breakpoint, "Toggle [B]reakpoint")
 	nmap("<leader>dB", function()

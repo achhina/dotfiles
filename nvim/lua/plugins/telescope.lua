@@ -34,7 +34,7 @@ return {
 			-- See `:help telescope.builtin`
 			vim.keymap.set(
 				"n",
-				"<leader>?",
+				"<leader>fr",
 				require("telescope.builtin").oldfiles,
 				{ desc = "[?] Find recently opened files" }
 			)
