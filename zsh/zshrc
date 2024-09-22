@@ -41,6 +41,11 @@ source_dotfile "${CONFIG_DIR}/bash/aliases"
 
 prepend_to_path "${HOME_DIR}/bin"
 
+# Function to map `$ <command>` to just `command`. Useful for copying single
+# line commands prefixed with '$'.
+# https://github.com/orgs/community/discussions/35615#discussioncomment-10491333
+function \$ { "$@"; }
+
 export PATH
 
 if [[ -n "$DEBUG_DOTFILES" ]]; then
