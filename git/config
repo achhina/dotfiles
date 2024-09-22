@@ -1,0 +1,31 @@
+[include]
+	path = ~/.config/secrets/git/config
+[pull]
+	rebase = false
+[core]
+	excludesfile = ~/.gitignore
+	; This is to have better interop between Mac & other OSs. Mac performs
+	; unicode decomposition (NFD) when handling unicode filenames. Where as in
+	; other OSs output is based on the input, and input is usually NFC. This
+	; issue can manifest in re-adding an existing file in git and not having
+	; this shown in any diff tools. This came to my attention after running
+	; into an issue installing copier via nix, where it's speculated that a
+	; file added from a linux distribution was re-added in Mac because of the
+	; difference between NFC/NFD output.
+	;
+	; Issue with recommended config settings:
+	; https://github.com/copier-org/copier/issues/1595
+	;
+	; Unicode composition notes from SVN that provide broader context
+	; https://svn.apache.org/viewvc/subversion/trunk/notes/unicode-composition-for-filenames?view=markup
+	;
+	; git-config documentation:
+	; https://git-scm.com/docs/git-config#Documentation/git-config.txt-coreprecomposeUnicode
+	; https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+	precomposeunicode = true
+	quotePath = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
