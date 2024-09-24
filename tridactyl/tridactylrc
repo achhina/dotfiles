@@ -21,13 +21,13 @@ bindurl www.google.com f hint -Jc #search a,#botstuff a,[role="listitem"]>[role=
 bindurl www.google.com F hint -Jbc #search a,#botstuff a,[role="listitem"]>[role="link"],[data-q] [role="button"]
 
 " Make `gi` on GitHub take you to the search/issue box
-bindurl ^https://github.com gi hint -Vc .AppHeader-searchButton
-bindurl ^https://github.com.*/issues$ gi hint -c input[id="js-issues-search"]
+bindurl ^https://github\..*com.*/issues(\?.*)?$ gi hint -Vc input[id="js-issues-search"]
 
 " Make `gi` on Sourcegraph take you to the search query editor.
 " This is still not perfect because it will take you to the beginning of the
 " query editor instead of the end.
-bindurl ^https://sourcegraph.com gi hint -c div[class="cm-line"]
+bindurl ^https://sourcegraph\..*com gi hint -c div[class="cm-line"]
+bindurl ^https://sourcegraph\..*com / hint -Vc .cm-sg-search-input input[type="search"]
 
 " Allow Ctrl-a to select all in the commandline
 unbind --mode=ex <C-a>
@@ -72,9 +72,11 @@ set searchurls.gr https://www.google.com/search?q=site:reddit.com+%s
 " Set sourcegraph queries
 set searchurls.repo https://sourcegraph.com/search?q=%s1:%5E.*blah.*%24+%s2&patternType=regexp&sm=0
 set searchurls.sg https://sourcegraph.com/search?q=%s&patternType=regexp&sm=0
+set searchurls.repo https://sourcegraph.com/search?q=context:global+repo:%5E.*%s1.*%24+%s2&patternType=regexp&sm=0
 
 " Unset defaults
 unset searchurls.github
+unset searchurls.google
 
 " Find settings
 bind / fillcmdline find
