@@ -26,6 +26,17 @@
 	quotePath = false
 	; https://github.com/dandavison/delta
 	pager = delta
+[alias]
+	cm = commit --message
+	root = rev-parse --show-toplevel
+	amend = commit --amend --no-edit
+	unstage = reset HEAD --
+	undo = reset --soft HEAD^
+        whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+	pip = shortlog --summary --email --numbered --regexp-ignore-case --extended-regexp
+        aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
+	diffstat = diff --stat -r
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
