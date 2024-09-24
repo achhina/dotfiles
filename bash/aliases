@@ -75,11 +75,12 @@ alias c="clear"
 
 function man(){
 	MAN="/usr/bin/man"
+	MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$XDG_HOME/.nix-profile/share/man")
 	if [ -n "$1" ]; then
 		$MAN "$@"
 		return $?
 	else
-		fd -t f . /usr/share/man/ | sed "s|.*\/||" | sed "s|\..*||" | fzf --reverse --preview="$MAN {}" | xargs $MAN
+		fd -tf -tl . "${MANPATHS[@]}" | sed "s|.*\/||" | sed "s|\..*||" | fzf --reverse --preview="$MAN {}" | xargs $MAN
 		return $?
 	fi
 }
