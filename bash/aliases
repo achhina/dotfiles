@@ -48,9 +48,8 @@ alias jdk="select_java_version"
 
 ##### Shell Utils #####
 
-# exa - https://the.exa.website/
-if where exa &> /dev/null; then
-    exa_lst() {
+if where eza &> /dev/null; then
+    eza_lst() {
         TREE_DEPTH="3"
         if [[ $1 =~ ^[0-9]+$ ]]; then
             TREE_DEPTH=$1
@@ -60,9 +59,11 @@ if where exa &> /dev/null; then
         exa --tree --all --level "$TREE_DEPTH" "$@"
     }
 
-    alias l="exa"
-    alias ll="exa --header --all --long --git"
-    alias lt="exa_lst"
+    export EZA_COLORS="gm=33:ga=31"
+
+    alias l="eza"
+    alias ll="eza --header --all --long --git --color=always --icons=auto"
+    alias lt="eza_lst"
 fi
 
 ##### Custom #####
