@@ -21,13 +21,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Load plugins
-require("lazy").setup({
-	spec = {
-		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
-		{ import = "lazyvim.plugins.extras.test.core" },
-		{ import = "plugins" },
-	},
-})
+require("lazy").setup("plugins", {})
 
 -- Load options, keymaps, autocmds
 require("config")
