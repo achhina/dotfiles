@@ -23,7 +23,7 @@ return {
 			gopls = {},
 			pyright = {},
 			rust_analyzer = {},
-			tsserver = {},
+			ts_ls = {},
 			lua_ls = {
 				Lua = {
 					workspace = { checkThirdParty = false },
