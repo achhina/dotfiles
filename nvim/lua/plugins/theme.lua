@@ -4,7 +4,7 @@ local themes = {
 		lazy = false,
 		priority = 1000,
 		config = function()
-			vim.cmd.colorscheme("rose-pine")
+			vim.cmd.colorscheme("rose-pine-main")
 		end,
 	},
 
@@ -16,6 +16,15 @@ local themes = {
 			vim.cmd.colorscheme("night-owl")
 		end,
 	},
+
+	tokyo_dark = {
+		"tiagovla/tokyodark.nvim",
+		lazy = false,
+		priority = 1000,
+		config = function()
+			vim.cmd.colorscheme("tokyodark")
+		end,
+	},
 }
 
-return themes.night_owl
+return themes.tokyo_dark
