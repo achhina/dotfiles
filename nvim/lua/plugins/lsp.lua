@@ -26,12 +26,18 @@ return {
 			ts_ls = {},
 			lua_ls = {
 				Lua = {
-					workspace = { checkThirdParty = false },
+					workspace = {
+						checkThirdParty = false,
+						-- Make the server aware of Neovim runtime files
+						library = vim.api.nvim_get_runtime_file("", true),
+					},
 					telemetry = { enable = false },
 					diagnostic = {
 						neededFileStatus = {
 							codestyle_check = "any",
 						},
+						-- Get the language server to recognize the `vim` global
+						globals = { "vim" },
 					},
 					format = {
 						enable = true,
