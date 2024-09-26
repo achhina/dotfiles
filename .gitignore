@@ -12,3 +12,6 @@ tmux/plugins/**
 
 # Secrets
 **secret**
+
+# Artifacts
+zsh/zsh-autocomplete
