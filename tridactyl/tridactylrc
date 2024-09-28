@@ -1,3 +1,11 @@
+" Because of storage race conditions you should not wipe from within your rc
+" file, and instead run `:sanitise tridactylsyncsanitise tridactyllocal`
+" separately.
+"
+" Relevant comments/issues:
+" https://github.com/tridactyl/tridactyl/issues/1542#issuecomment-491316808
+" https://github.com/tridactyl/tridactyl/issues/4579#issuecomment-1412645295
+
 "
 " Theme
 "
