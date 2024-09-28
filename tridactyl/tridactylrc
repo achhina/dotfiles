@@ -14,6 +14,8 @@ colourscheme --url https://raw.githubusercontent.com/dracula/tridactyl/main/drac
 "
 " Binds
 "
+" Note: Regex flavor is ECMA (JavaScript)
+" https://www.regular-expressions.info/javascript.html
 
 " Git{Hub,Lab} git clone via SSH yank
 bind yg composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
@@ -75,6 +77,7 @@ set scrollduration 300
 
 " Set search engine keywords
 set searchurls.gh https://www.github.com/%s
+set searchurls.ghi https://www.github.com/%s/issues
 set searchurls.gr https://www.google.com/search?q=site:reddit.com+%s
 
 " Set sourcegraph queries
