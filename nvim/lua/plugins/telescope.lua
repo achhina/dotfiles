@@ -80,7 +80,7 @@ return {
 			)
 			vim.keymap.set("n", "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" })
 			vim.keymap.set("n", "<leader>sG", function()
-				require("telescope.builtin").live_grep({ cwd = require("telescope.tutils").buffer_dir() })
+				require("telescope.builtin").live_grep({ cwd = require("telescope.utils").buffer_dir() })
 			end, { desc = "[S]earch by [G]rep from buffer cwd" })
 			vim.keymap.set(
 				"n",
