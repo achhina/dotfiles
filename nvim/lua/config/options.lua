@@ -55,6 +55,9 @@ function M.load_options()
 
 	-- Set vertical rulers
 	vim.opt.colorcolumn = "80,88,120"
+
+	-- What things to save for vim sessions
+	vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 end
 
 return M
