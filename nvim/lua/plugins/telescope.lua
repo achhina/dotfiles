@@ -54,15 +54,23 @@ return {
 
 			vim.keymap.set("n", "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" })
 			vim.keymap.set("n", "<leader>sf", function()
-				require("telescope.builtin").find_files({ hidden = true, no_ignore = true })
+				require("telescope.builtin").find_files()
 			end, { desc = "[S]earch [F]iles" })
+			vim.keymap.set("n", "<leader>Sf", function()
+				require("telescope.builtin").find_files({ hidden = true, no_ignore = true })
+			end, { desc = "[S]earch [F]iles including hidden & ignored" })
 			vim.keymap.set("n", "<leader>sF", function()
+				require("telescope.builtin").find_files({
+					cwd = require("telescope.utils").buffer_dir(),
+				})
+			end, { desc = "[S]earch [F]iles from buffer cwd" })
+			vim.keymap.set("n", "<leader>SF", function()
 				require("telescope.builtin").find_files({
 					cwd = require("telescope.utils").buffer_dir(),
 					hidden = true,
 					no_ignore = true,
 				})
-			end, { desc = "[S]earch [F]iles from buffer cwd" })
+			end, { desc = "[S]earch [F]iles from buffer cwd including hidden & ignored" })
 			vim.keymap.set("n", "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" })
 			vim.keymap.set(
 				"n",
