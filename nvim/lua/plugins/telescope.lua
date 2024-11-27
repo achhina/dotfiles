@@ -100,7 +100,7 @@ return {
 				"n",
 				"<leader>ss",
 				require("telescope.builtin").spell_suggest,
-				{ desc = "[S]pell Suggestions" }
+				{ desc = "[S]pell [S]uggestions" }
 			)
 		end,
 	},
