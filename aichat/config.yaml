@@ -1,0 +1,9 @@
+# Example config:
+# https://github.com/sigoden/aichat/blob/main/config.example.yaml
+
+# https://github.com/sigoden/aichat/issues/805
+save_session: true
+save: true
+model: openai
+clients:
+  - type: openai

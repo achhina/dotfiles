@@ -4,6 +4,9 @@
 **/log/*
 **/logs/*
 
+# aichat
+aichat/sessions/**
+
 # tmux
 tmux/plugins/**
 
