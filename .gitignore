@@ -11,6 +11,9 @@ aichat/sessions/**
 ipython/**
 !ipython/profile_default/ipython_config.py
 
+# htop - meh not married to any settings
+htop/**
+
 # tmux
 tmux/plugins/**
 
