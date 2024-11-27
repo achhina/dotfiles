@@ -19,12 +19,17 @@ return {
 	opts = {
 		-- Define your formatters
 		formatters_by_ft = {
-
-			python = {
-				"ruff_format",
-				"ruff_fix",
-				"ruff_organize_imports",
-			},
+			python = function(bufnr)
+				if require("conform").get_formatter_info("ruff_format", bufnr).available then
+					return {
+						"ruff_format",
+						"ruff_fix",
+						"ruff_organize_imports",
+					}
+				else
+					return { "isort", "black" }
+				end
+			end,
 			rust = {
 				format_after_save = nil,
 			},
@@ -40,10 +45,13 @@ return {
 			jsx = {
 				"prettier",
 			},
+			tsx = {
+				"prettier",
+			},
 		},
 		-- Set default options
 		default_format_opts = {
-			lsp_format = "fallback",
+			lsp_format = "never",
 			format_on_save = false,
 			format_after_save = false,
 		},
