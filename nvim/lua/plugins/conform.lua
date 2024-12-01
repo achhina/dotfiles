@@ -39,13 +39,16 @@ return {
 			css = {
 				"prettier",
 			},
-			js = {
+			javascript = {
 				"prettier",
 			},
-			jsx = {
+			typescript = {
 				"prettier",
 			},
-			tsx = {
+			javascriptreact = {
+				"prettier",
+			},
+			typescriptreact = {
 				"prettier",
 			},
 		},
