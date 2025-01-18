@@ -6,6 +6,7 @@
 
 # aichat
 aichat/sessions/**
+aichat/messages.md
 
 # ipython
 ipython/**
