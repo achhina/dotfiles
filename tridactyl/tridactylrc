@@ -31,7 +31,7 @@ bindurl www.google.com f hint -Jc #search a,#botstuff a,[role="listitem"]>[role=
 bindurl www.google.com F hint -Jbc #search a,#botstuff a,[role="listitem"]>[role="link"],[data-q] [role="button"]
 
 " Make `gi` on GitHub take you to the search/issue box
-bindurl ^https://github\..*com.*/issues(\?.*)?$ gi hint -Vc input[id="js-issues-search"]
+bindurl ^https://github\..*com.*/issues(\?.*)?$ gi hint -Vc input[id="repository-input"]
 
 " Make `gi` on Sourcegraph take you to the search query editor.
 " This is still not perfect because it will take you to the beginning of the
