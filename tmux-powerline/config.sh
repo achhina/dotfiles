@@ -110,7 +110,7 @@
 
 	## Maildir
 	# Path to the maildir to check.
-	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILDIR_INBOX="/Users/aman/.mail/inbox/new"
+	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILDIR_INBOX="/Users/achhina/.mail/inbox/new"
 
 	## mbox
 	# Path to the mbox to check.
@@ -118,7 +118,7 @@
 
 	## mailcheck
 	# Optional path to mailcheckrc
-	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC="/Users/aman/.mailcheckrc"
+	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC="/Users/achhina/.mailcheckrc"
 # }
 
 # now_playing.sh {
