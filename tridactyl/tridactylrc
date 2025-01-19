@@ -62,7 +62,7 @@ bindurl discuss.python.org F hint -x .names>span>a,.trigger-user-card,.reply-to-
 bindurl old.reddit.com f hint -x div.contents>ul>li>a,div.contents>ul>li>form>button,div.sitetable>div,.arrow,ul.flat-list,ul.flat-list>li,ul.flat-list>:not(li[class="first"])>a,.state-button,.hide-button,.noCtrlF,.domain>a,.userTagLink,.title>a,.linkflairlabel>a,li,.account-activity-box>p>a,.sidebox>div>a,.premium-banner-outer,.premium-banner>button
 bindurl old.reddit.com F hint -x div.contents>ul>li>a,div.contents>ul>li>form>button,div.sitetable>div,.arrow,ul.flat-list,ul.flat-list>li,ul.flat-list>:not(li[class="first"])>a,.state-button,.hide-button,.noCtrlF,.domain>a,.userTagLink,.title>a,.linkflairlabel>a,li,.account-activity-box>p>a,.sidebox>div>a,.premium-banner-outer,.premium-banner>button
 " hint comments
-bind ;c composite hint -Jc a[class="expand"] | unfocus; hint -c div[class="commentarea"]
+bind ;c composite hint -Jc a[class="expand"] | unfocus; hint -Jc div[class="commentarea"]
 
 "
 " Misc settings
