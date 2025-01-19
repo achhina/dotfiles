@@ -34,7 +34,7 @@ bindurl www.google.com F hint -Jbc #search a,#botstuff a,[role="listitem"]>[role
 bindurl ^https://github\..*com.*/issues(\?.*)?$ gi hint -Vc input[id="repository-input"]
 
 " Make `gi` on DDG take you to the search input
-bindurl www\.duckduckgo\.com\/.* gi hint -Jc input[id="search_form_input"]
+bindurl ^(https?://)?(www\.)?duckduckgo\.com\/.* gi hint -Jc input[id="search_form_input"]
 
 " Make `gi` on Sourcegraph take you to the search query editor.
 " This is still not perfect because it will take you to the beginning of the
