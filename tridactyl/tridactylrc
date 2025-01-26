@@ -29,6 +29,8 @@ bindurl reddit.com gu urlparent 4
 " Only hint search results on Google and DDG
 bindurl www.google.com f hint -Jc #search a,#botstuff a,[role="listitem"]>[role="link"],[data-q] [role="button"]
 bindurl www.google.com F hint -Jbc #search a,#botstuff a,[role="listitem"]>[role="link"],[data-q] [role="button"]
+bindurl ^(https?://)?(www\.)?duckduckgo\.com\/.* f hint -Jc li
+bindurl ^(https?://)?(www\.)?duckduckgo\.com\/.* F hint -Jc li
 
 " Make `gi` on GitHub take you to the search/issue box
 bindurl ^https://github\..*com.*/issues(\?.*)?$ gi hint -Vc input[id="repository-input"]
