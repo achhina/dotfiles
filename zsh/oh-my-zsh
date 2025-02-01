@@ -13,6 +13,7 @@ plugins=(
 	git
 	zsh-syntax-highlighting
 	zsh-autosuggestions
+	fzf-tab
 )
 
 OH_MY_ZSH="${ZSH}/oh-my-zsh.sh"
