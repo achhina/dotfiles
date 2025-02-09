@@ -147,3 +147,10 @@ run = ['move-node-to-workspace 10']
 if.app-id = 'net.whatsapp.WhatsApp'
 check-further-callbacks = true
 run = ['move-node-to-workspace 10']
+
+# Set layout to floating for Firefox picture-in-picture
+# https://github.com/nikitabobko/AeroSpace/issues/246#issuecomment-2182361297
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+if.window-title-regex-substring = 'Picture-in-Picture'
+run = 'layout floating'
