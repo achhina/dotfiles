@@ -14,4 +14,7 @@ return {
 		{ "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
 		{ "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
 	},
+	config = function()
+		vim.g.tmux_navigator_disable_when_zoomed = 1
+	end,
 }
