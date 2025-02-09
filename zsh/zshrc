@@ -36,6 +36,9 @@ source_dotfile "${CONFIG_DIR}/zsh/oh-my-zsh"
 
 source_dotfile "${CONFIG_DIR}/bash/secrets"
 
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
 # Set aliases last to override oh-my-zsh defaults
 source_dotfile "${CONFIG_DIR}/bash/aliases"
 
