@@ -110,5 +110,10 @@ bind ,<Space> nohlsearch
 " New reddit is bad
 autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
 
+" Remove hinting styles - they remove background images from websites for me
+set hintstyles.bg none
+set hintstyles.fg none
+set hintstyles.outline none
+
 " For syntax highlighting see https://github.com/tridactyl/vim-tridactyl
 " vim: set filetype=tridactyl
