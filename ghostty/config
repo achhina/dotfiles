@@ -1,2 +1,5 @@
 theme = catppuccin-mocha
 font-family = Fira Code
+
+# MacOS settings
+macos-titlebar-style = hidden
