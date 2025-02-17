@@ -3,3 +3,4 @@ font-family = Fira Code
 
 # MacOS settings
 macos-titlebar-style = hidden
+macos-icon = chalkboard
