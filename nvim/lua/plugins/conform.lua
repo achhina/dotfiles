@@ -19,6 +19,7 @@ return {
 	opts = {
 		-- Define your formatters
 		formatters_by_ft = {
+			lua = { "StyLua" },
 			python = function(bufnr)
 				if require("conform").get_formatter_info("ruff_format", bufnr).available then
 					return {
@@ -31,7 +32,7 @@ return {
 				end
 			end,
 			rust = {
-				format_after_save = nil,
+				"rustfmt",
 			},
 			html = {
 				"prettier",
@@ -54,7 +55,7 @@ return {
 		},
 		-- Set default options
 		default_format_opts = {
-			lsp_format = "never",
+			lsp_format = "fallback",
 			format_on_save = false,
 			format_after_save = false,
 		},
