@@ -23,6 +23,9 @@ return {
 		scroll = { enabled = false },
 		statuscolumn = { enabled = false },
 		words = { enabled = false },
+		image = {
+			enabled = true,
+		},
 	},
 	keys = {
 		-- zen
@@ -41,14 +44,13 @@ return {
 			desc = "Toggle Zoom",
 		},
 	},
-	config = function()
-		local opts = {
-			dashboard = {
-				preset = {
-					header = table.concat(require("ascii.art").misc.krakens.sleekraken, "\n"),
-				},
+	config = function(_, opts)
+		opts.dashboard = {
+			preset = {
+				header = table.concat(require("ascii.art").misc.krakens.sleekraken, "\n"),
 			},
 		}
+		vim.api.nvim_create_user_command("Dashboard", Snacks.dashboard.open, {})
 		Snacks.setup(opts)
 	end,
 }
