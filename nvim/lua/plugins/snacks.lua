@@ -1,3 +1,4 @@
+-- luacheck: globals Snacks
 return {
 	"folke/snacks.nvim",
 	dependencies = {
@@ -23,6 +24,23 @@ return {
 		statuscolumn = { enabled = false },
 		words = { enabled = false },
 	},
+	keys = {
+		-- zen
+		{
+			"<leader>z",
+			function()
+				Snacks.zen()
+			end,
+			desc = "Toggle Zen Mode",
+		},
+		{
+			"<leader>Z",
+			function()
+				Snacks.zen.zoom()
+			end,
+			desc = "Toggle Zoom",
+		},
+	},
 	config = function()
 		local opts = {
 			dashboard = {
@@ -31,6 +49,6 @@ return {
 				},
 			},
 		}
-		require("snacks").setup(opts)
+		Snacks.setup(opts)
 	end,
 }
