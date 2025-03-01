@@ -4,6 +4,6 @@
 # https://github.com/sigoden/aichat/issues/805
 save_session: true
 save: true
-model: openai
+model: openai:gpt-4o-mini
 clients:
   - type: openai
