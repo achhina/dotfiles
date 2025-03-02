@@ -23,7 +23,7 @@ alias gcd=git_top_level
 ##### Multiplexers #####
 
 alias t="tmux"
-alias ta="tmux attach"
+alias ta="tmux attach || tmux new-session"
 
 ##### Python #####
 
