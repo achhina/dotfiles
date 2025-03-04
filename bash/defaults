@@ -11,7 +11,6 @@ export EDITOR="${VISUAL}"
 
 # Set XDG Based Directories
 export XDG_HOME="${HOME}"
-export XDG_CACHE_HOME="${XDG_HOME}/.cache"
 export XDG_CONFIG_HOME="${XDG_HOME}/.config"
 export XDG_STATE_HOME="${XDG_HOME}/.local/state"
 export XDG_CACHE_HOME="${XDG_HOME}/.cache"
