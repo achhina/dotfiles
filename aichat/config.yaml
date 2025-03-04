@@ -4,6 +4,9 @@
 # https://github.com/sigoden/aichat/issues/805
 save_session: true
 save: true
-model: openai:gpt-4o-mini
+model: claude:claude-3-5-sonnet-latest
 clients:
   - type: openai
+    api_base: https://api.openai.com/v1
+  - type: claude
+    api_base: https://api.anthropic.com/v1
