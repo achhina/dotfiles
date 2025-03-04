@@ -19,3 +19,9 @@ export XDG_DATA_HOME="${XDG_HOME}/.local/share"
 # Set other app directories
 export IPYTHONDIR=${XDG_CONFIG_HOME:-$HOME/.config}/ipython
 export JUPYTER_CONFIG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/jupyter
+
+# Use home-manager
+HOME_MANAGER_VARS="$XDG_HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+if [[ -n $HOME_MANAGER_VARS ]]; then
+    . "$HOME_MANAGER_VARS"
+fi
