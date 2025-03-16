@@ -4,7 +4,7 @@
 # https://github.com/sigoden/aichat/issues/805
 save_session: true
 save: true
-model: openrouter:claude-3-5-sonnet
+model: openrouter:anthropic/claude-3.5-sonnet
 clients:
   - type: openai-compatible
     name: openrouter
