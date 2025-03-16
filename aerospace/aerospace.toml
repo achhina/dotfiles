@@ -2,7 +2,7 @@ after-login-command = []
 after-startup-command = [
     # JankyBorders has a built-in detection of already running process,
     # so it won't be run twice on AeroSpace restart
-    'exec-and-forget /usr/local/opt/borders/bin/borders'
+    'exec-and-forget /Users/achhina/.nix-profile/bin/borders'
 ]
 start-at-login = true
 
