@@ -49,6 +49,7 @@ alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
 
 # Turn off hide application shortcut
 cmd-h = []
+cmd-alt-h = [] # Disable "hide others"
 
 # Not supported, because this command is redundant in AeroSpace mental model.
 # See: https://nikitabobko.github.io/AeroSpace/guide#floating-windows
