@@ -8,6 +8,9 @@ start-at-login = true
 
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
+default-root-container-layout = 'accordion'
+default-root-container-orientation = 'horizontal'
+
 # Set same as one used in JankyBorders
 [gaps]
 inner.horizontal = 5
