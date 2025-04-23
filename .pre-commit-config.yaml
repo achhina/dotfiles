@@ -1,12 +1,12 @@
 repos:
   - repo: 'https://github.com/pre-commit/pre-commit-hooks'
-    rev: v2.3.0
+    rev: v5.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: 'https://github.com/astral-sh/ruff-pre-commit'
-    rev: v0.1.13
+    rev: v0.11.6
     hooks:
       - id: ruff
         args:
@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: shellcheck
   - repo: 'https://github.com/lunarmodules/luacheck'
-    rev: v1.1.2
+    rev: v1.2.0
     hooks:
       - id: luacheck
         args:
@@ -25,15 +25,15 @@ repos:
           - 'vim'
           - '--'
   - repo: 'https://github.com/JohnnyMorganz/StyLua'
-    rev: v0.19.1
+    rev: v2.1.0
     hooks:
       - id: stylua
   - repo: 'https://github.com/google/yamlfmt'
-    rev: v0.10.0
+    rev: v0.16.0
     hooks:
       - id: yamlfmt
   - repo: 'https://github.com/gitleaks/gitleaks'
-    rev: v8.16.1
+    rev: v8.19.3
     hooks:
       - id: gitleaks
   - repo: 'https://github.com/mrtazz/checkmake.git'
