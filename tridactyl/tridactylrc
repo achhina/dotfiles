@@ -9,7 +9,7 @@
 "
 " Theme
 "
-colourscheme --url https://raw.githubusercontent.com/dracula/tridactyl/main/dracula.css dracula
+colours midnight
 
 "
 " Binds
