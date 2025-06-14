@@ -47,7 +47,7 @@ alt-f = 'fullscreen'
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
 
-alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
+alt-shift-space = 'layout floating accordion' # 'floating toggle' in i3
 
 # Turn off hide application shortcut
 cmd-h = []
