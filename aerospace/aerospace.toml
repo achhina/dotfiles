@@ -116,17 +116,7 @@ check-further-callbacks = true
 run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
-if.app-id = 'com.mitchellh.ghostty'
-check-further-callbacks = true
-run = ['move-node-to-workspace 2']
-
-[[on-window-detected]]
-if.app-id = 'com.apple.iCal'
-check-further-callbacks = true
-run = ['move-node-to-workspace 3']
-
-[[on-window-detected]]
-if.app-id = 'com.apple.mail'
+if.app-name-regex-substring = 'ical|mail'
 check-further-callbacks = true
 run = ['move-node-to-workspace 3']
 
@@ -141,21 +131,6 @@ check-further-callbacks = true
 run = ['move-node-to-workspace 9']
 
 [[on-window-detected]]
-if.app-id = 'com.hnc.Discord'
-check-further-callbacks = true
-run = ['move-node-to-workspace 10']
-
-[[on-window-detected]]
-if.app-id = 'com.apple.MobileSMS'
-check-further-callbacks = true
-run = ['move-node-to-workspace 10']
-
-[[on-window-detected]]
-if.app-id = 'net.whatsapp.WhatsApp'
-check-further-callbacks = true
-run = ['move-node-to-workspace 10']
-
-[[on-window-detected]]
-if.app-id = 'com.automattic.beeper.desktop'
+if.app-name-regex-substring = 'messages|whatsapp|beeper|discord'
 check-further-callbacks = true
 run = ['move-node-to-workspace 10']
