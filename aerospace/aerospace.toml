@@ -122,7 +122,8 @@ check-further-callbacks = true
 run = ['move-node-to-workspace 3']
 
 [[on-window-detected]]
-if.app-id = 'com.spotify.client'
+if.app-id = 'si.filips.firefoxpwa.runtime'
+if.app-name-regex-substring = 'spotify'
 check-further-callbacks = true
 run = ['move-node-to-workspace 4']
 
