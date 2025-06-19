@@ -1,10 +1,16 @@
 { config, pkgs, ... }:
 
+let
+  # System detection
+  isDarwin = pkgs.stdenv.isDarwin;
+  isLinux = pkgs.stdenv.isLinux;
+in
+
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "achhina";
-  home.homeDirectory = "/Users/achhina";
+  home.homeDirectory = if isDarwin then "/Users/achhina" else "/home/achhina";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -18,7 +24,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    aerospace
+    # Cross-platform packages
     aichat
     bash-language-server
     bat
@@ -28,17 +34,12 @@
     dust
     eza
     fd
-    # firefoxpwa # not available in platform
     fzf
-    # ghostty # marked broken for macos darwin at least
     git
     git-lfs
     github-cli
     htop
-    iterm2
-    jankyborders
     jq
-    keycastr
     lua
     luaPackages.luacheck
     luaPackages.luarocks
@@ -55,7 +56,6 @@
     ripgrep
     stylua
     starship
-    # sublime # not available in platform
     tectonic
     tldr
     tmux
@@ -64,6 +64,16 @@
     uv
     wget
     yarn
+  ] ++ pkgs.lib.optionals isDarwin [
+    # macOS-specific packages
+    aerospace
+    iterm2
+    jankyborders
+    keycastr
+  ] ++ pkgs.lib.optionals isLinux [
+    # Linux-specific packages
+    firefox
+    alacritty
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -98,7 +108,7 @@
   programs.home-manager.enable = true;
 
 
-  programs.ghostty = {
+  programs.ghostty = pkgs.lib.mkIf isDarwin {
     enable = false;
 
     settings = {
@@ -121,7 +131,7 @@
 
 
 
-  programs.aerospace = {
+  programs.aerospace = pkgs.lib.mkIf isDarwin {
     enable = false;
 
     userSettings = {
