@@ -86,6 +86,7 @@ return {
 
 		mason_lspconfig.setup({
 			ensure_installed = mason_servers,
+			automatic_installation = true,
 		})
 
 		mason_lspconfig.setup_handlers({
