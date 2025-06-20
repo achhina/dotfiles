@@ -17,8 +17,8 @@ return {
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 		end
 
-		-- Enable the following language servers
-		local servers = {
+		-- Mason-managed servers
+		local mason_servers = {
 			clangd = {},
 			gopls = {},
 			pyright = {
@@ -71,22 +71,18 @@ return {
 				},
 			},
 			bashls = {},
-			nil_ls = {},
 		}
 
 		-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-		-- Ensure the servers above are installed (exclude nil_ls as it's installed via Nix)
+		-- Setup Mason-managed servers
 		local mason_lspconfig = require("mason-lspconfig")
-		local mason_servers = vim.tbl_filter(function(key)
-			return key ~= "nil_ls"
-		end, vim.tbl_keys(servers))
 
 		mason_lspconfig.setup({
-			ensure_installed = mason_servers,
-			automatic_installation = true,
+			ensure_installed = vim.tbl_keys(mason_servers),
+			automatic_installation = false, -- Disable to prevent unwanted auto-installs
 		})
 
 		mason_lspconfig.setup_handlers({
@@ -94,12 +90,12 @@ return {
 				require("lspconfig")[server_name].setup({
 					capabilities = capabilities,
 					on_attach = on_attach,
-					settings = servers[server_name],
+					settings = mason_servers[server_name],
 				})
 			end,
 		})
 
-		-- Setup nil_ls separately (installed via Nix)
+		-- Setup nil_ls separately (installed via Nix, not managed by Mason)
 		require("lspconfig").nil_ls.setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
