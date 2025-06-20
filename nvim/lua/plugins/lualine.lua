@@ -2,16 +2,36 @@ return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
+		-- Cache for better performance
+		local lsp_clients_cache = {}
+		local cache_time = 0
+
 		local function lsp_clients()
+			local current_time = vim.fn.localtime()
+			if current_time - cache_time < 1 then -- Cache for 1 second
+				return lsp_clients_cache.result or ""
+			end
+
 			local clients = vim.lsp.get_clients({ bufnr = 0 })
 			if #clients == 0 then
-				return ""
+				lsp_clients_cache.result = ""
+			else
+				-- Only show first 2 clients to avoid clutter
+				local client_names = {}
+				for i, client in ipairs(clients) do
+					if i <= 2 then
+						table.insert(client_names, client.name)
+					end
+				end
+				local result = " " .. table.concat(client_names, ",")
+				if #clients > 2 then
+					result = result .. "+" .. (#clients - 2)
+				end
+				lsp_clients_cache.result = result
 			end
-			local client_names = {}
-			for _, client in ipairs(clients) do
-				table.insert(client_names, client.name)
-			end
-			return " " .. table.concat(client_names, ", ")
+
+			cache_time = current_time
+			return lsp_clients_cache.result
 		end
 
 		local function diff_source()
@@ -25,33 +45,82 @@ return {
 			end
 		end
 
+		local function search_count()
+			if vim.v.hlsearch == 0 then
+				return ""
+			end
+			local ok, result = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 500 })
+			if not ok or result.incomplete == 1 or result.total == 0 then
+				return ""
+			end
+			if result.total == 1 then
+				return " [1/1]"
+			end
+			return string.format(" [%d/%d]", result.current, result.total)
+		end
+
+		local function macro_recording()
+			local recording_register = vim.fn.reg_recording()
+			if recording_register == "" then
+				return ""
+			else
+				return " @" .. recording_register
+			end
+		end
+
+		local function word_count()
+			if vim.bo.filetype == "markdown" or vim.bo.filetype == "text" then
+				local words = vim.fn.wordcount().words
+				return words .. " words"
+			end
+			return ""
+		end
+
 		require("lualine").setup({
 			options = {
 				theme = "tokyodark",
 				component_separators = { left = "", right = "" },
 				section_separators = { left = "", right = "" },
 				globalstatus = true,
+				refresh = {
+					statusline = 100, -- Refresh every 100ms instead of default 1000ms
+				},
 			},
 			sections = {
-				lualine_a = { "mode" },
+				lualine_a = {
+					"mode",
+					{
+						macro_recording,
+						color = { fg = "#ff9e64" },
+					},
+				},
 				lualine_b = {
 					"branch",
 					{
 						"diff",
 						source = diff_source,
+						symbols = { added = " ", modified = " ", removed = " " },
 					},
 					{
 						"diagnostics",
 						sources = { "nvim_diagnostic" },
 						symbols = { error = " ", warn = " ", info = " ", hint = " " },
+						update_in_insert = false,
 					},
 				},
 				lualine_c = {
 					{
 						"filename",
-						path = 1, -- 0 = just filename, 1 = relative path, 2 = absolute path
+						path = 1,
 						shorting_target = 40,
+						symbols = {
+							modified = " ●",
+							readonly = " ",
+							unnamed = "[No Name]",
+							newfile = " [New]",
+						},
 					},
+					search_count,
 				},
 				lualine_x = {
 					{
@@ -59,13 +128,19 @@ return {
 						cond = require("noice").api.statusline.mode.has,
 						color = { fg = "#ff9e64" },
 					},
+					word_count,
 					lsp_clients,
-					"encoding",
-					"fileformat",
-					"filetype",
+					{
+						"filetype",
+						icons_enabled = true,
+						icon_only = true,
+					},
 				},
 				lualine_y = { "progress" },
-				lualine_z = { "location" },
+				lualine_z = {
+					"location",
+					"selectioncount",
+				},
 			},
 			inactive_sections = {
 				lualine_a = {},
@@ -75,10 +150,7 @@ return {
 				lualine_y = {},
 				lualine_z = {},
 			},
-			tabline = {},
-			winbar = {},
-			inactive_winbar = {},
-			extensions = { "oil", "trouble", "mason" },
+			extensions = { "oil", "trouble", "mason", "lazy" },
 		})
 	end,
 }
