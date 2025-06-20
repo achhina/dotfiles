@@ -1,14 +1,19 @@
 # Example config:
 # https://github.com/sigoden/aichat/blob/main/config.example.yaml
-
 # https://github.com/sigoden/aichat/issues/805
 save_session: true
 save: true
-model: openrouter:anthropic/claude-3.5-sonnet
+model: openrouter:deepseek/deepseek-r1-zero:free
 clients:
   - type: openai-compatible
     name: openrouter
     api_base: https://openrouter.ai/api/v1
+  - type: openai-compatible
+    name: openrouter
+    api_base: https://openrouter.ai/api/v1
+    models:
+      - name: deepseek/deepseek-r1-zero:free
+      - name: openrouter/auto
   - type: openai
     api_base: https://api.openai.com/v1
   - type: claude

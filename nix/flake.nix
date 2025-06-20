@@ -22,7 +22,10 @@
       # Function to create home configuration for any system
       mkHomeConfiguration = system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
           # Only include mac-app-util on Darwin systems
           modules = [
             ./home-manager/home.nix
@@ -35,11 +38,6 @@
           inherit modules;
         };
     in {
-      homeConfigurations = forAllSystems (system: {
-        achhina = mkHomeConfiguration system;
-      });
-
-      # Convenience outputs for current system
-      homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "aarch64-darwin");
+      homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
     };
 }

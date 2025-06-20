@@ -94,8 +94,6 @@ in
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
-
-    ".config/starship.toml".source = ../starship/starship.toml;
   };
 
   home.sessionVariables = {
@@ -138,6 +136,8 @@ in
 
   programs.starship = {
     enable = true;
+    # Configuration will be managed separately
+    settings = pkgs.lib.importTOML ../../starship/starship.toml;
   };
 
   # Not ready to move everything over yet
