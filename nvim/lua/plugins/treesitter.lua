@@ -3,20 +3,62 @@ return {
 	"nvim-treesitter/nvim-treesitter",
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter-textobjects",
+		"nvim-treesitter/nvim-treesitter-context",
 	},
 	build = ":TSUpdate",
 	config = function()
 		-- [[ Configure Treesitter ]]
-		-- See `:help nvim-treesitter`
 		require("nvim-treesitter.configs").setup({
-			-- Add languages to be installed here that you want installed for treesitter
-			ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "tsx", "typescript", "vimdoc", "vim" },
+			-- Comprehensive language support
+			ensure_installed = {
+				"bash",
+				"c",
+				"cpp",
+				"css",
+				"dockerfile",
+				"go",
+				"html",
+				"javascript",
+				"json",
+				"lua",
+				"markdown",
+				"markdown_inline",
+				"nix",
+				"python",
+				"regex",
+				"rust",
+				"toml",
+				"tsx",
+				"typescript",
+				"vim",
+				"vimdoc",
+				"yaml",
+			},
 
-			-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-			auto_install = false,
+			-- Enable automatic installation for new filetypes
+			auto_install = true,
 
-			highlight = { enable = true },
-			indent = { enable = true },
+			-- Enhanced highlighting with additional features
+			highlight = {
+				enable = true,
+				-- Disable slow treesitter highlighting for large files
+				disable = function(_, buf)
+					local max_filesize = 100 * 1024 -- 100 KB
+					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					if ok and stats and stats.size > max_filesize then
+						return true
+					end
+				end,
+				-- Use additional vim regex highlighting
+				additional_vim_regex_highlighting = false,
+			},
+
+			-- Better indentation
+			indent = {
+				enable = true,
+				-- Disable for specific languages that have issues
+				disable = { "python", "yaml" },
+			},
 			incremental_selection = {
 				enable = true,
 				keymaps = {
@@ -26,19 +68,51 @@ return {
 					node_decremental = "<M-space>",
 				},
 			},
+			-- Enhanced folding
+			fold = {
+				enable = true,
+				disable = {},
+			},
+
+			-- Better textobjects with more comprehensive mappings
 			textobjects = {
 				select = {
 					enable = true,
 					lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
 					keymaps = {
-						-- You can use the capture groups defined in textobjects.scm
+						-- Parameters/arguments
 						["aa"] = "@parameter.outer",
 						["ia"] = "@parameter.inner",
+						-- Functions
 						["af"] = "@function.outer",
 						["if"] = "@function.inner",
+						-- Classes
 						["ac"] = "@class.outer",
 						["ic"] = "@class.inner",
+						-- Conditionals
+						["ai"] = "@conditional.outer",
+						["ii"] = "@conditional.inner",
+						-- Loops
+						["al"] = "@loop.outer",
+						["il"] = "@loop.inner",
+						-- Comments
+						["aC"] = "@comment.outer",
+						["iC"] = "@comment.inner",
+						-- Blocks
+						["ab"] = "@block.outer",
+						["ib"] = "@block.inner",
+						-- Calls
+						["aF"] = "@call.outer",
+						["iF"] = "@call.inner",
 					},
+					-- Selection modes
+					selection_modes = {
+						["@parameter.outer"] = "v", -- charwise
+						["@function.outer"] = "V", -- linewise
+						["@class.outer"] = "V", -- linewise
+					},
+					-- Include surrounding whitespace
+					include_surrounding_whitespace = true,
 				},
 				move = {
 					enable = true,
@@ -46,30 +120,91 @@ return {
 					goto_next_start = {
 						["]m"] = "@function.outer",
 						["]]"] = "@class.outer",
+						["]i"] = "@conditional.outer",
+						["]l"] = "@loop.outer",
+						["]c"] = "@comment.outer",
 					},
 					goto_next_end = {
 						["]M"] = "@function.outer",
 						["]["] = "@class.outer",
+						["]I"] = "@conditional.outer",
+						["]L"] = "@loop.outer",
+						["]C"] = "@comment.outer",
 					},
 					goto_previous_start = {
 						["[m"] = "@function.outer",
 						["[["] = "@class.outer",
+						["[i"] = "@conditional.outer",
+						["[l"] = "@loop.outer",
+						["[c"] = "@comment.outer",
 					},
 					goto_previous_end = {
 						["[M"] = "@function.outer",
 						["[]"] = "@class.outer",
+						["[I"] = "@conditional.outer",
+						["[L"] = "@loop.outer",
+						["[C"] = "@comment.outer",
 					},
 				},
 				swap = {
 					enable = true,
 					swap_next = {
 						["<leader>a"] = "@parameter.inner",
+						["<leader>f"] = "@function.outer",
+						["<leader>c"] = "@class.outer",
 					},
 					swap_previous = {
 						["<leader>A"] = "@parameter.inner",
+						["<leader>F"] = "@function.outer",
+						["<leader>C"] = "@class.outer",
+					},
+				},
+				-- LSP interop for better definitions
+				lsp_interop = {
+					enable = true,
+					border = "none",
+					floating_preview_opts = {},
+					peek_definition_code = {
+						["<leader>df"] = "@function.outer",
+						["<leader>dF"] = "@class.outer",
 					},
 				},
 			},
+
+			-- Enable playground for testing
+			playground = {
+				enable = true,
+				disable = {},
+				updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+				persist_queries = false, -- Whether the query persists across vim sessions
+				keybindings = {
+					toggle_query_editor = "o",
+					toggle_hl_groups = "i",
+					toggle_injected_languages = "t",
+					toggle_anonymous_nodes = "a",
+					toggle_language_display = "I",
+					focus_language = "f",
+					unfocus_language = "F",
+					update = "R",
+					goto_node = "<cr>",
+					show_help = "?",
+				},
+			},
+		})
+
+		-- Configure treesitter context
+		require("treesitter-context").setup({
+			enable = true,
+			max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit
+			min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit
+			line_numbers = true,
+			multiline_threshold = 20, -- Maximum number of lines to show for a single context
+			trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded
+			mode = "cursor", -- Line used to calculate context
+			-- Separator between context and content. Should be a single character string, like '-'.
+			separator = nil,
+			zindex = 20, -- The Z-index of the context window
+			on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 		})
 	end,
 }
