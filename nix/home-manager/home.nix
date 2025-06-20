@@ -390,6 +390,8 @@ in
       config = "$XDG_CONFIG_HOME";
       g = "git";
       gcd = "$(git rev-parse --show-toplevel)";
+      hm = "home-manager switch --flake ~/.config/nix#achhina";
+      home-manager = "home-manager switch --flake ~/.config/nix#achhina";
       l = "eza";
       ll = "eza --header --all --long --git --color=always --icons=auto";
       lt = "eza --tree --all --level 3";
