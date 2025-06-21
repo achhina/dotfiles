@@ -3,7 +3,52 @@ return {
 	{
 		"mfussenegger/nvim-dap",
 		config = function()
-			require("config.keymaps").load_dap_keymaps()
+			local dap = require("dap")
+
+			-- Load DAP keymaps only when a debug session starts
+			dap.listeners.after.event_initialized["dap_keymaps"] = function()
+				require("config.keymaps").load_dap_keymaps()
+			end
+
+			-- Clean up keymaps when debug session ends
+			dap.listeners.before.event_terminated["dap_keymaps"] = function()
+				-- Clear DAP keymaps
+				local keymaps_to_clear = {
+					"<leader>Ds",
+					"<leader>DS",
+					"<leader>Dn",
+					"<leader>Do",
+					"<leader>Dc",
+					"<leader>Dr",
+					"<leader>Db",
+					"<leader>DB",
+					"<leader>De",
+					"<leader>DE",
+				}
+				for _, keymap in ipairs(keymaps_to_clear) do
+					pcall(vim.keymap.del, "n", keymap)
+				end
+			end
+
+			dap.listeners.before.event_exited["dap_keymaps"] = function()
+				-- Clear DAP keymaps
+				local keymaps_to_clear = {
+					"<leader>Ds",
+					"<leader>DS",
+					"<leader>Dn",
+					"<leader>Do",
+					"<leader>Dc",
+					"<leader>Dr",
+					"<leader>Db",
+					"<leader>DB",
+					"<leader>De",
+					"<leader>DE",
+				}
+				for _, keymap in ipairs(keymaps_to_clear) do
+					pcall(vim.keymap.del, "n", keymap)
+				end
+			end
+
 			vim.fn.sign_define("DapBreakpoint", { text = "ß", texthl = "", linehl = "", numhl = "" })
 			vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl = "", numhl = "" })
 		end,
