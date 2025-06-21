@@ -54,11 +54,7 @@ function M.load_keymaps()
 	map("n", "<leader>wx", "<cmd>close<CR>", { desc = "Close current window" })
 	map("n", "<leader>wm", "<cmd>MaximizerToggle<CR>", { desc = "Toggle window maximize" })
 
-	-- Window navigation
-	map("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
-	map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
-	map("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
-	map("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+	-- Window navigation (handled by vim-tmux-navigator plugin)
 
 	-- Resize windows
 	map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
@@ -89,8 +85,8 @@ function M.load_keymaps()
 	-- Quickfix list
 	map("n", "[q", "<cmd>cprevious<CR>", { desc = "Previous quickfix item" })
 	map("n", "]q", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
-	map("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix list" })
-	map("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix list" })
+	map("n", "<leader>Qo", "<cmd>copen<CR>", { desc = "Open quickfix list" })
+	map("n", "<leader>Qc", "<cmd>cclose<CR>", { desc = "Close quickfix list" })
 
 	-- Location list
 	map("n", "[l", "<cmd>lprevious<CR>", { desc = "Previous location item" })
@@ -119,9 +115,9 @@ function M.load_keymaps()
 	map("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Quit all without saving" })
 
 	-- File operations
-	map("n", "<leader>fn", "<cmd>enew<CR>", { desc = "New file" })
-	map("n", "<leader>fe", "<cmd>e!<CR>", { desc = "Reload file" })
-	map("n", "<leader>fR", "<cmd>e<CR>", { desc = "Refresh file" })
+	map("n", "<leader>Fn", "<cmd>enew<CR>", { desc = "New file" })
+	map("n", "<leader>Fe", "<cmd>e!<CR>", { desc = "Reload file" })
+	map("n", "<leader>FR", "<cmd>e<CR>", { desc = "Refresh file" })
 
 	-- Text manipulation
 	map("n", "U", "<C-r>", { desc = "Redo" })
@@ -152,7 +148,7 @@ function M.load_keymaps()
 	map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
 
 	-- Source current file
-	map("n", "<leader><leader>x", "<cmd>source %<CR>", { desc = "Source current file" })
+	map("n", "<leader>Sx", "<cmd>source %<CR>", { desc = "Source current file" })
 
 	-- Toggle options
 	map("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
@@ -180,18 +176,18 @@ function M.load_lsp_keymaps(bufnr)
 	nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
 	nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 	nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-	nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
+	nmap("<leader>td", vim.lsp.buf.type_definition, "[T]ype [D]efinition")
 	nmap("<leader>sy", require("telescope.builtin").lsp_document_symbols, "Document [S][y]mbols")
-	nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+	nmap("<leader>Ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
 
 	-- Lesser used LSP functionality
 	nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-	nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
-	nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-	nmap("<leader>wl", function()
+	nmap("<leader>Wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
+	nmap("<leader>Wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
+	nmap("<leader>Wl", function()
 		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	end, "[W]orkspace [L]ist Folders")
 
@@ -212,18 +208,18 @@ function M.load_dap_keymaps()
 		vim.keymap.set("n", keys, func, { silent = true, desc = desc })
 	end
 
-	nmap("<leader>ds", dap.step_into, "[S]tep into")
-	nmap("<leader>dS", dap.step_back, "[S]tep back")
-	nmap("<leader>dn", dap.step_over, "[N]ext | [S]tep Over")
-	nmap("<leader>dds", dap.step_out, "[D] [S]tep Out")
-	nmap("<leader>dc", dap.continue, "[C]ontinue")
-	nmap("<leader>dr", dap.repl.open, "[R]EPL Open")
-	nmap("<leader>db", dap.toggle_breakpoint, "Toggle [B]reakpoint")
-	nmap("<leader>dB", function()
+	nmap("<leader>Ds", dap.step_into, "[S]tep into")
+	nmap("<leader>DS", dap.step_back, "[S]tep back")
+	nmap("<leader>Dn", dap.step_over, "[N]ext | [S]tep Over")
+	nmap("<leader>Do", dap.step_out, "[S]tep [O]ut")
+	nmap("<leader>Dc", dap.continue, "[C]ontinue")
+	nmap("<leader>Dr", dap.repl.open, "[R]EPL Open")
+	nmap("<leader>Db", dap.toggle_breakpoint, "Toggle [B]reakpoint")
+	nmap("<leader>DB", function()
 		dap.set_breakpoint(vim.fn.input("[DAP] Condition > "))
 	end, "Set [B]reakpoint")
-	nmap("<leader>de", dapui.eval, "[E]valuate")
-	nmap("<leader>dE", function()
+	nmap("<leader>De", dapui.eval, "[E]valuate")
+	nmap("<leader>DE", function()
 		dapui.eval(vim.fn.input("[DAP] Expression > "))
 	end, "[E]xpression")
 end
