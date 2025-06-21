@@ -85,8 +85,13 @@ function M.load_keymaps()
 	-- Quickfix list
 	map("n", "[q", "<cmd>cprevious<CR>", { desc = "Previous quickfix item" })
 	map("n", "]q", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
-	map("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix list" })
-	map("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix list" })
+	map("n", "<leader>q", function()
+		if vim.fn.empty(vim.fn.filter(vim.fn.getwininfo(), "v:val.quickfix")) == 1 then
+			vim.cmd("copen")
+		else
+			vim.cmd("cclose")
+		end
+	end, { desc = "Toggle quickfix list" })
 
 	-- Location list
 	map("n", "[l", "<cmd>lprevious<CR>", { desc = "Previous location item" })
