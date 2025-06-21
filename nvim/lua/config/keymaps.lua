@@ -119,9 +119,9 @@ function M.load_keymaps()
 	map("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Quit all without saving" })
 
 	-- File operations
-	map("n", "<leader>Fn", "<cmd>enew<CR>", { desc = "New file" })
-	map("n", "<leader>Fe", "<cmd>e!<CR>", { desc = "Reload file" })
-	map("n", "<leader>FR", "<cmd>e<CR>", { desc = "Refresh file" })
+	map("n", "<leader>fn", "<cmd>enew<CR>", { desc = "New file" })
+	map("n", "<leader>fe", "<cmd>e!<CR>", { desc = "Reload file" })
+	map("n", "<leader>fr", "<cmd>e<CR>", { desc = "Refresh file" })
 
 	-- Text manipulation
 	map("n", "U", "<C-r>", { desc = "Redo" })
@@ -152,7 +152,7 @@ function M.load_keymaps()
 	map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
 
 	-- Source current file
-	map("n", "<leader>Sx", "<cmd>source %<CR>", { desc = "Source current file" })
+	map("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
 
 	-- Toggle options
 	map("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
@@ -180,7 +180,7 @@ function M.load_lsp_keymaps(bufnr)
 	nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
 	nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 	nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-	nmap("<leader>td", vim.lsp.buf.type_definition, "[T]ype [D]efinition")
+	nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
 	nmap("<leader>sy", require("telescope.builtin").lsp_document_symbols, "Document [S][y]mbols")
 	nmap("<leader>Ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
