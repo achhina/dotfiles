@@ -116,7 +116,6 @@ function M.load_keymaps()
 	-- Quick save and quit
 	map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
 	map("n", "<leader>W", "<cmd>wa<CR>", { desc = "Save all files" })
-	map("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
 	map("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Quit all without saving" })
 
 	-- File operations
