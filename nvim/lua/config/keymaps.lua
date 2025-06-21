@@ -85,8 +85,8 @@ function M.load_keymaps()
 	-- Quickfix list
 	map("n", "[q", "<cmd>cprevious<CR>", { desc = "Previous quickfix item" })
 	map("n", "]q", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
-	map("n", "<leader>Qo", "<cmd>copen<CR>", { desc = "Open quickfix list" })
-	map("n", "<leader>Qc", "<cmd>cclose<CR>", { desc = "Close quickfix list" })
+	map("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix list" })
+	map("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix list" })
 
 	-- Location list
 	map("n", "[l", "<cmd>lprevious<CR>", { desc = "Previous location item" })
