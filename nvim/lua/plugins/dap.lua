@@ -14,16 +14,16 @@ return {
 			dap.listeners.before.event_terminated["dap_keymaps"] = function()
 				-- Clear DAP keymaps
 				local keymaps_to_clear = {
-					"<leader>Ds",
-					"<leader>DS",
-					"<leader>Dn",
-					"<leader>Do",
-					"<leader>Dc",
-					"<leader>Dr",
-					"<leader>Db",
-					"<leader>DB",
-					"<leader>De",
-					"<leader>DE",
+					"<leader>ds",
+					"<leader>dS",
+					"<leader>dn",
+					"<leader>do",
+					"<leader>dc",
+					"<leader>dr",
+					"<leader>db",
+					"<leader>dB",
+					"<leader>de",
+					"<leader>dE",
 				}
 				for _, keymap in ipairs(keymaps_to_clear) do
 					pcall(vim.keymap.del, "n", keymap)
@@ -33,16 +33,16 @@ return {
 			dap.listeners.before.event_exited["dap_keymaps"] = function()
 				-- Clear DAP keymaps
 				local keymaps_to_clear = {
-					"<leader>Ds",
-					"<leader>DS",
-					"<leader>Dn",
-					"<leader>Do",
-					"<leader>Dc",
-					"<leader>Dr",
-					"<leader>Db",
-					"<leader>DB",
-					"<leader>De",
-					"<leader>DE",
+					"<leader>ds",
+					"<leader>dS",
+					"<leader>dn",
+					"<leader>do",
+					"<leader>dc",
+					"<leader>dr",
+					"<leader>db",
+					"<leader>dB",
+					"<leader>de",
+					"<leader>dE",
 				}
 				for _, keymap in ipairs(keymaps_to_clear) do
 					pcall(vim.keymap.del, "n", keymap)
