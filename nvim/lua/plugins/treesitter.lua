@@ -149,14 +149,14 @@ return {
 				swap = {
 					enable = true,
 					swap_next = {
-						["<leader>a"] = "@parameter.inner",
-						["<leader>f"] = "@function.outer",
-						["<leader>c"] = "@class.outer",
+						["<leader>sa"] = "@parameter.inner",
+						["<leader>sf"] = "@function.outer",
+						["<leader>sc"] = "@class.outer",
 					},
 					swap_previous = {
-						["<leader>A"] = "@parameter.inner",
-						["<leader>F"] = "@function.outer",
-						["<leader>C"] = "@class.outer",
+						["<leader>sA"] = "@parameter.inner",
+						["<leader>sF"] = "@function.outer",
+						["<leader>sC"] = "@class.outer",
 					},
 				},
 				-- LSP interop for better definitions
@@ -165,8 +165,8 @@ return {
 					border = "none",
 					floating_preview_opts = {},
 					peek_definition_code = {
-						["<leader>df"] = "@function.outer",
-						["<leader>dF"] = "@class.outer",
+						["<leader>Pf"] = "@function.outer",
+						["<leader>PF"] = "@class.outer",
 					},
 				},
 			},
