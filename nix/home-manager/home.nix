@@ -170,10 +170,6 @@ in
     alt-shift-k = ['move up', 'mode main']
     alt-shift-l = ['move right', 'mode main']
 
-    alt-shift-h = ['join-with left', 'mode resize']
-    alt-shift-j = ['join-with down', 'mode resize']
-    alt-shift-k = ['join-with up', 'mode resize']
-    alt-shift-l = ['join-with right', 'mode resize']
 
     alt-minus = 'resize smart -50'
     alt-equal = 'resize smart +50'
@@ -227,6 +223,12 @@ in
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
     enter = 'mode main'
     esc = 'mode main'
+
+
+    alt-shift-h = ['join-with left', 'mode resize']
+    alt-shift-j = ['join-with down', 'mode resize']
+    alt-shift-k = ['join-with up', 'mode resize']
+    alt-shift-l = ['join-with right', 'mode resize']
 
     # Set some common workplaces to secondary monitor
     [workspace-to-monitor-force-assignment]
