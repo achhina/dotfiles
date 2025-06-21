@@ -59,6 +59,7 @@ return {
 					telemetry = { enable = false },
 					diagnostics = {
 						globals = { "vim" },
+						disable = { "missing-fields", "undefined-doc-name" },
 					},
 					format = {
 						enable = true,
@@ -67,6 +68,15 @@ return {
 							indent_size = "2",
 							quote_style = "double",
 						},
+					},
+					hint = {
+						enable = true,
+						arrayIndex = "Disable", -- "Enable" | "Auto" | "Disable"
+						await = true,
+						paramName = "Disable", -- "All" | "Literal" | "Disable"
+						paramType = true,
+						semicolon = "Disable", -- "All" | "SameLine" | "Disable"
+						setType = false,
 					},
 				},
 			},
