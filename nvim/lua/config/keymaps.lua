@@ -86,9 +86,12 @@ function M.load_keymaps()
 	map("n", "[q", "<cmd>cprevious<CR>", { desc = "Previous quickfix item" })
 	map("n", "]q", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
 	map("n", "<leader>q", function()
-		vim.diagnostic.setqflist()
-		vim.cmd("copen")
-	end, { desc = "Show diagnostics in quickfix list" })
+		vim.diagnostic.setloclist()
+		vim.cmd("lopen")
+	end, { desc = "Show diagnostics in location list" })
+
+	-- Open quickfix list
+	map("n", "<leader>cq", "<cmd>copen<CR>", { desc = "Open quickfix list" })
 
 	-- Location list
 	map("n", "[l", "<cmd>lprevious<CR>", { desc = "Previous location item" })
