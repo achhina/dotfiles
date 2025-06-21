@@ -65,6 +65,7 @@ in
       typescript
       typescript-language-server
       uv
+      vscode-langservers-extracted
       wget
       yarn
     ]

@@ -113,5 +113,17 @@ return {
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
+
+		-- Setup jsonls separately (installed via Nix, not managed by Mason)
+		require("lspconfig").jsonls.setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			settings = {
+				json = {
+					schemas = require("schemastore").json.schemas(),
+					validate = { enable = true },
+				},
+			},
+		})
 	end,
 }
