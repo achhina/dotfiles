@@ -31,6 +31,7 @@ in
       aichat
       bash-language-server
       bat
+      clang-tools          # provides clangd
       claude-code
       cloc
       delta
@@ -41,6 +42,7 @@ in
       git
       git-lfs
       github-cli
+      gopls               # Go LSP
       htop
       jq
       lua
@@ -52,6 +54,8 @@ in
       nginx
       nil
       nixpkgs-fmt
+      pyright            # Python LSP
+      rust-analyzer      # Rust LSP
       neovim
       nodejs
       pnpm

@@ -17,26 +17,8 @@ return {
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 		end
 
-		-- Mason-managed servers
+		-- Mason-managed servers (keeping TypeScript and Lua for now)
 		local mason_servers = {
-			clangd = {},
-			gopls = {},
-			pyright = {
-				python = {
-					analysis = {
-						typeCheckingMode = "basic",
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
-					},
-				},
-			},
-			rust_analyzer = {
-				["rust-analyzer"] = {
-					checkOnSave = {
-						command = "clippy",
-					},
-				},
-			},
 			ts_ls = {
 				typescript = {
 					inlayHints = {
@@ -85,6 +67,28 @@ return {
 					},
 				},
 			},
+		}
+
+		-- Nix-managed server configurations
+		local nix_servers = {
+			clangd = {},
+			gopls = {},
+			pyright = {
+				python = {
+					analysis = {
+						typeCheckingMode = "basic",
+						autoSearchPaths = true,
+						useLibraryCodeForTypes = true,
+					},
+				},
+			},
+			rust_analyzer = {
+				["rust-analyzer"] = {
+					checkOnSave = {
+						command = "clippy",
+					},
+				},
+			},
 			bashls = {},
 		}
 
@@ -99,7 +103,7 @@ return {
 			automatic_installation = false, -- Disable to prevent unwanted auto-installs
 		})
 
-		-- Setup each server individually
+		-- Setup Mason-managed servers
 		for server_name, server_config in pairs(mason_servers) do
 			require("lspconfig")[server_name].setup({
 				capabilities = capabilities,
@@ -108,13 +112,22 @@ return {
 			})
 		end
 
-		-- Setup nil_ls separately (installed via Nix, not managed by Mason)
+		-- Setup Nix-managed servers
+		for server_name, server_config in pairs(nix_servers) do
+			require("lspconfig")[server_name].setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+				settings = server_config,
+			})
+		end
+
+		-- Setup nil_ls (Nix LSP)
 		require("lspconfig").nil_ls.setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
 
-		-- Setup jsonls separately (installed via Nix, not managed by Mason)
+		-- Setup jsonls (from vscode-langservers-extracted)
 		require("lspconfig").jsonls.setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
