@@ -131,11 +131,7 @@ function M.setup()
 	safe_keymap("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
 	safe_keymap("i", "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save file from insert mode" })
 
-	-- Better window navigation
-	safe_keymap("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
-	safe_keymap("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
-	safe_keymap("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
-	safe_keymap("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+	-- Window navigation handled by vim-tmux-navigator plugin
 
 	-- Window resizing
 	safe_keymap("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height" })
@@ -169,10 +165,7 @@ function M.setup()
 
 	-- Terminal
 	safe_keymap("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-	safe_keymap("t", "<C-h>", "<cmd>wincmd h<CR>", { desc = "Terminal: Move to left window" })
-	safe_keymap("t", "<C-j>", "<cmd>wincmd j<CR>", { desc = "Terminal: Move to bottom window" })
-	safe_keymap("t", "<C-k>", "<cmd>wincmd k<CR>", { desc = "Terminal: Move to top window" })
-	safe_keymap("t", "<C-l>", "<cmd>wincmd l<CR>", { desc = "Terminal: Move to right window" })
+	-- Terminal window navigation handled by vim-tmux-navigator plugin
 
 	-- Quick commands
 	safe_keymap("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
