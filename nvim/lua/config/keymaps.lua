@@ -178,6 +178,16 @@ function M.load_lsp_keymaps(bufnr)
 	nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 	nmap("<leader>F", vim.lsp.buf.format, "[F]ormat document")
 
+	-- Format selection in visual mode
+	local vmap = function(keys, func, desc)
+		if desc then
+			desc = "LSP: " .. desc
+		end
+		vim.keymap.set("v", keys, func, { buffer = bufnr, desc = desc })
+	end
+	vmap("<leader>F", vim.lsp.buf.format, "[F]ormat selection")
+	vmap("K", vim.lsp.buf.hover, "Hover Documentation")
+
 	nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
 	nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 	nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
@@ -187,6 +197,15 @@ function M.load_lsp_keymaps(bufnr)
 
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
+
+	-- Insert mode signature help
+	local imap = function(keys, func, desc)
+		if desc then
+			desc = "LSP: " .. desc
+		end
+		vim.keymap.set("i", keys, func, { buffer = bufnr, desc = desc })
+	end
+	imap("<C-k>", vim.lsp.buf.signature_help, "Signature help")
 
 	-- Lesser used LSP functionality
 	nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
