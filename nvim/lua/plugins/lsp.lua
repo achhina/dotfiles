@@ -121,8 +121,13 @@ return {
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
 					if client then
 						vim.notify("LSP server disconnected: " .. client.name, vim.log.levels.WARN)
-						-- Auto-restart logic
+						-- Auto-restart logic only for lspconfig-managed servers
 						vim.defer_fn(function()
+							-- Skip auto-restart for non-lspconfig servers like copilot
+							if client.name == "copilot" then
+								return -- Copilot manages its own lifecycle
+							end
+
 							local bufnr = vim.api.nvim_get_current_buf()
 							local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
 							if filetype and filetype ~= "" then

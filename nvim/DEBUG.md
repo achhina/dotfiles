@@ -141,4 +141,102 @@ nvim # Test configuration
 :verbose map <key>          " After - verify new mapping
 ```
 
-**Key Principle**: Always establish baseline state before making changes, then use the same observability tools to verify fixes took effect.
+## Headless Testing for Automated Verification
+
+### Why Headless Testing is Superior for Configuration Verification
+
+Headless mode (`nvim --headless`) provides:
+- **Faster execution** - No UI startup overhead
+- **Isolated environment** - Tests pure configuration without UI interactions
+- **Automated verification** - Can script complex test scenarios
+- **Deterministic results** - No user input or timing issues
+- **Real plugin loading** - All plugins load normally, just without UI
+
+### Headless Testing Examples
+
+#### Test LSP Server Configuration
+```bash
+# Test if specific LSP servers are running
+nvim --headless -c 'lua
+vim.defer_fn(function()
+  local clients = vim.lsp.get_clients()
+  print("Active LSP clients:", #clients)
+  for i, client in ipairs(clients) do
+    print("  " .. i .. ":", client.name, "(id:" .. client.id .. ")")
+  end
+  vim.cmd("qa")
+end, 2000)' 2>&1
+```
+
+#### Test Plugin Configuration Loading
+```bash
+# Test if plugin configuration is correct
+nvim --headless -c 'lua
+local ok, plugin = pcall(require, "plugin_name")
+if ok then
+  print("Plugin loaded:", ok)
+  print("Config:", vim.inspect(plugin.config or plugin._config))
+else
+  print("Plugin failed:", plugin)
+end
+vim.defer_fn(function() vim.cmd("qa") end, 500)' 2>&1
+```
+
+#### Test for Deprecation Warnings
+```bash
+# Capture deprecation warnings during startup
+nvim --headless -c 'lua
+local original_notify = vim.notify
+local warnings = {}
+vim.notify = function(msg, level)
+  if level == vim.log.levels.WARN and msg:match("deprecated") then
+    table.insert(warnings, msg)
+  end
+  original_notify(msg, level)
+end
+
+vim.defer_fn(function()
+  print("Deprecation warnings found:")
+  for i, warning in ipairs(warnings) do
+    print("  " .. i .. ":", warning)
+  end
+  vim.cmd("qa")
+end, 1000)' 2>&1
+```
+
+### Real Example: Copilot LSP Investigation
+
+This headless test revealed that copilot.lua **always** starts an LSP server:
+```bash
+nvim --headless -c 'lua
+local copilot = require("copilot")
+print("Copilot suggestion enabled:",
+  copilot._config and copilot._config.suggestion and copilot._config.suggestion.enabled)
+
+vim.defer_fn(function()
+  local clients = vim.lsp.get_clients()
+  print("Copilot LSP running despite suggestion.enabled=false:", #clients > 0)
+  vim.cmd("qa")
+end, 2000)' 2>&1
+```
+
+**Result**: Showed that disabling `suggestion.enabled` doesn't prevent LSP server startup, correcting wrong assumptions about the architecture.
+
+### Systematic Headless Test Template
+
+```bash
+#!/bin/bash
+# Template for testing Neovim configuration changes
+echo "=== Pre-Change Baseline ==="
+nvim --headless -c 'BASELINE_TEST_COMMANDS_HERE' -c 'qa' 2>&1
+
+echo "=== Making Configuration Changes ==="
+# Apply your configuration changes here
+
+echo "=== Post-Change Verification ==="
+nvim --headless -c 'VERIFICATION_TEST_COMMANDS_HERE' -c 'qa' 2>&1
+
+echo "=== Test Complete ==="
+```
+
+**Key Principle**: Always establish baseline state before making changes, then use the same observability tools to verify fixes took effect. Headless testing provides automated, deterministic verification of configuration behavior.
