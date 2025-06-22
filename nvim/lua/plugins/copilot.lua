@@ -35,7 +35,10 @@ return {
 					["."] = false,
 				},
 				copilot_node_command = "node", -- Node.js version must be > 16.x
-				server_opts_overrides = {},
+				server_opts_overrides = {
+					-- Explicitly prevent LSP server registration
+					name = "copilot_agent", -- Use a different name to avoid conflicts
+				},
 			})
 		end,
 	},
@@ -46,7 +49,23 @@ return {
 		dependencies = "copilot.lua",
 		opts = {},
 		config = function(_, opts)
-			require("copilot_cmp").setup(opts)
+			-- Ensure copilot.lua is loaded first and disable LSP registration
+			local copilot_ok, _ = pcall(require, "copilot")
+			if not copilot_ok then
+				vim.notify("Copilot.lua not available, skipping copilot-cmp setup", vim.log.levels.WARN)
+				return
+			end
+
+			-- Setup copilot-cmp with safe error handling
+			local copilot_cmp_ok, copilot_cmp = pcall(require, "copilot_cmp")
+			if copilot_cmp_ok then
+				copilot_cmp.setup(vim.tbl_extend("force", {
+					-- Ensure it doesn't register as LSP server
+					method = "getCompletionsCycling", -- Use the completion method, not LSP
+				}, opts))
+			else
+				vim.notify("Failed to setup copilot-cmp", vim.log.levels.ERROR)
+			end
 		end,
 	},
 }

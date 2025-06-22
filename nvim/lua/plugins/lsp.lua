@@ -545,31 +545,53 @@ return {
 		capabilities.textDocument.foldingRange = { lineFoldingOnly = true }
 		capabilities.textDocument.colorProvider = true
 
-		-- Setup Nix-managed servers
+		-- Setup Nix-managed servers with error handling
+		local function safe_setup_server(name, config)
+			local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+			if not lspconfig_ok then
+				vim.notify("LSPConfig not available", vim.log.levels.ERROR)
+				return false
+			end
+
+			local server_setup_ok, server_setup_err = pcall(function()
+				lspconfig[name].setup({
+					capabilities = capabilities,
+					on_attach = on_attach,
+					settings = config,
+				})
+			end)
+
+			if not server_setup_ok then
+				vim.notify("Failed to setup LSP server " .. name .. ": " .. server_setup_err, vim.log.levels.WARN)
+				return false
+			end
+
+			return true
+		end
+
 		for server_name, server_config in pairs(nix_servers) do
-			require("lspconfig")[server_name].setup({
-				capabilities = capabilities,
-				on_attach = on_attach,
-				settings = server_config,
-			})
+			safe_setup_server(server_name, server_config)
 		end
 
 		-- Setup nil_ls (Nix LSP)
-		require("lspconfig").nil_ls.setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
+		safe_setup_server("nil_ls", {})
 
 		-- Setup jsonls (from vscode-langservers-extracted)
-		require("lspconfig").jsonls.setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			settings = {
-				json = {
-					schemas = require("schemastore").json.schemas(),
-					validate = { enable = true },
+		local jsonls_setup_ok, jsonls_setup_err = pcall(function()
+			require("lspconfig").jsonls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+				settings = {
+					json = {
+						schemas = require("schemastore").json.schemas(),
+						validate = { enable = true },
+					},
 				},
-			},
-		})
+			})
+		end)
+
+		if not jsonls_setup_ok then
+			vim.notify("Failed to setup jsonls: " .. jsonls_setup_err, vim.log.levels.WARN)
+		end
 	end,
 }

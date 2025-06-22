@@ -1,30 +1,37 @@
 return {
-	-- Fuzzy Finder (files, lsp, etc)
-	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
-
-	-- Fuzzy Finder Algorithm which requires local dependencies to be built.
-	-- Only load if `make` is available. Make sure you have the system
-	-- requirements installed.
+	-- Telescope core - loads unconditionally
 	{
-		"nvim-telescope/telescope-fzf-native.nvim",
-		-- NOTE: If you are having trouble with this installation,
-		--       refer to the README for telescope-fzf-native for more instructions.
-		build = "make",
-		cond = function()
-			return vim.fn.executable("make") == 1
-		end,
-
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		cmd = "Telescope",
+		keys = {
+			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Find recently opened files" },
+			{ "<leader><space>", "<cmd>Telescope buffers<cr>", desc = "Find existing buffers" },
+			{ "<leader>sf", "<cmd>Telescope find_files<cr>", desc = "Search Files" },
+			{ "<leader>sg", "<cmd>Telescope live_grep<cr>", desc = "Search by Grep" },
+			{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Search Help" },
+			{ "<leader>sw", "<cmd>Telescope grep_string<cr>", desc = "Search current Word" },
+			{ "<leader>sd", "<cmd>Telescope diagnostics<cr>", desc = "Search Diagnostics" },
+		},
 		config = function()
-			-- [[ Configure Telescope ]]
-			require("telescope").setup({
+			local telescope = require("telescope")
+			local actions = require("telescope.actions")
+
+			-- Check if fzf-native is available
+			local has_fzf = pcall(require, "telescope._extensions.fzf")
+
+			telescope.setup({
 				defaults = {
 					prompt_prefix = " ",
 					selection_caret = " ",
 					path_display = { "truncate" },
-					-- Enhanced performance optimizations
-					file_sorter = require("telescope.sorters").get_fzy_sorter,
-					generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
-					-- Improved file ignore patterns for better performance
+					-- Use fzf sorters if available, otherwise fallback to default
+					file_sorter = has_fzf and require("telescope.sorters").get_fzf_sorter
+						or require("telescope.sorters").get_fuzzy_file,
+					generic_sorter = has_fzf and require("telescope.sorters").get_generic_fzf_sorter
+						or require("telescope.sorters").get_generic_fuzzy_sorter,
+					-- Enhanced file ignore patterns for better performance
 					file_ignore_patterns = {
 						"^.git/",
 						"^./.git/",
@@ -69,10 +76,10 @@ return {
 						"%.doc",
 						"%.docx",
 					},
-					-- Performance: Cache for better performance
+					-- Performance optimizations
 					cache_picker = {
 						num_pickers = 10,
-						limit_entries = 1000, -- Limit entries for large directories
+						limit_entries = 1000,
 					},
 					layout_config = {
 						horizontal = {
@@ -80,9 +87,7 @@ return {
 							preview_width = 0.55,
 							results_width = 0.8,
 						},
-						vertical = {
-							mirror = false,
-						},
+						vertical = { mirror = false },
 						width = 0.87,
 						height = 0.80,
 						preview_cutoff = 120,
@@ -96,58 +101,50 @@ return {
 					set_env = { ["COLORTERM"] = "truecolor" },
 					mappings = {
 						i = {
-							["<C-n>"] = require("telescope.actions").move_selection_next,
-							["<C-p>"] = require("telescope.actions").move_selection_previous,
-							["<C-c>"] = require("telescope.actions").close,
-							["<Down>"] = require("telescope.actions").move_selection_next,
-							["<Up>"] = require("telescope.actions").move_selection_previous,
-							["<CR>"] = require("telescope.actions").select_default,
-							["<C-x>"] = require("telescope.actions").select_horizontal,
-							["<C-v>"] = require("telescope.actions").select_vertical,
-							["<C-t>"] = require("telescope.actions").select_tab,
-							["<C-u>"] = require("telescope.actions").preview_scrolling_up,
-							["<C-d>"] = require("telescope.actions").preview_scrolling_down,
-							["<PageUp>"] = require("telescope.actions").results_scrolling_up,
-							["<PageDown>"] = require("telescope.actions").results_scrolling_down,
-							["<Tab>"] = require("telescope.actions").toggle_selection
-								+ require("telescope.actions").move_selection_worse,
-							["<S-Tab>"] = require("telescope.actions").toggle_selection
-								+ require("telescope.actions").move_selection_better,
-							["<C-q>"] = require("telescope.actions").send_to_qflist
-								+ require("telescope.actions").open_qflist,
-							["<M-q>"] = require("telescope.actions").send_selected_to_qflist
-								+ require("telescope.actions").open_qflist,
-							["<C-l>"] = require("telescope.actions").complete_tag,
-							["<C-_>"] = require("telescope.actions").which_key, -- keys from pressing <C-/>
+							["<C-n>"] = actions.move_selection_next,
+							["<C-p>"] = actions.move_selection_previous,
+							["<C-c>"] = actions.close,
+							["<Down>"] = actions.move_selection_next,
+							["<Up>"] = actions.move_selection_previous,
+							["<CR>"] = actions.select_default,
+							["<C-x>"] = actions.select_horizontal,
+							["<C-v>"] = actions.select_vertical,
+							["<C-t>"] = actions.select_tab,
+							["<C-u>"] = actions.preview_scrolling_up,
+							["<C-d>"] = actions.preview_scrolling_down,
+							["<PageUp>"] = actions.results_scrolling_up,
+							["<PageDown>"] = actions.results_scrolling_down,
+							["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+							["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+							["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+							["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+							["<C-l>"] = actions.complete_tag,
+							["<C-_>"] = actions.which_key,
 						},
 						n = {
-							["<esc>"] = require("telescope.actions").close,
-							["<CR>"] = require("telescope.actions").select_default,
-							["<C-x>"] = require("telescope.actions").select_horizontal,
-							["<C-v>"] = require("telescope.actions").select_vertical,
-							["<C-t>"] = require("telescope.actions").select_tab,
-							["<Tab>"] = require("telescope.actions").toggle_selection
-								+ require("telescope.actions").move_selection_worse,
-							["<S-Tab>"] = require("telescope.actions").toggle_selection
-								+ require("telescope.actions").move_selection_better,
-							["<C-q>"] = require("telescope.actions").send_to_qflist
-								+ require("telescope.actions").open_qflist,
-							["<M-q>"] = require("telescope.actions").send_selected_to_qflist
-								+ require("telescope.actions").open_qflist,
-							["j"] = require("telescope.actions").move_selection_next,
-							["k"] = require("telescope.actions").move_selection_previous,
-							["H"] = require("telescope.actions").move_to_top,
-							["M"] = require("telescope.actions").move_to_middle,
-							["L"] = require("telescope.actions").move_to_bottom,
-							["<Down>"] = require("telescope.actions").move_selection_next,
-							["<Up>"] = require("telescope.actions").move_selection_previous,
-							["gg"] = require("telescope.actions").move_to_top,
-							["G"] = require("telescope.actions").move_to_bottom,
-							["<C-u>"] = require("telescope.actions").preview_scrolling_up,
-							["<C-d>"] = require("telescope.actions").preview_scrolling_down,
-							["<PageUp>"] = require("telescope.actions").results_scrolling_up,
-							["<PageDown>"] = require("telescope.actions").results_scrolling_down,
-							["?"] = require("telescope.actions").which_key,
+							["<esc>"] = actions.close,
+							["<CR>"] = actions.select_default,
+							["<C-x>"] = actions.select_horizontal,
+							["<C-v>"] = actions.select_vertical,
+							["<C-t>"] = actions.select_tab,
+							["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+							["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+							["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+							["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+							["j"] = actions.move_selection_next,
+							["k"] = actions.move_selection_previous,
+							["H"] = actions.move_to_top,
+							["M"] = actions.move_to_middle,
+							["L"] = actions.move_to_bottom,
+							["<Down>"] = actions.move_selection_next,
+							["<Up>"] = actions.move_selection_previous,
+							["gg"] = actions.move_to_top,
+							["G"] = actions.move_to_bottom,
+							["<C-u>"] = actions.preview_scrolling_up,
+							["<C-d>"] = actions.preview_scrolling_down,
+							["<PageUp>"] = actions.results_scrolling_up,
+							["<PageDown>"] = actions.results_scrolling_down,
+							["?"] = actions.which_key,
 						},
 					},
 				},
@@ -166,175 +163,110 @@ return {
 						previewer = false,
 						initial_mode = "normal",
 						mappings = {
-							i = {
-								["<C-d>"] = require("telescope.actions").delete_buffer,
-							},
-							n = {
-								["dd"] = require("telescope.actions").delete_buffer,
-							},
+							i = { ["<C-d>"] = actions.delete_buffer },
+							n = { ["dd"] = actions.delete_buffer },
 						},
 					},
-					planets = {
-						show_pluto = true,
-						show_moon = true,
-					},
-					colorscheme = {
-						enable_preview = true,
-					},
-					lsp_references = {
-						theme = "dropdown",
-						initial_mode = "normal",
-					},
-					lsp_definitions = {
-						theme = "dropdown",
-						initial_mode = "normal",
-					},
-					lsp_declarations = {
-						theme = "dropdown",
-						initial_mode = "normal",
-					},
-					lsp_implementations = {
-						theme = "dropdown",
-						initial_mode = "normal",
-					},
+					colorscheme = { enable_preview = true },
+					lsp_references = { theme = "dropdown", initial_mode = "normal" },
+					lsp_definitions = { theme = "dropdown", initial_mode = "normal" },
+					lsp_declarations = { theme = "dropdown", initial_mode = "normal" },
+					lsp_implementations = { theme = "dropdown", initial_mode = "normal" },
 				},
 			})
 
-			-- Enable telescope fzf native, if installed
-			pcall(require("telescope").load_extension, "fzf")
+			-- Try to load fzf extension if available
+			pcall(telescope.load_extension, "fzf")
 
-			-- See `:help telescope.builtin`
-			vim.keymap.set(
-				"n",
-				"<leader>fr",
-				require("telescope.builtin").oldfiles,
-				{ desc = "[?] Find recently opened files" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader><space>",
-				require("telescope.builtin").buffers,
-				{ desc = "[ ] Find existing buffers" }
-			)
+			-- Additional telescope keymaps
+			local builtin = require("telescope.builtin")
+			local utils = require("telescope.utils")
+			local themes = require("telescope.themes")
+
+			-- Buffer and file search
 			vim.keymap.set("n", "<leader>/", function()
-				-- You can pass additional configuration to telescope to change theme, layout, etc.
-				require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+				builtin.current_buffer_fuzzy_find(themes.get_dropdown({
 					winblend = 10,
 					previewer = false,
 				}))
-			end, { desc = "[/] Fuzzily search in current buffer" })
+			end, { desc = "Fuzzily search in current buffer" })
 
-			vim.keymap.set("n", "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" })
-			vim.keymap.set("n", "<leader>sf", function()
-				require("telescope.builtin").find_files()
-			end, { desc = "[S]earch [F]iles" })
+			-- File pickers
+			vim.keymap.set("n", "<leader>gf", builtin.git_files, { desc = "Search Git Files" })
 			vim.keymap.set("n", "<leader>Sf", function()
-				require("telescope.builtin").find_files({ hidden = true, no_ignore = true })
-			end, { desc = "[S]earch [F]iles including hidden & ignored" })
+				builtin.find_files({ hidden = true, no_ignore = true })
+			end, { desc = "Search Files including hidden & ignored" })
 			vim.keymap.set("n", "<leader>sF", function()
-				require("telescope.builtin").find_files({
-					cwd = require("telescope.utils").buffer_dir(),
-				})
-			end, { desc = "[S]earch [F]iles from buffer cwd" })
+				builtin.find_files({ cwd = utils.buffer_dir() })
+			end, { desc = "Search Files from buffer cwd" })
 			vim.keymap.set("n", "<leader>SF", function()
-				require("telescope.builtin").find_files({
-					cwd = require("telescope.utils").buffer_dir(),
-					hidden = true,
-					no_ignore = true,
-				})
-			end, { desc = "[S]earch [F]iles from buffer cwd including hidden & ignored" })
-			vim.keymap.set("n", "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" })
-			vim.keymap.set(
-				"n",
-				"<leader>sw",
-				require("telescope.builtin").grep_string,
-				{ desc = "[S]earch current [W]ord" }
-			)
-			vim.keymap.set("n", "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" })
+				builtin.find_files({ cwd = utils.buffer_dir(), hidden = true, no_ignore = true })
+			end, { desc = "Search Files from buffer cwd including hidden & ignored" })
+
+			-- Grep pickers
 			vim.keymap.set("n", "<leader>sG", function()
-				require("telescope.builtin").live_grep({ cwd = require("telescope.utils").buffer_dir() })
-			end, { desc = "[S]earch by [G]rep from buffer cwd" })
-			vim.keymap.set(
-				"n",
-				"<leader>sd",
-				require("telescope.builtin").diagnostics,
-				{ desc = "[S]earch [D]iagnostics" }
-			)
+				builtin.live_grep({ cwd = utils.buffer_dir() })
+			end, { desc = "Search by Grep from buffer cwd" })
+
+			-- Utility pickers
+			vim.keymap.set("n", "<leader>sc", builtin.commands, { desc = "Search Commands" })
+			vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "Search Keymaps" })
+			vim.keymap.set("n", "<leader>sr", builtin.registers, { desc = "Search Registers" })
+			vim.keymap.set("n", "<leader>sm", builtin.marks, { desc = "Search Marks" })
+			vim.keymap.set("n", "<leader>sj", builtin.jumplist, { desc = "Search Jumplist" })
+			vim.keymap.set("n", "<leader>so", builtin.vim_options, { desc = "Search Options" })
+			vim.keymap.set("n", "<leader>st", builtin.colorscheme, { desc = "Search Themes" })
+			vim.keymap.set("n", "<leader>sb", builtin.current_buffer_fuzzy_find, { desc = "Search in Buffer" })
+			vim.keymap.set("n", "<leader>ss", builtin.spell_suggest, { desc = "Spell Suggestions" })
+
+			-- Git pickers
+			vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git Commits" })
+			vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "Git Branches" })
+			vim.keymap.set("n", "<leader>gs", builtin.git_status, { desc = "Git Status" })
+			vim.keymap.set("n", "<leader>gt", builtin.git_stash, { desc = "Git stash" })
+
+			-- LSP pickers (these will be available globally)
+			vim.keymap.set("n", "<leader>lr", builtin.lsp_references, { desc = "LSP References" })
+			vim.keymap.set("n", "<leader>ld", builtin.lsp_definitions, { desc = "LSP Definitions" })
+			vim.keymap.set("n", "<leader>li", builtin.lsp_implementations, { desc = "LSP Implementations" })
+			vim.keymap.set("n", "<leader>lt", builtin.lsp_type_definitions, { desc = "LSP Type definitions" })
+			vim.keymap.set("n", "<leader>ls", builtin.lsp_document_symbols, { desc = "LSP document Symbols" })
+			vim.keymap.set("n", "<leader>lS", builtin.lsp_workspace_symbols, { desc = "LSP workspace Symbols" })
+
+			-- Resume last picker
+			vim.keymap.set("n", "<leader>sR", builtin.resume, { desc = "Search Resume" })
 
 			-- Diagnostic keymaps
 			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 			vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
+		end,
+	},
 
-			-- Spell Check Keymaps
-			vim.keymap.set(
-				"n",
-				"<leader>ss",
-				require("telescope.builtin").spell_suggest,
-				{ desc = "[S]pell [S]uggestions" }
-			)
+	-- FZF native extension - optional, better performance when available
+	{
+		"nvim-telescope/telescope-fzf-native.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
+		build = "make",
+		cond = function()
+			-- Check if we have make or cmake available
+			return vim.fn.executable("make") == 1 or vim.fn.executable("cmake") == 1
+		end,
+		config = function()
+			-- Extension will be loaded automatically by telescope
+			pcall(require("telescope").load_extension, "fzf")
+		end,
+	},
 
-			-- Additional useful pickers
-			vim.keymap.set("n", "<leader>sc", require("telescope.builtin").commands, { desc = "[S]earch [C]ommands" })
-			vim.keymap.set("n", "<leader>sk", require("telescope.builtin").keymaps, { desc = "[S]earch [K]eymaps" })
-			vim.keymap.set("n", "<leader>sr", require("telescope.builtin").registers, { desc = "[S]earch [R]egisters" })
-			vim.keymap.set("n", "<leader>sm", require("telescope.builtin").marks, { desc = "[S]earch [M]arks" })
-			vim.keymap.set("n", "<leader>sj", require("telescope.builtin").jumplist, { desc = "[S]earch [J]umplist" })
-			vim.keymap.set("n", "<leader>so", require("telescope.builtin").vim_options, { desc = "[S]earch [O]ptions" })
-			vim.keymap.set("n", "<leader>st", require("telescope.builtin").colorscheme, { desc = "[S]earch [T]hemes" })
-			vim.keymap.set(
-				"n",
-				"<leader>sb",
-				require("telescope.builtin").current_buffer_fuzzy_find,
-				{ desc = "[S]earch in [B]uffer" }
-			)
-
-			-- Git pickers
-			vim.keymap.set("n", "<leader>gc", require("telescope.builtin").git_commits, { desc = "[G]it [C]ommits" })
-			vim.keymap.set("n", "<leader>gb", require("telescope.builtin").git_branches, { desc = "[G]it [B]ranches" })
-			vim.keymap.set("n", "<leader>gs", require("telescope.builtin").git_status, { desc = "[G]it [S]tatus" })
-			vim.keymap.set("n", "<leader>gt", require("telescope.builtin").git_stash, { desc = "[G]it s[T]ash" })
-
-			-- LSP pickers
-			vim.keymap.set(
-				"n",
-				"<leader>lr",
-				require("telescope.builtin").lsp_references,
-				{ desc = "[L]SP [R]eferences" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader>ld",
-				require("telescope.builtin").lsp_definitions,
-				{ desc = "[L]SP [D]efinitions" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader>li",
-				require("telescope.builtin").lsp_implementations,
-				{ desc = "[L]SP [I]mplementations" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader>lt",
-				require("telescope.builtin").lsp_type_definitions,
-				{ desc = "[L]SP [T]ype definitions" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader>ls",
-				require("telescope.builtin").lsp_document_symbols,
-				{ desc = "[L]SP document [S]ymbols" }
-			)
-			vim.keymap.set(
-				"n",
-				"<leader>lS",
-				require("telescope.builtin").lsp_workspace_symbols,
-				{ desc = "[L]SP workspace [S]ymbols" }
-			)
-
-			-- Resume last picker
-			vim.keymap.set("n", "<leader>sR", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" })
+	-- Undo tree with telescope
+	{
+		"debugloop/telescope-undo.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
+		keys = {
+			{ "<leader>su", "<cmd>Telescope undo<cr>", desc = "Search Undo tree" },
+		},
+		config = function()
+			pcall(require("telescope").load_extension, "undo")
 		end,
 	},
 }

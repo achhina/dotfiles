@@ -1,271 +1,210 @@
 local M = {}
 
--- Helper function for easier keymap creation
-local function map(mode, lhs, rhs, opts)
+-- Safe keymap helper that validates functions before setting
+local function safe_keymap(mode, lhs, rhs, opts, bufnr)
 	opts = opts or {}
-	opts.silent = opts.silent ~= false
+
+	-- Validate that rhs is a function or valid command string
+	local valid_rhs = false
+	if type(rhs) == "function" then
+		valid_rhs = true
+	elseif type(rhs) == "string" then
+		-- Check if it's a valid command
+		if rhs:match("^<cmd>") or rhs:match("^:") then
+			valid_rhs = true
+		elseif vim.fn.exists(rhs) == 1 then
+			valid_rhs = true
+		end
+	end
+
+	if not valid_rhs then
+		vim.notify("Skipping invalid keymap: " .. lhs .. " -> " .. tostring(rhs), vim.log.levels.WARN)
+		return false
+	end
+
+	-- Set buffer-specific or global keymap
+	if bufnr then
+		opts.buffer = bufnr
+	end
+
 	vim.keymap.set(mode, lhs, rhs, opts)
+	return true
 end
 
-function M.load_keymaps()
-	-- [[ Basic Keymaps ]]
-
-	-- Disable space in normal and visual mode (leader key)
-	map({ "n", "v" }, "<Space>", "<Nop>")
-
-	-- Better navigation with word wrap
-	map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
-	map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
-
-	-- Clear search highlighting
-	map("n", "<Esc>", "<cmd>nohlsearch<CR>")
-	map("n", "<leader>/", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
-
-	-- Better indenting
-	map("v", "<", "<gv", { desc = "Indent left and reselect" })
-	map("v", ">", ">gv", { desc = "Indent right and reselect" })
-
-	-- Move lines up/down
-	map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move line down" })
-	map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move line up" })
-	map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move line down" })
-	map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move line up" })
-	map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
-	map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
-
-	-- Better paste (don't overwrite register)
-	map("v", "p", '"_dP', { desc = "Paste without overwriting register" })
-
-	-- Delete to black hole register
-	map({ "n", "v" }, "<leader>d", '"_d', { desc = "Delete to black hole register" })
-
-	-- Copy to system clipboard
-	map({ "n", "v" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
-	map("n", "<leader>Y", '"+Y', { desc = "Copy line to system clipboard" })
-
-	-- Paste from system clipboard
-	map({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
-	map({ "n", "v" }, "<leader>P", '"+P', { desc = "Paste before from system clipboard" })
-
-	-- Window management
-	map("n", "<leader>wv", "<C-w>v", { desc = "Split window vertically" })
-	map("n", "<leader>wh", "<C-w>s", { desc = "Split window horizontally" })
-	map("n", "<leader>we", "<C-w>=", { desc = "Make windows equal size" })
-	map("n", "<leader>wx", "<cmd>close<CR>", { desc = "Close current window" })
-	map("n", "<leader>wm", "<cmd>MaximizerToggle<CR>", { desc = "Toggle window maximize" })
-
-	-- Window navigation (handled by vim-tmux-navigator plugin)
-
-	-- Resize windows
-	map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
-	map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
-	map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
-	map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
-
-	-- Buffer management
-	map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
-	map("n", "<leader>bD", "<cmd>bdelete!<CR>", { desc = "Force delete buffer" })
-	map("n", "<leader>ba", "<cmd>%bdelete|edit#|bdelete#<CR>", { desc = "Delete all buffers but current" })
-	map("n", "<leader>bl", "<cmd>blast<CR>", { desc = "Go to last buffer" })
-	map("n", "<leader>bf", "<cmd>bfirst<CR>", { desc = "Go to first buffer" })
-
-	-- Buffer navigation
-	map("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-	map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
-	map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-	map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-
-	-- Tab management
-	map("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
-	map("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" })
-	map("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
-	map("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
-	map("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" })
-
-	-- Quickfix list
-	map("n", "[q", "<cmd>cprevious<CR>", { desc = "Previous quickfix item" })
-	map("n", "]q", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
-	map("n", "<leader>q", function()
-		vim.diagnostic.setloclist()
-		vim.cmd("lopen")
-	end, { desc = "Show diagnostics in location list" })
-
-	-- Open quickfix list
-	map("n", "<leader>cq", "<cmd>copen<CR>", { desc = "Open quickfix list" })
-
-	-- Location list
-	map("n", "[l", "<cmd>lprevious<CR>", { desc = "Previous location item" })
-	map("n", "]l", "<cmd>lnext<CR>", { desc = "Next location item" })
-	map("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list" })
-	map("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list" })
-
-	-- Better command line editing
-	map("c", "<C-a>", "<Home>", { desc = "Go to beginning of line" })
-	map("c", "<C-e>", "<End>", { desc = "Go to end of line" })
-	map("c", "<C-h>", "<Left>", { desc = "Move cursor left" })
-	map("c", "<C-l>", "<Right>", { desc = "Move cursor right" })
-	map("c", "<C-j>", "<Down>", { desc = "Next command in history" })
-	map("c", "<C-k>", "<Up>", { desc = "Previous command in history" })
-
-	-- Insert mode navigation
-	map("i", "<C-h>", "<Left>", { desc = "Move cursor left" })
-	map("i", "<C-l>", "<Right>", { desc = "Move cursor right" })
-	map("i", "<C-j>", "<Down>", { desc = "Move cursor down" })
-	map("i", "<C-k>", "<Up>", { desc = "Move cursor up" })
-
-	-- Quick save and quit
-	map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
-	map("n", "<leader>W", "<cmd>wa<CR>", { desc = "Save all files" })
-	map("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Quit all without saving" })
-
-	-- File operations
-	map("n", "<leader>fn", "<cmd>enew<CR>", { desc = "New file" })
-	map("n", "<leader>fe", "<cmd>e!<CR>", { desc = "Reload file" })
-	map("n", "<leader>fr", "<cmd>e<CR>", { desc = "Refresh file" })
-
-	-- Text manipulation
-	map("n", "U", "<C-r>", { desc = "Redo" })
-	map("n", "<leader>J", "mzJ`z", { desc = "Join lines and restore cursor" })
-
-	-- Center screen on navigation
-	map("n", "<C-d>", "<C-d>zz", { desc = "Half page down and center" })
-	map("n", "<C-u>", "<C-u>zz", { desc = "Half page up and center" })
-	map("n", "n", "nzzzv", { desc = "Next search result and center" })
-	map("n", "N", "Nzzzv", { desc = "Previous search result and center" })
-
-	-- Select all
-	map("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
-
-	-- Increment/decrement numbers
-	map("n", "<leader>+", "<C-a>", { desc = "Increment number" })
-	map("n", "<leader>-", "<C-x>", { desc = "Decrement number" })
-
-	-- Replace word under cursor
-	map(
-		"n",
-		"<leader>rw",
-		[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-		{ desc = "Replace word under cursor" }
-	)
-
-	-- Make file executable
-	map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
-
-	-- Source current file
-	map("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
-
-	-- Toggle options
-	map("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
-	map("n", "<leader>tn", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
-	map("n", "<leader>tr", "<cmd>set relativenumber!<CR>", { desc = "Toggle relative numbers" })
-	map("n", "<leader>ts", "<cmd>set spell!<CR>", { desc = "Toggle spell check" })
-
-	-- Macro shortcuts
-	map("n", "Q", "@q", { desc = "Execute macro q" })
-	map("v", "Q", ":norm @q<CR>", { desc = "Execute macro q on selection" })
-end
-
-function M.load_lsp_keymaps(bufnr)
-	local nmap = function(keys, func, desc)
-		if desc then
-			desc = "LSP: " .. desc
-		end
-
-		vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
+-- Enhanced LSP keymap creator with validation
+local function create_lsp_keymap(bufnr)
+	-- Helper functions for different modes
+	local function nmap(keys, func, desc)
+		local full_desc = desc and ("LSP: " .. desc) or nil
+		return safe_keymap("n", keys, func, { desc = full_desc }, bufnr)
 	end
 
-	nmap("<leader>rn", function()
-		local new_name = vim.fn.input("New name: ", vim.fn.expand("<cword>"))
-		if new_name ~= "" then
-			vim.lsp.buf.rename(new_name)
-		end
-	end, "[R]e[n]ame with preview")
-	nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-	nmap("<leader>F", vim.lsp.buf.format, "[F]ormat document")
-
-	-- Advanced navigation
-	nmap("<leader>ci", vim.lsp.buf.incoming_calls, "[I]ncoming calls")
-	nmap("<leader>co", vim.lsp.buf.outgoing_calls, "[O]utgoing calls")
-	nmap("<leader>th", vim.lsp.buf.type_hierarchy, "[T]ype [H]ierarchy")
-	nmap("<leader>cl", vim.lsp.codelens.run, "[C]ode [L]ens action")
-
-	-- Format selection in visual mode
-	local vmap = function(keys, func, desc)
-		if desc then
-			desc = "LSP: " .. desc
-		end
-		vim.keymap.set("v", keys, func, { buffer = bufnr, desc = desc })
+	local function vmap(keys, func, desc)
+		local full_desc = desc and ("LSP: " .. desc) or nil
+		return safe_keymap("v", keys, func, { desc = full_desc }, bufnr)
 	end
-	vmap("<leader>F", vim.lsp.buf.format, "[F]ormat selection")
-	vmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
-	nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
-	-- Use telescope if available, otherwise fallback to built-in LSP functions
+	local function imap(keys, func, desc)
+		local full_desc = desc and ("LSP: " .. desc) or nil
+		return safe_keymap("i", keys, func, { desc = full_desc }, bufnr)
+	end
+
+	-- Check telescope availability for LSP functions
 	local has_telescope, telescope_builtin = pcall(require, "telescope.builtin")
-	if has_telescope then
-		nmap("gr", telescope_builtin.lsp_references, "[G]oto [R]eferences")
-		nmap("<leader>sy", telescope_builtin.lsp_document_symbols, "Document [S][y]mbols")
-		nmap("<leader>ws", telescope_builtin.lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+
+	-- Core LSP navigation with telescope fallbacks
+	nmap("gd", vim.lsp.buf.definition, "Goto Definition")
+	nmap("gI", vim.lsp.buf.implementation, "Goto Implementation")
+	nmap("<leader>D", vim.lsp.buf.type_definition, "Type Definition")
+
+	-- References with telescope or fallback
+	if has_telescope and telescope_builtin.lsp_references then
+		nmap("gr", telescope_builtin.lsp_references, "Goto References")
 	else
-		nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
-		nmap("<leader>sy", vim.lsp.buf.document_symbol, "Document [S][y]mbols")
-		nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
+		nmap("gr", vim.lsp.buf.references, "Goto References")
 	end
 
-	nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-	nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
+	-- Document symbols with telescope or fallback
+	if has_telescope and telescope_builtin.lsp_document_symbols then
+		nmap("<leader>sy", telescope_builtin.lsp_document_symbols, "Document Symbols")
+	else
+		nmap("<leader>sy", vim.lsp.buf.document_symbol, "Document Symbols")
+	end
 
+	-- Workspace symbols with telescope or fallback
+	if has_telescope and telescope_builtin.lsp_dynamic_workspace_symbols then
+		nmap("<leader>ws", telescope_builtin.lsp_dynamic_workspace_symbols, "Workspace Symbols")
+	else
+		nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace Symbols")
+	end
+
+	-- Core LSP actions
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
+	nmap("<leader>ca", vim.lsp.buf.code_action, "Code Action")
+	nmap("<leader>F", vim.lsp.buf.format, "Format Document")
+
+	-- Rename with input validation
+	nmap("<leader>rn", function()
+		local new_name = vim.fn.input("New name: ", vim.fn.expand("<cword>"))
+		if new_name ~= "" and new_name ~= vim.fn.expand("<cword>") then
+			vim.lsp.buf.rename(new_name)
+		end
+	end, "Rename with preview")
+
+	-- Advanced LSP features (check if they exist)
+	if vim.lsp.buf.incoming_calls then
+		nmap("<leader>ci", vim.lsp.buf.incoming_calls, "Incoming calls")
+	end
+	if vim.lsp.buf.outgoing_calls then
+		nmap("<leader>co", vim.lsp.buf.outgoing_calls, "Outgoing calls")
+	end
+	if vim.lsp.buf.type_hierarchy then
+		nmap("<leader>th", vim.lsp.buf.type_hierarchy, "Type Hierarchy")
+	end
+	if vim.lsp.codelens and vim.lsp.codelens.run then
+		nmap("<leader>cl", vim.lsp.codelens.run, "Code Lens action")
+	end
+
+	-- Visual mode mappings
+	vmap("<leader>F", vim.lsp.buf.format, "Format selection")
+	vmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
 	-- Insert mode signature help
-	local imap = function(keys, func, desc)
-		if desc then
-			desc = "LSP: " .. desc
-		end
-		vim.keymap.set("i", keys, func, { buffer = bufnr, desc = desc })
-	end
 	imap("<C-k>", vim.lsp.buf.signature_help, "Signature help")
-
-	-- Lesser used LSP functionality
-	nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-	nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
-	nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-	nmap("<leader>wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	end, "[W]orkspace [L]ist Folders")
-
-	-- Create a command `:Format` local to the LSP buffer
-	vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-		vim.lsp.buf.format()
-	end, { desc = "Format current buffer with LSP" })
 end
 
-function M.load_dap_keymaps()
-	local dap = require("dap")
-	local dapui = require("dapui")
+function M.setup()
+	-- Leader key
+	vim.g.mapleader = " "
+	vim.g.maplocalleader = " "
 
-	local nmap = function(keys, func, desc)
-		if desc then
-			desc = "[D]AP: " .. desc
-		end
-		vim.keymap.set("n", keys, func, { silent = true, desc = desc })
+	-- General keymaps with validation
+	safe_keymap("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlighting" })
+	safe_keymap("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
+	safe_keymap("i", "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save file from insert mode" })
+
+	-- Better window navigation
+	safe_keymap("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
+	safe_keymap("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
+	safe_keymap("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
+	safe_keymap("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+
+	-- Window resizing
+	safe_keymap("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height" })
+	safe_keymap("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
+	safe_keymap("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
+	safe_keymap("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
+
+	-- Buffer navigation
+	safe_keymap("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+	safe_keymap("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+	safe_keymap("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
+
+	-- Better indenting
+	safe_keymap("v", "<", "<gv", { desc = "Indent left and keep selection" })
+	safe_keymap("v", ">", ">gv", { desc = "Indent right and keep selection" })
+
+	-- Move text up and down
+	safe_keymap("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+	safe_keymap("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+	safe_keymap("x", "J", ":move '>+1<CR>gv-gv", { desc = "Move selection down" })
+	safe_keymap("x", "K", ":move '<-2<CR>gv-gv", { desc = "Move selection up" })
+
+	-- Better paste
+	safe_keymap("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
+
+	-- Keep cursor centered
+	safe_keymap("n", "<C-d>", "<C-d>zz", { desc = "Scroll down and center" })
+	safe_keymap("n", "<C-u>", "<C-u>zz", { desc = "Scroll up and center" })
+	safe_keymap("n", "n", "nzzzv", { desc = "Next search result and center" })
+	safe_keymap("n", "N", "Nzzzv", { desc = "Previous search result and center" })
+
+	-- Terminal
+	safe_keymap("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+	safe_keymap("t", "<C-h>", "<cmd>wincmd h<CR>", { desc = "Terminal: Move to left window" })
+	safe_keymap("t", "<C-j>", "<cmd>wincmd j<CR>", { desc = "Terminal: Move to bottom window" })
+	safe_keymap("t", "<C-k>", "<cmd>wincmd k<CR>", { desc = "Terminal: Move to top window" })
+	safe_keymap("t", "<C-l>", "<cmd>wincmd l<CR>", { desc = "Terminal: Move to right window" })
+
+	-- Quick commands
+	safe_keymap("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
+	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
+
+	-- Toggle options
+	safe_keymap("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
+	safe_keymap("n", "<leader>tn", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
+	safe_keymap("n", "<leader>tr", "<cmd>set relativenumber!<CR>", { desc = "Toggle relative numbers" })
+	safe_keymap("n", "<leader>ts", "<cmd>set spell!<CR>", { desc = "Toggle spell check" })
+
+	-- Macro shortcuts
+	safe_keymap("n", "Q", "@q", { desc = "Execute macro q" })
+	safe_keymap("v", "Q", ":norm @q<CR>", { desc = "Execute macro q on selection" })
+end
+
+-- LSP keymap loader with enhanced validation
+function M.load_lsp_keymaps(bufnr)
+	-- Validate that we have LSP capabilities before setting keymaps
+	local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
+	if #clients == 0 then
+		vim.notify("No active LSP clients for buffer " .. bufnr, vim.log.levels.WARN)
+		return
 	end
 
-	nmap("<leader>ds", dap.step_into, "[S]tep into")
-	nmap("<leader>dS", dap.step_back, "[S]tep back")
-	nmap("<leader>dn", dap.step_over, "[N]ext | [S]tep Over")
-	nmap("<leader>do", dap.step_out, "[S]tep [O]ut")
-	nmap("<leader>dc", dap.continue, "[C]ontinue")
-	nmap("<leader>dr", dap.repl.open, "[R]EPL Open")
-	nmap("<leader>db", dap.toggle_breakpoint, "Toggle [B]reakpoint")
-	nmap("<leader>dB", function()
-		dap.set_breakpoint(vim.fn.input("[DAP] Condition > "))
-	end, "Set [B]reakpoint")
-	nmap("<leader>de", dapui.eval, "[E]valuate")
-	nmap("<leader>dE", function()
-		dapui.eval(vim.fn.input("[DAP] Expression > "))
-	end, "[E]xpression")
+	-- Create LSP keymaps with validation
+	create_lsp_keymap(bufnr)
+
+	-- Auto-formatting on save for supported file types
+	local client = clients[1] -- Use first available client
+	if client.server_capabilities.documentFormattingProvider then
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			buffer = bufnr,
+			callback = function()
+				vim.lsp.buf.format({ bufnr = bufnr })
+			end,
+			desc = "Auto-format on save",
+		})
+	end
 end
 
 return M

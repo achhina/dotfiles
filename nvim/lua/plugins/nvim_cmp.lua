@@ -78,6 +78,7 @@ return {
 					show_labelDetails = true,
 					before = function(entry, vim_item)
 						local menu_mapping = {
+							copilot = "[Copilot]",
 							nvim_lsp = "[LSP]",
 							nvim_lua = "[Lua]",
 							luasnip = "[Snippet]",
@@ -130,6 +131,7 @@ return {
 				end, { "i", "s" }),
 			}),
 			sources = cmp.config.sources({
+				{ name = "copilot", priority = 1100 },
 				{ name = "nvim_lsp", priority = 1000 },
 				{ name = "nvim_lsp_signature_help", priority = 1000 },
 				{ name = "luasnip", priority = 750 },
