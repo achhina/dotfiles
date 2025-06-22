@@ -174,9 +174,20 @@ function M.load_lsp_keymaps(bufnr)
 		vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
 	end
 
-	nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+	nmap("<leader>rn", function()
+		local new_name = vim.fn.input("New name: ", vim.fn.expand("<cword>"))
+		if new_name ~= "" then
+			vim.lsp.buf.rename(new_name)
+		end
+	end, "[R]e[n]ame with preview")
 	nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 	nmap("<leader>F", vim.lsp.buf.format, "[F]ormat document")
+
+	-- Advanced navigation
+	nmap("<leader>ci", vim.lsp.buf.incoming_calls, "[I]ncoming calls")
+	nmap("<leader>co", vim.lsp.buf.outgoing_calls, "[O]utgoing calls")
+	nmap("<leader>th", vim.lsp.buf.type_hierarchy, "[T]ype [H]ierarchy")
+	nmap("<leader>cl", vim.lsp.codelens.run, "[C]ode [L]ens action")
 
 	-- Format selection in visual mode
 	local vmap = function(keys, func, desc)
