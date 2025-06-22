@@ -192,19 +192,74 @@ return {
 			},
 		})
 
-		-- Configure treesitter context
+		-- Configure treesitter context with performance optimizations
 		require("treesitter-context").setup({
 			enable = true,
-			max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit
-			min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit
+			max_lines = 3, -- Limit context lines for performance
+			min_window_height = 10, -- Don't show context in small windows
 			line_numbers = true,
-			multiline_threshold = 20, -- Maximum number of lines to show for a single context
-			trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded
-			mode = "cursor", -- Line used to calculate context
-			-- Separator between context and content. Should be a single character string, like '-'.
+			multiline_threshold = 2, -- Reduced threshold for better performance
+			trim_scope = "outer",
+			mode = "cursor",
 			separator = nil,
-			zindex = 20, -- The Z-index of the context window
-			on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+			zindex = 20,
+			-- Performance: disable for large files and certain file types
+			on_attach = function(buf)
+				-- Disable for large files
+				local max_filesize = 100 * 1024 -- 100 KB
+				local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+				if ok and stats and stats.size > max_filesize then
+					return false
+				end
+
+				-- Disable for specific filetypes
+				local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+				local excluded_filetypes = {
+					"help",
+					"alpha",
+					"dashboard",
+					"neo-tree",
+					"Trouble",
+					"trouble",
+					"lazy",
+					"mason",
+					"notify",
+					"toggleterm",
+					"lazyterm",
+					"oil",
+					"qf",
+					"quickfix",
+				}
+
+				for _, ft in ipairs(excluded_filetypes) do
+					if filetype == ft then
+						return false
+					end
+				end
+
+				return true
+			end,
+		})
+
+		-- Additional performance optimizations
+		-- Disable treesitter for very large buffers
+		vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
+			callback = function()
+				local buf = vim.api.nvim_get_current_buf()
+				local max_filesize = 500 * 1024 -- 500 KB
+				local filename = vim.api.nvim_buf_get_name(buf)
+
+				if filename == "" then
+					return
+				end
+
+				local ok, stats = pcall(vim.loop.fs_stat, filename)
+				if ok and stats and stats.size > max_filesize then
+					vim.notify("Large file detected. Disabling treesitter for performance.", vim.log.levels.WARN)
+					vim.api.nvim_buf_set_option(buf, "syntax", "off")
+					vim.treesitter.stop(buf)
+				end
+			end,
 		})
 	end,
 }
