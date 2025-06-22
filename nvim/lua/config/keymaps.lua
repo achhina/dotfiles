@@ -4,31 +4,38 @@ local M = {}
 local function safe_keymap(mode, lhs, rhs, opts, bufnr)
 	opts = opts or {}
 
-	-- Validate that rhs is a function or valid command string
-	local valid_rhs = false
-	if type(rhs) == "function" then
-		valid_rhs = true
-	elseif type(rhs) == "string" then
-		-- Check if it's a valid command
-		if rhs:match("^<cmd>") or rhs:match("^:") then
-			valid_rhs = true
-		elseif vim.fn.exists(rhs) == 1 then
-			valid_rhs = true
-		end
-	end
-
-	if not valid_rhs then
-		vim.notify("Skipping invalid keymap: " .. lhs .. " -> " .. tostring(rhs), vim.log.levels.WARN)
+	-- Validate rhs - only reject if it's clearly invalid
+	if rhs == nil then
+		vim.notify("Skipping invalid keymap: " .. lhs .. " -> nil", vim.log.levels.WARN)
 		return false
 	end
 
-	-- Set buffer-specific or global keymap
-	if bufnr then
-		opts.buffer = bufnr
+	-- Functions are always valid
+	if type(rhs) == "function" then
+		-- Set buffer-specific or global keymap
+		if bufnr then
+			opts.buffer = bufnr
+		end
+		vim.keymap.set(mode, lhs, rhs, opts)
+		return true
 	end
 
-	vim.keymap.set(mode, lhs, rhs, opts)
-	return true
+	-- Strings are typically valid (vim sequences, commands, etc.)
+	if type(rhs) == "string" then
+		-- Set buffer-specific or global keymap
+		if bufnr then
+			opts.buffer = bufnr
+		end
+		vim.keymap.set(mode, lhs, rhs, opts)
+		return true
+	end
+
+	-- Other types are likely invalid
+	vim.notify(
+		"Skipping invalid keymap: " .. lhs .. " -> " .. tostring(rhs) .. " (type: " .. type(rhs) .. ")",
+		vim.log.levels.WARN
+	)
+	return false
 end
 
 -- Enhanced LSP keymap creator with validation
@@ -185,7 +192,7 @@ end
 -- LSP keymap loader with enhanced validation
 function M.load_lsp_keymaps(bufnr)
 	-- Validate that we have LSP capabilities before setting keymaps
-	local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
+	local clients = vim.lsp.get_clients({ bufnr = bufnr })
 	if #clients == 0 then
 		vim.notify("No active LSP clients for buffer " .. bufnr, vim.log.levels.WARN)
 		return

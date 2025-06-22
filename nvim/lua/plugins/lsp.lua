@@ -149,7 +149,7 @@ return {
 
 		-- Advanced LSP metrics and status
 		_G.lsp_status = function()
-			local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+			local clients = vim.lsp.get_clients({ bufnr = 0 })
 			if #clients == 0 then
 				return "No LSP"
 			end

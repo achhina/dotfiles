@@ -35,10 +35,7 @@ return {
 					["."] = false,
 				},
 				copilot_node_command = "node", -- Node.js version must be > 16.x
-				server_opts_overrides = {
-					-- Explicitly prevent LSP server registration
-					name = "copilot_agent", -- Use a different name to avoid conflicts
-				},
+				server_opts_overrides = {},
 			})
 		end,
 	},
