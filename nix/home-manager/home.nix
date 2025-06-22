@@ -56,6 +56,10 @@ in
       nixpkgs-fmt
       pyright            # Python LSP
       rust-analyzer      # Rust LSP
+      marksman           # Markdown LSP
+      yaml-language-server # YAML LSP
+      dockerfile-language-server-nodejs # Docker LSP
+      taplo              # TOML LSP
       neovim
       nodejs
       pnpm
