@@ -200,11 +200,20 @@ function M.load_lsp_keymaps(bufnr)
 	vmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
 	nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
-	nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+	-- Use telescope if available, otherwise fallback to built-in LSP functions
+	local has_telescope, telescope_builtin = pcall(require, "telescope.builtin")
+	if has_telescope then
+		nmap("gr", telescope_builtin.lsp_references, "[G]oto [R]eferences")
+		nmap("<leader>sy", telescope_builtin.lsp_document_symbols, "Document [S][y]mbols")
+		nmap("<leader>ws", telescope_builtin.lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+	else
+		nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
+		nmap("<leader>sy", vim.lsp.buf.document_symbol, "Document [S][y]mbols")
+		nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
+	end
+
 	nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
 	nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
-	nmap("<leader>sy", require("telescope.builtin").lsp_document_symbols, "Document [S][y]mbols")
-	nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
