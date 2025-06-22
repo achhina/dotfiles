@@ -7,20 +7,20 @@ return {
 		config = function()
 			require("copilot").setup({
 				panel = {
-					enabled = false, -- We'll use inline suggestions
+					enabled = false, -- Disabled - using copilot-cmp instead
 					auto_refresh = true,
 				},
 				suggestion = {
-					enabled = true,
-					auto_trigger = true,
+					enabled = false, -- Disabled - using copilot-cmp instead
+					auto_trigger = false,
 					debounce = 75,
 					keymap = {
-						accept = "<M-l>", -- Alt+l to accept
-						accept_word = "<M-w>", -- Alt+w to accept word
-						accept_line = "<M-j>", -- Alt+j to accept line
-						next = "<M-]>", -- Alt+] for next suggestion
-						prev = "<M-[>", -- Alt+[ for prev suggestion
-						dismiss = "<C-]>", -- Ctrl+] to dismiss
+						accept = false, -- Disabled - using copilot-cmp
+						accept_word = false,
+						accept_line = false,
+						next = false,
+						prev = false,
+						dismiss = false,
 					},
 				},
 				filetypes = {
@@ -46,23 +46,7 @@ return {
 		dependencies = "copilot.lua",
 		opts = {},
 		config = function(_, opts)
-			-- Ensure copilot.lua is loaded first and disable LSP registration
-			local copilot_ok, _ = pcall(require, "copilot")
-			if not copilot_ok then
-				vim.notify("Copilot.lua not available, skipping copilot-cmp setup", vim.log.levels.WARN)
-				return
-			end
-
-			-- Setup copilot-cmp with safe error handling
-			local copilot_cmp_ok, copilot_cmp = pcall(require, "copilot_cmp")
-			if copilot_cmp_ok then
-				copilot_cmp.setup(vim.tbl_extend("force", {
-					-- Ensure it doesn't register as LSP server
-					method = "getCompletionsCycling", -- Use the completion method, not LSP
-				}, opts))
-			else
-				vim.notify("Failed to setup copilot-cmp", vim.log.levels.ERROR)
-			end
+			require("copilot_cmp").setup(opts)
 		end,
 	},
 }
