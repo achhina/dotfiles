@@ -120,9 +120,10 @@ return {
 				callback = function(args)
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
 					if client then
-						-- Reduce log level for expected disconnections like copilot
-						local level = client.name == "copilot" and vim.log.levels.INFO or vim.log.levels.WARN
-						vim.notify("LSP server disconnected: " .. client.name, level)
+						-- Skip notification for copilot disconnections (expected behavior)
+						if client.name ~= "copilot" then
+							vim.notify("LSP server disconnected: " .. client.name, vim.log.levels.WARN)
+						end
 						-- Auto-restart logic only for lspconfig-managed servers
 						vim.defer_fn(function()
 							-- Skip auto-restart for non-lspconfig servers like copilot
