@@ -33,6 +33,31 @@ function M.setup()
 		original_notify(msg, level, opts)
 	end
 
+	-- Intercept vim.api.nvim_echo to catch echomsg deprecation warnings
+	local original_echo = vim.api.nvim_echo
+	vim.api.nvim_echo = function(chunks, history, opts)
+		-- Check if any chunk contains deprecation warnings
+		for _, chunk in ipairs(chunks) do
+			local text = chunk[1]
+			if
+				type(text) == "string"
+				and (
+					text:match("deprecated")
+					or text:match("buf_get_clients")
+					or text:match("is_stopped")
+					or text:match("tbl_flatten")
+					or text:match("vim%.validate")
+				)
+			then
+				-- Skip echoing deprecation warnings
+				return
+			end
+		end
+
+		-- Pass through all other echo calls normally
+		return original_echo(chunks, history, opts)
+	end
+
 	-- Disable vim.deprecated health check since all warnings are from outdated plugins
 	-- This prevents the overwhelming output from :checkhealth vim.deprecated
 	local health = require("vim.health")

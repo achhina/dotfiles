@@ -30,9 +30,24 @@ return {
 				},
 				view = "mini",
 			},
+			-- Suppress mode notifications (visual, insert, etc)
 			{
 				filter = { event = "msg_showmode" },
-				view = "notify",
+				opts = { skip = true },
+			},
+			-- Suppress deprecation warnings
+			{
+				filter = {
+					event = "msg_show",
+					any = {
+						{ find = "deprecated" },
+						{ find = "buf_get_clients" },
+						{ find = "is_stopped" },
+						{ find = "tbl_flatten" },
+						{ find = "vim%.validate" },
+					},
+				},
+				opts = { skip = true },
 			},
 		},
 	},
