@@ -60,7 +60,11 @@ autocmd("BufWritePre", {
 		-- Organize imports
 		local params = vim.lsp.util.make_range_params()
 		params.context = { only = { "source.organizeImports" } }
-		local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		if err then
+			vim.notify("Error organizing imports: " .. tostring(err), vim.log.levels.WARN)
+			return
+		end
 		if result then
 			for _, res in pairs(result) do
 				if res.result then
@@ -87,7 +91,10 @@ autocmd("BufWritePre", {
 		-- Try to organize imports with LSP
 		local params = vim.lsp.util.make_range_params()
 		params.context = { only = { "source.organizeImports" } }
-		vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		local _, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		if err then
+			vim.notify("Error organizing Python imports: " .. tostring(err), vim.log.levels.WARN)
+		end
 	end,
 })
 
@@ -99,7 +106,11 @@ autocmd("BufWritePre", {
 		-- Organize imports
 		local params = vim.lsp.util.make_range_params()
 		params.context = { only = { "source.organizeImports", "source.fixAll" } }
-		local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		if err then
+			vim.notify("Error organizing TS/JS imports: " .. tostring(err), vim.log.levels.WARN)
+			return
+		end
 		if result then
 			for _, res in pairs(result) do
 				if res.result then

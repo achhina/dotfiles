@@ -120,7 +120,9 @@ return {
 				callback = function(args)
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
 					if client then
-						vim.notify("LSP server disconnected: " .. client.name, vim.log.levels.WARN)
+						-- Reduce log level for expected disconnections like copilot
+						local level = client.name == "copilot" and vim.log.levels.INFO or vim.log.levels.WARN
+						vim.notify("LSP server disconnected: " .. client.name, level)
 						-- Auto-restart logic only for lspconfig-managed servers
 						vim.defer_fn(function()
 							-- Skip auto-restart for non-lspconfig servers like copilot
@@ -315,7 +317,11 @@ return {
 				local params = vim.lsp.util.make_range_params()
 				params.context = { only = { "source.organizeImports", "source.fixAll" } }
 
-				local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+				local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+				if err then
+					vim.notify("Error organizing imports: " .. tostring(err), vim.log.levels.WARN)
+					return
+				end
 				if result then
 					for _, res in pairs(result) do
 						if res.result then
