@@ -60,6 +60,113 @@ Runs command with verbose output showing sourcing information.
 - **Example**: `:verbose map <leader>` shows where keymaps are defined
 - **Testing Use**: Identify conflicting configurations and source files
 
+## Keymap Debugging Methodology
+
+### Systematic Keymap Issue Diagnosis
+
+When keymaps aren't working as expected, follow this step-by-step approach:
+
+#### Step 1: Check Current Keymap State
+```vim
+:verbose nmap <key>    " Shows exact mapping and source file
+:verbose imap <key>    " For insert mode
+:verbose vmap <key>    " For visual mode
+:verbose tmap <key>    " For terminal mode
+```
+**Key Information**:
+- Exact command the key maps to
+- Source file where mapping was last set
+- Description if available
+
+#### Step 2: Check for Conflicts
+```vim
+:verbose map           " Show all mappings (can be long)
+:verbose nmap          " Show only normal mode mappings
+```
+Look for:
+- Multiple mappings to the same key
+- Conflicting plugin keymaps
+- Overridden default vim behaviors
+
+#### Step 3: Test Commands Directly
+```vim
+:CommandName           " Test if the target command works
+:echo exists(':CommandName')  " Check if command exists (returns 2 if exists)
+```
+
+#### Step 4: Minimal Configuration Test
+Create a minimal config to isolate the issue:
+```lua
+-- /tmp/minimal_test.lua
+vim.opt.runtimepath:prepend('~/.local/share/nvim/lazy/lazy.nvim')
+require('lazy').setup({
+  { "plugin/name", config = function()
+    -- Only the essential keymap
+    vim.keymap.set('n', '<key>', '<cmd>Command<cr>')
+  end }
+})
+```
+Test with: `nvim -u /tmp/minimal_test.lua`
+
+#### Step 5: Check Plugin Loading Order
+Plugin loading order affects keymap precedence:
+```vim
+:lua print(vim.inspect(require('lazy').plugins()))
+```
+Later-loading plugins can override earlier keymaps.
+
+### Common Keymap Issues and Solutions
+
+#### Issue: Keymap Not Working
+**Systematic Diagnosis:**
+1. `:verbose nmap <key>` - Check if key is mapped at all
+2. `:CommandName` - Test if target command works
+3. Check for conflicting plugins or configurations
+4. Verify plugin is loaded: `:lua print(require('lazy').plugins()['plugin-name']._.loaded)`
+
+#### Issue: Wrong Command Executed
+**Systematic Diagnosis:**
+1. `:verbose nmap <key>` - See what command is actually mapped
+2. Find source file causing the override
+3. Check plugin loading order
+4. Look for duplicate keymap definitions
+
+#### Issue: Keymap Inconsistent Behavior
+**Common Causes:**
+- Different behavior in different modes
+- TTY/terminal environment issues
+- Plugin-specific context requirements (like tmux-navigator)
+- Buffer-local vs global keymaps
+
+#### Real Example: Tmux Navigator Issue
+**Problem**: `<C-h>`, `<C-j>`, `<C-k>`, `<C-l>` not working for tmux navigation
+
+**Systematic Diagnosis:**
+```bash
+# Step 1: Check keymap state
+nvim -c 'verbose nmap <C-h>' -c 'qa'
+
+# Step 2: Test command directly
+nvim -c 'TmuxNavigateLeft' -c 'qa'
+
+# Step 3: Check tmux side
+tmux list-keys | grep -E "C-[hjkl]"
+
+# Step 4: Check TTY detection
+ps -o state= -o comm= -t "$(tty)" | grep vim
+```
+
+**Resolution**: Found conflicting window navigation keymaps in `keymaps.lua` overriding tmux-navigator plugin keymaps.
+
+### Keymap Testing Protocol
+
+For every keymap change:
+1. **Document expected behavior**: What should the key do?
+2. **Test before changes**: `:verbose nmap <key>`
+3. **Make targeted change**: One keymap at a time
+4. **Test after changes**: `:verbose nmap <key>`
+5. **Verify in relevant context**: Different modes, tmux sessions, etc.
+
 ### Lua Object Inspection
 ```lua
 :lua print(vim.inspect(vim.lsp.get_clients()))

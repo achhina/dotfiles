@@ -137,30 +137,86 @@ vim.defer_fn(function() vim.cmd('qa') end, 500)
 
 ### Keymap Changes
 
-**Test Template:**
+**Standard Keymap Testing Protocol:**
 ```bash
 #!/bin/bash
-# Test keymap configuration
+# Systematic keymap testing following DEBUG.md methodology
 
 echo "=== Testing Keymap: $1 ==="
+
+echo "Step 1: Check current keymap state"
+nvim -c "verbose nmap $1" -c 'qa' 2>&1
+
+echo "Step 2: Test target command directly (if applicable)"
+if [ -n "$2" ]; then
+  nvim -c "echo 'Testing command: $2'" -c "$2" -c 'qa' 2>&1
+fi
+
+echo "Step 3: Check for conflicts"
 nvim --headless -c "lua
-local keymap = '$1'
+local target_key = '$1'
 local maps = vim.api.nvim_get_keymap('n')
+local conflicts = {}
 
 for _, map in ipairs(maps) do
-  if map.lhs == keymap then
-    print('✓ Keymap found:', keymap)
-    print('  - RHS:', map.rhs or '[function]')
-    print('  - Description:', map.desc or '[none]')
-    print('  - Buffer:', map.buffer and 'buffer-local' or 'global')
+  if map.lhs == target_key then
+    table.insert(conflicts, {
+      key = map.lhs,
+      cmd = map.rhs or '[function]',
+      desc = map.desc or '[none]'
+    })
   end
 end
 
-vim.defer_fn(function() vim.cmd('qa') end, 200)
+if #conflicts == 0 then
+  print('✗ No mapping found for', target_key)
+elseif #conflicts == 1 then
+  print('✓ Single mapping found for', target_key)
+  print('  Command:', conflicts[1].cmd)
+  print('  Description:', conflicts[1].desc)
+else
+  print('⚠ Multiple mappings found for', target_key, '(potential conflict)')
+  for i, conflict in ipairs(conflicts) do
+    print('  ' .. i .. ':', conflict.cmd, '(' .. conflict.desc .. ')')
+  end
+end
+
+vim.cmd('qa')
 " 2>&1
+
+echo "Step 4: Verify in minimal config (create /tmp/minimal_test.lua if needed)"
 ```
 
-**Usage:** `test_keymap.sh '<leader>ff'`
+**Usage:** `test_keymap.sh '<C-h>' 'TmuxNavigateLeft'`
+
+**Enhanced Test for Plugin Keymaps:**
+```bash
+#!/bin/bash
+# Test plugin keymap with loading verification
+
+echo "=== Testing Plugin Keymap: $1 for $2 ==="
+
+echo "Pre-test: Check plugin loading"
+nvim --headless -c "lua
+local plugin = '$2'
+local lazy = require('lazy')
+local plugins = lazy.plugins()
+
+if plugins[plugin] then
+  print('✓ Plugin found:', plugin)
+  print('  Loaded:', plugins[plugin]._.loaded and 'YES' or 'NO')
+else
+  print('✗ Plugin not found:', plugin)
+end
+
+vim.defer_fn(function() vim.cmd('qa') end, 1000)
+" 2>&1
+
+echo "Keymap test with verbose output:"
+nvim -c "verbose nmap $1" -c 'qa' 2>&1
+```
+
+**Usage:** `test_plugin_keymap.sh '<C-h>' 'christoomey/vim-tmux-navigator'`
 
 ## Systematic Test Suites
 
