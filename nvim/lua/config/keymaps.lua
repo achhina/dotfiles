@@ -207,4 +207,50 @@ function M.load_lsp_keymaps(bufnr)
 	end
 end
 
+-- DAP keymap loader for debugging sessions
+function M.load_dap_keymaps()
+	local dap = require("dap")
+	local dapui = require("dapui")
+
+	-- Core debugging controls
+	safe_keymap("n", "<leader>ds", dap.continue, { desc = "Debug: Start/Continue" })
+	safe_keymap("n", "<leader>dS", dap.close, { desc = "Debug: Stop" })
+	safe_keymap("n", "<leader>dn", dap.step_over, { desc = "Debug: Step Over" })
+	safe_keymap("n", "<leader>di", dap.step_into, { desc = "Debug: Step Into" })
+	safe_keymap("n", "<leader>do", dap.step_out, { desc = "Debug: Step Out" })
+	safe_keymap("n", "<leader>dc", dap.run_to_cursor, { desc = "Debug: Run to Cursor" })
+	safe_keymap("n", "<leader>dr", dap.restart, { desc = "Debug: Restart" })
+
+	-- Breakpoint management
+	safe_keymap("n", "<leader>db", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint" })
+	safe_keymap("n", "<leader>dB", function()
+		dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+	end, { desc = "Debug: Conditional Breakpoint" })
+	safe_keymap("n", "<leader>dl", function()
+		dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: "))
+	end, { desc = "Debug: Log Point" })
+
+	-- UI controls
+	safe_keymap("n", "<leader>de", dapui.eval, { desc = "Debug: Evaluate Expression" })
+	safe_keymap("v", "<leader>de", dapui.eval, { desc = "Debug: Evaluate Selection" })
+	safe_keymap("n", "<leader>dE", function()
+		dapui.eval(vim.fn.input("Expression: "))
+	end, { desc = "Debug: Evaluate Input" })
+	safe_keymap("n", "<leader>du", dapui.toggle, { desc = "Debug: Toggle UI" })
+
+	-- Session management
+	safe_keymap("n", "<leader>dR", dap.clear_breakpoints, { desc = "Debug: Clear All Breakpoints" })
+	safe_keymap("n", "<leader>dt", dap.terminate, { desc = "Debug: Terminate Session" })
+
+	-- REPL
+	safe_keymap("n", "<leader>dq", dap.repl.toggle, { desc = "Debug: Toggle REPL" })
+
+	-- Advanced features if available
+	if dap.session then
+		safe_keymap("n", "<leader>dh", function()
+			dapui.hover()
+		end, { desc = "Debug: Hover Variables" })
+	end
+end
+
 return M

@@ -1,67 +1,271 @@
 return {
-	-- debugger support
+	-- Auto-install debug adapters
 	{
-		"mfussenegger/nvim-dap",
+		"jay-babu/mason-nvim-dap.nvim",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"mfussenegger/nvim-dap",
+		},
 		config = function()
-			local dap = require("dap")
-
-			-- Load DAP keymaps only when a debug session starts
-			dap.listeners.after.event_initialized["dap_keymaps"] = function()
-				require("config.keymaps").load_dap_keymaps()
-			end
-
-			-- Clean up keymaps when debug session ends
-			dap.listeners.before.event_terminated["dap_keymaps"] = function()
-				-- Clear DAP keymaps
-				local keymaps_to_clear = {
-					"<leader>ds",
-					"<leader>dS",
-					"<leader>dn",
-					"<leader>do",
-					"<leader>dc",
-					"<leader>dr",
-					"<leader>db",
-					"<leader>dB",
-					"<leader>de",
-					"<leader>dE",
-				}
-				for _, keymap in ipairs(keymaps_to_clear) do
-					pcall(vim.keymap.del, "n", keymap)
-				end
-			end
-
-			dap.listeners.before.event_exited["dap_keymaps"] = function()
-				-- Clear DAP keymaps
-				local keymaps_to_clear = {
-					"<leader>ds",
-					"<leader>dS",
-					"<leader>dn",
-					"<leader>do",
-					"<leader>dc",
-					"<leader>dr",
-					"<leader>db",
-					"<leader>dB",
-					"<leader>de",
-					"<leader>dE",
-				}
-				for _, keymap in ipairs(keymaps_to_clear) do
-					pcall(vim.keymap.del, "n", keymap)
-				end
-			end
-
-			vim.fn.sign_define("DapBreakpoint", { text = "ß", texthl = "", linehl = "", numhl = "" })
-			vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl = "", numhl = "" })
+			require("mason-nvim-dap").setup({
+				ensure_installed = {
+					"python", -- Python debugger
+					"node2", -- Node.js/JavaScript debugger
+					"chrome", -- Chrome DevTools for web debugging
+					"codelldb", -- Rust/C/C++ debugger
+				},
+				automatic_installation = true,
+				handlers = {
+					-- Default handler for auto-setup
+					function(config)
+						require("mason-nvim-dap").default_setup(config)
+					end,
+					-- Custom configurations
+					python = function(config)
+						config.adapters = {
+							type = "executable",
+							command = "python",
+							args = {
+								"-m",
+								"debugpy.adapter",
+							},
+						}
+						require("mason-nvim-dap").default_setup(config)
+					end,
+				},
+			})
 		end,
 	},
 
-	-- provides nice ui
+	-- Core debugging support
+	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"nvim-neotest/nvim-nio",
+		},
+		keys = {
+			{ "<leader>d", "", desc = "+debug", mode = { "n", "v" } },
+		},
+		config = function()
+			local dap = require("dap")
+
+			-- Enhanced sign definitions
+			vim.fn.sign_define("DapBreakpoint", {
+				text = "🔴",
+				texthl = "DiagnosticError",
+				linehl = "DapBreakpointLine",
+				numhl = "DiagnosticError",
+			})
+			vim.fn.sign_define("DapBreakpointCondition", {
+				text = "🟡",
+				texthl = "DiagnosticWarn",
+				linehl = "DapBreakpointLine",
+				numhl = "DiagnosticWarn",
+			})
+			vim.fn.sign_define("DapLogPoint", {
+				text = "📝",
+				texthl = "DiagnosticInfo",
+				linehl = "DapBreakpointLine",
+				numhl = "DiagnosticInfo",
+			})
+			vim.fn.sign_define("DapStopped", {
+				text = "▶️",
+				texthl = "DiagnosticWarn",
+				linehl = "DapStoppedLine",
+				numhl = "DiagnosticWarn",
+			})
+			vim.fn.sign_define("DapBreakpointRejected", {
+				text = "❌",
+				texthl = "DiagnosticError",
+				linehl = "DapBreakpointLine",
+				numhl = "DiagnosticError",
+			})
+
+			-- Enhanced session management
+			dap.listeners.after.event_initialized["dap_config"] = function(session)
+				require("config.keymaps").load_dap_keymaps()
+				vim.notify("Debug session started: " .. session.config.name, vim.log.levels.INFO)
+			end
+
+			dap.listeners.before.event_terminated["dap_config"] = function(session)
+				-- Clear DAP keymaps
+				local keymaps_to_clear = {
+					"<leader>ds",
+					"<leader>dS",
+					"<leader>dn",
+					"<leader>di",
+					"<leader>do",
+					"<leader>dc",
+					"<leader>dr",
+					"<leader>db",
+					"<leader>dB",
+					"<leader>dl",
+					"<leader>de",
+					"<leader>dE",
+					"<leader>du",
+					"<leader>dR",
+					"<leader>dt",
+					"<leader>dq",
+					"<leader>dh",
+				}
+				for _, keymap in ipairs(keymaps_to_clear) do
+					pcall(vim.keymap.del, "n", keymap)
+				end
+				if session then
+					vim.notify(
+						"Debug session terminated: " .. (session.config and session.config.name or "unknown"),
+						vim.log.levels.INFO
+					)
+				end
+			end
+
+			dap.listeners.before.event_exited["dap_config"] = function(session)
+				-- Same cleanup as terminated
+				local keymaps_to_clear = {
+					"<leader>ds",
+					"<leader>dS",
+					"<leader>dn",
+					"<leader>di",
+					"<leader>do",
+					"<leader>dc",
+					"<leader>dr",
+					"<leader>db",
+					"<leader>dB",
+					"<leader>dl",
+					"<leader>de",
+					"<leader>dE",
+					"<leader>du",
+					"<leader>dR",
+					"<leader>dt",
+					"<leader>dq",
+					"<leader>dh",
+				}
+				for _, keymap in ipairs(keymaps_to_clear) do
+					pcall(vim.keymap.del, "n", keymap)
+				end
+				if session then
+					vim.notify(
+						"Debug session exited: " .. (session.config and session.config.name or "unknown"),
+						vim.log.levels.INFO
+					)
+				end
+			end
+
+			-- Load advanced debugging profiles and configurations
+			require("config.debug-profiles").setup()
+
+			-- Load inline debugging enhancements
+			require("config.inline-debug").setup()
+		end,
+	},
+
+	-- Enhanced debugging UI
 	{
 		"rcarriga/nvim-dap-ui",
-		dependencies = "mfussenegger/nvim-dap",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"nvim-neotest/nvim-nio",
+		},
+		keys = {
+			{
+				"<leader>du",
+				function()
+					require("dapui").toggle()
+				end,
+				desc = "Debug: Toggle UI",
+			},
+			{
+				"<leader>de",
+				function()
+					require("dapui").eval()
+				end,
+				desc = "Debug: Evaluate Expression",
+				mode = { "n", "v" },
+			},
+		},
 		config = function()
 			local dap = require("dap")
 			local dapui = require("dapui")
-			dapui.setup()
+
+			dapui.setup({
+				controls = {
+					element = "repl",
+					enabled = true,
+					icons = {
+						disconnect = "⏹",
+						pause = "⏸",
+						play = "▶",
+						run_last = "⏮",
+						step_back = "⏪",
+						step_into = "⏬",
+						step_out = "⏫",
+						step_over = "⏭",
+						terminate = "⏹",
+					},
+				},
+				element_mappings = {
+					scopes = {
+						edit = "e",
+						expand = { "<CR>", "<2-LeftMouse>" },
+						repl = "r",
+						toggle = "t",
+					},
+					watches = {
+						edit = "e",
+						expand = { "<CR>", "<2-LeftMouse>" },
+						remove = "d",
+						repl = "r",
+						toggle = "t",
+					},
+				},
+				expand_lines = true,
+				floating = {
+					border = "rounded",
+					mappings = {
+						close = { "q", "<Esc>" },
+					},
+				},
+				force_buffers = true,
+				icons = {
+					collapsed = "▶",
+					current_frame = "▶",
+					expanded = "▼",
+				},
+				layouts = {
+					{
+						elements = {
+							{ id = "scopes", size = 0.25 },
+							{ id = "breakpoints", size = 0.25 },
+							{ id = "stacks", size = 0.25 },
+							{ id = "watches", size = 0.25 },
+						},
+						position = "left",
+						size = 40,
+					},
+					{
+						elements = {
+							{ id = "repl", size = 0.5 },
+							{ id = "console", size = 0.5 },
+						},
+						position = "bottom",
+						size = 10,
+					},
+				},
+				mappings = {
+					edit = "e",
+					expand = { "<CR>", "<2-LeftMouse>" },
+					open = "o",
+					remove = "d",
+					repl = "r",
+					toggle = "t",
+				},
+				render = {
+					indent = 1,
+					max_value_lines = 100,
+				},
+			})
+
+			-- Auto-open/close UI
 			dap.listeners.after.event_initialized["dapui_config"] = function()
 				dapui.open()
 			end
@@ -74,7 +278,56 @@ return {
 		end,
 	},
 
-	-- python debugger
+	-- Telescope integration for DAP
+	{
+		"nvim-telescope/telescope-dap.nvim",
+		dependencies = {
+			"nvim-telescope/telescope.nvim",
+			"mfussenegger/nvim-dap",
+		},
+		config = function()
+			require("telescope").load_extension("dap")
+		end,
+		keys = {
+			{
+				"<leader>dfc",
+				function()
+					require("telescope").extensions.dap.configurations()
+				end,
+				desc = "Debug: Configurations",
+			},
+			{
+				"<leader>dfb",
+				function()
+					require("telescope").extensions.dap.list_breakpoints()
+				end,
+				desc = "Debug: List Breakpoints",
+			},
+			{
+				"<leader>dfv",
+				function()
+					require("telescope").extensions.dap.variables()
+				end,
+				desc = "Debug: Variables",
+			},
+			{
+				"<leader>dff",
+				function()
+					require("telescope").extensions.dap.frames()
+				end,
+				desc = "Debug: Frames",
+			},
+			{
+				"<leader>dfc",
+				function()
+					require("telescope").extensions.dap.commands()
+				end,
+				desc = "Debug: Commands",
+			},
+		},
+	},
+
+	-- Enhanced Python debugging
 	{
 		"mfussenegger/nvim-dap-python",
 		ft = "python",
@@ -82,45 +335,243 @@ return {
 			"mfussenegger/nvim-dap",
 			"rcarriga/nvim-dap-ui",
 		},
+		keys = {
+			{
+				"<leader>dpt",
+				function()
+					require("dap-python").test_method()
+				end,
+				desc = "Debug: Test Method",
+				ft = "python",
+			},
+			{
+				"<leader>dpc",
+				function()
+					require("dap-python").test_class()
+				end,
+				desc = "Debug: Test Class",
+				ft = "python",
+			},
+			{
+				"<leader>dps",
+				function()
+					require("dap-python").debug_selection()
+				end,
+				desc = "Debug: Debug Selection",
+				mode = "v",
+				ft = "python",
+			},
+		},
 		config = function()
-			require("dap-python").setup("~/venv/debugpy/bin/python")
+			-- Try to find Python with debugpy installed
+			local python_path = vim.fn.exepath("python3") or vim.fn.exepath("python")
 
-			-- Add configuration overrides
-			local configurations = require("dap").configurations.python
-			for _, configuration in pairs(configurations) do
+			-- Setup with fallback paths
+			local debugpy_python = python_path
+			if vim.fn.isdirectory(vim.fn.expand("~/venv/debugpy")) == 1 then
+				debugpy_python = "~/venv/debugpy/bin/python"
+			elseif vim.fn.isdirectory(vim.fn.expand("~/.virtualenvs/debugpy")) == 1 then
+				debugpy_python = "~/.virtualenvs/debugpy/bin/python"
+			end
+
+			require("dap-python").setup(debugpy_python)
+
+			-- Enhanced Python configurations
+			local dap = require("dap")
+			table.insert(dap.configurations.python, {
+				name = "Python: Django",
+				type = "python",
+				request = "launch",
+				program = vim.fn.getcwd() .. "/manage.py",
+				args = { "runserver", "--noreload" },
+				django = true,
+				justMyCode = false,
+			})
+
+			table.insert(dap.configurations.python, {
+				name = "Python: Flask",
+				type = "python",
+				request = "launch",
+				module = "flask",
+				env = { FLASK_APP = "app.py" },
+				args = { "run", "--debug" },
+				justMyCode = false,
+			})
+
+			table.insert(dap.configurations.python, {
+				name = "Python: FastAPI",
+				type = "python",
+				request = "launch",
+				module = "uvicorn",
+				args = { "main:app", "--reload" },
+				justMyCode = false,
+			})
+
+			-- Override default configurations
+			for _, configuration in pairs(dap.configurations.python) do
 				configuration.justMyCode = false
+				configuration.console = "integratedTerminal"
 			end
 		end,
 	},
 
-	-- virtual text support
+	-- Enhanced virtual text support (works with all languages)
 	{
 		"theHamsta/nvim-dap-virtual-text",
-		ft = "python",
 		dependencies = {
 			"mfussenegger/nvim-dap",
-			"rcarriga/nvim-dap-ui",
+			"nvim-treesitter/nvim-treesitter",
+		},
+		keys = {
+			{
+				"<leader>dvt",
+				function()
+					require("nvim-dap-virtual-text").toggle()
+				end,
+				desc = "Debug: Toggle Virtual Text",
+			},
 		},
 		config = function()
 			require("nvim-dap-virtual-text").setup({
 				enabled = true,
-
-				-- DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, DapVirtualTextForceRefresh
-				enabled_commands = false,
-
-				-- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
+				enabled_commands = true,
 				highlight_changed_variables = true,
 				highlight_new_as_changed = true,
-
-				-- prefix virtual text with comment string
-				commented = false,
-
 				show_stop_reason = true,
-
-				-- experimental features:
-				-- virt_text_pos = "eol", -- position of virtual text, see `:h nvim_buf_set_extmark()`
-				-- all_frames = true, -- show virtual text for all stack frames not only current
+				commented = false,
+				only_first_definition = true,
+				all_references = false,
+				clear_on_continue = false,
+				display_callback = function(variable, _, _, _, options)
+					-- Custom display formatting
+					if options.virt_text_pos == "inline" then
+						return " = " .. variable.value
+					else
+						return variable.name .. " = " .. variable.value
+					end
+				end,
+				virt_text_pos = vim.fn.has("nvim-0.10") == 1 and "inline" or "eol",
+				all_frames = false,
+				virt_lines = false,
+				virt_text_win_col = nil,
 			})
+		end,
+	},
+
+	-- Persistent breakpoints
+	{
+		"Weissle/persistent-breakpoints.nvim",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+		keys = {
+			{
+				"<leader>dbb",
+				function()
+					require("persistent-breakpoints.api").toggle_breakpoint()
+				end,
+				desc = "Debug: Toggle Breakpoint (Persistent)",
+			},
+			{
+				"<leader>dbc",
+				function()
+					require("persistent-breakpoints.api").clear_all_breakpoints()
+				end,
+				desc = "Debug: Clear All Breakpoints (Persistent)",
+			},
+			{
+				"<leader>dbl",
+				function()
+					require("persistent-breakpoints.api").load_breakpoints()
+				end,
+				desc = "Debug: Load Breakpoints",
+			},
+			{
+				"<leader>dbs",
+				function()
+					require("persistent-breakpoints.api").save_breakpoints()
+				end,
+				desc = "Debug: Save Breakpoints",
+			},
+		},
+		config = function()
+			require("persistent-breakpoints").setup({
+				save_dir = vim.fn.stdpath("data") .. "/dap_breakpoints/",
+				load_breakpoints_event = { "BufReadPost" },
+				perf_record = false,
+				on_load_breakpoint = function()
+					vim.notify("Breakpoints loaded", vim.log.levels.INFO)
+				end,
+			})
+		end,
+	},
+
+	-- Enhanced REPL and debug console
+	{
+		"rcarriga/cmp-dap",
+		dependencies = {
+			"hrsh7th/nvim-cmp",
+			"mfussenegger/nvim-dap",
+		},
+		config = function()
+			require("cmp").setup({
+				enabled = function()
+					return vim.api.nvim_get_option_value("buftype", { buf = 0 }) ~= "prompt"
+						or require("cmp_dap").is_dap_buffer()
+				end,
+			})
+
+			require("cmp").setup.filetype({ "dap-repl", "dapui_watches", "dapui_hover" }, {
+				sources = {
+					{ name = "dap" },
+				},
+			})
+		end,
+	},
+
+	-- Auto-attach to processes
+	{
+		"ofirgall/goto-breakpoints.nvim",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+		keys = {
+			{
+				"<leader>dgn",
+				function()
+					require("goto-breakpoints").next()
+				end,
+				desc = "Debug: Next Breakpoint",
+			},
+			{
+				"<leader>dgp",
+				function()
+					require("goto-breakpoints").prev()
+				end,
+				desc = "Debug: Previous Breakpoint",
+			},
+			{
+				"<leader>dgc",
+				function()
+					require("goto-breakpoints").cycle()
+				end,
+				desc = "Debug: Cycle Through Breakpoints",
+			},
+		},
+		config = function()
+			require("goto-breakpoints").setup({})
+		end,
+	},
+
+	-- Debug profiles and configurations
+	{
+		"LiadOz/nvim-dap-repl-highlights",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"nvim-treesitter/nvim-treesitter",
+		},
+		config = function()
+			require("nvim-dap-repl-highlights").setup()
 		end,
 	},
 }

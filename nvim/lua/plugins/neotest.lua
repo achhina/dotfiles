@@ -81,6 +81,10 @@ return {
 			require("neotest").run.run({ strategy = "dap" })
 		end, { desc = "Debug nearest test" })
 
+		vim.keymap.set("n", "<leader>tD", function()
+			require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
+		end, { desc = "Debug all tests in file" })
+
 		vim.keymap.set("n", "<leader>ts", function()
 			require("neotest").summary.toggle()
 		end, { desc = "Toggle test summary" })

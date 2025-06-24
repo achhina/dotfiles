@@ -475,9 +475,9 @@ return {
 		event = "VeryLazy",
 		init = function()
 			vim.g.VM_maps = {
-				["Find Under"] = "<C-d>",
-				["Find Subword Under"] = "<C-d>",
-				["Select All"] = "<C-S-d>",
+				["Find Under"] = "<C-n>",
+				["Find Subword Under"] = "<C-n>",
+				["Select All"] = "<C-S-n>",
 				["Select h"] = "<S-Left>",
 				["Select l"] = "<S-Right>",
 				["Add Cursor Down"] = "<C-Down>",
