@@ -2,6 +2,8 @@
 
 **MANDATORY**: Every Neovim configuration change must be verified with appropriate tests following these standards.
 
+> 📖 **See DEBUG.md for comprehensive debugging workflows and real examples**
+
 ## Core Testing Protocol
 
 ### 1. Pre-Change Baseline (ALWAYS REQUIRED)

@@ -1,349 +1,242 @@
-# Neovim Testing & Debugging Guide
+# Neovim Debugging Guide
 
-## Systematic Configuration Testing Methodology
+## Emergency Triage (30 seconds)
 
-### Pre-Change Baseline (Always Do First)
-```vim
-:checkhealth       " Document all current warnings/errors
-:LspInfo          " Note active LSP servers and configurations
-:messages         " Check for existing error messages
-:verbose map      " Review current keymap sources
-```
-
-### Post-Change Verification (Test Every Fix)
-```vim
-:checkhealth       " Verify warnings/errors are resolved
-:LspInfo          " Confirm LSP server changes took effect
-:messages         " Check for new error messages
-:LspRestart       " Restart LSP servers to test new configs
-```
-
-### Testing LSP Changes Specifically
-```vim
-:LspInfo                    " Before: Note active servers and configs
-" Make LSP configuration changes
-:LspStop <server_name>      " Stop specific server
-:LspStart <server_name>     " Restart specific server
-:LspInfo                    " After: Verify changes took effect
-:LspLog                     " Check for errors in communication
-```
-
-## Core Diagnostics
-
-### `:checkhealth`
-Main diagnostic command. Shows status of all plugins and configurations.
-- **Source**: `:help checkhealth`
-- **Testing Use**: Establish baseline before changes, verify fixes after
-- **Focus Areas**: Look for deprecation warnings, missing dependencies, configuration errors
-
-### `:LspInfo`
-Shows status of all LSP servers for current buffer.
-- **Source**: nvim-lspconfig documentation
-- **Testing Use**: Verify LSP server attachment, check for unwanted servers
-- **Key Info**: Active clients, enabled configurations, attached buffers
-
-### `:messages`
-Shows all vim messages including errors and warnings.
-- **Source**: `:help messages`
-- **Testing Use**: Catch runtime errors that may not show in other commands
-
-### `:LspLog`
-Opens LSP log file in split window.
-- **Source**: nvim-lspconfig documentation
-- **Testing Use**: Debug LSP communication issues and server errors
-
-## Advanced Debugging
-
-### `:verbose <command>`
-Runs command with verbose output showing sourcing information.
-- **Source**: `:help verbose`
-- **Example**: `:verbose map <leader>` shows where keymaps are defined
-- **Testing Use**: Identify conflicting configurations and source files
-
-## Keymap Debugging Methodology
-
-### Systematic Keymap Issue Diagnosis
-
-When keymaps aren't working as expected, follow this step-by-step approach:
-
-#### Step 1: Check Current Keymap State
-```vim
-:verbose nmap <key>    " Shows exact mapping and source file
-:verbose imap <key>    " For insert mode
-:verbose vmap <key>    " For visual mode
-:verbose tmap <key>    " For terminal mode
-```
-**Key Information**:
-- Exact command the key maps to
-- Source file where mapping was last set
-- Description if available
-
-#### Step 2: Check for Conflicts
-```vim
-:verbose map           " Show all mappings (can be long)
-:verbose nmap          " Show only normal mode mappings
-```
-Look for:
-- Multiple mappings to the same key
-- Conflicting plugin keymaps
-- Overridden default vim behaviors
-
-#### Step 3: Test Commands Directly
-```vim
-:CommandName           " Test if the target command works
-:echo exists(':CommandName')  " Check if command exists (returns 2 if exists)
-```
-
-#### Step 4: Minimal Configuration Test
-Create a minimal config to isolate the issue:
-```lua
--- /tmp/minimal_test.lua
-vim.opt.runtimepath:prepend('~/.local/share/nvim/lazy/lazy.nvim')
-require('lazy').setup({
-  { "plugin/name", config = function()
-    -- Only the essential keymap
-    vim.keymap.set('n', '<key>', '<cmd>Command<cr>')
-  end }
-})
-```
-Test with: `nvim -u /tmp/minimal_test.lua`
-
-#### Step 5: Check Plugin Loading Order
-Plugin loading order affects keymap precedence:
-```vim
-:lua print(vim.inspect(require('lazy').plugins()))
-```
-Later-loading plugins can override earlier keymaps.
-
-### Common Keymap Issues and Solutions
-
-#### Issue: Keymap Not Working
-**Systematic Diagnosis:**
-1. `:verbose nmap <key>` - Check if key is mapped at all
-2. `:CommandName` - Test if target command works
-3. Check for conflicting plugins or configurations
-4. Verify plugin is loaded: `:lua print(require('lazy').plugins()['plugin-name']._.loaded)`
-
-#### Issue: Wrong Command Executed
-**Systematic Diagnosis:**
-1. `:verbose nmap <key>` - See what command is actually mapped
-2. Find source file causing the override
-3. Check plugin loading order
-4. Look for duplicate keymap definitions
-
-#### Issue: Keymap Inconsistent Behavior
-**Common Causes:**
-- Different behavior in different modes
-- TTY/terminal environment issues
-- Plugin-specific context requirements (like tmux-navigator)
-- Buffer-local vs global keymaps
-
-#### Real Example: Tmux Navigator Issue
-**Problem**: `<C-h>`, `<C-j>`, `<C-k>`, `<C-l>` not working for tmux navigation
-
-**Systematic Diagnosis:**
 ```bash
-# Step 1: Check keymap state
-nvim -c 'verbose nmap <C-h>' -c 'qa'
+# Editor won't start
+nvim --clean
+nvim --noplugin
 
-# Step 2: Test command directly
-nvim -c 'TmuxNavigateLeft' -c 'qa'
+# Editor freezes/crashes
+pkill nvim; nvim --clean
 
-# Step 3: Check tmux side
-tmux list-keys | grep -E "C-[hjkl]"
-
-# Step 4: Check TTY detection
-ps -o state= -o comm= -t "$(tty)" | grep vim
+# Can't save files (run inside nvim)
+:w! /tmp/backup.txt
 ```
 
-**Resolution**: Found conflicting window navigation keymaps in `keymaps.lua` overriding tmux-navigator plugin keymaps.
+## Quick Diagnosis (2 minutes)
 
-### Keymap Testing Protocol
+| Problem | Command | Look For |
+|---------|---------|----------|
+| General issues | `:checkhealth` | ❌ and ⚠️ |
+| Plugin errors | `:messages` | "Error", stack traces |
+| LSP not working | `:LspInfo` | Server status |
+| Keymaps broken | `:verbose nmap <key>` | Source conflicts |
+| Slow startup | `nvim --startuptime /tmp/startup.log` | >50ms items |
 
-For every keymap change:
-1. **Document expected behavior**: What should the key do?
-2. **Test before changes**: `:verbose nmap <key>`
-3. **Make targeted change**: One keymap at a time
-4. **Test after changes**: `:verbose nmap <key>`
-5. **Verify in relevant context**: Different modes, tmux sessions, etc.
+## Core Debugging Commands
 
-### Lua Object Inspection
-```lua
-:lua print(vim.inspect(vim.lsp.get_clients()))
-:lua print(vim.inspect(require('lazy').plugins()))
-```
-- **Source**: `:help vim.inspect`
-- **Testing Use**: Inspect runtime state of plugins and LSP clients
-
-### Enable LSP Debug Logging
-```lua
-vim.lsp.set_log_level("DEBUG")  -- Temporary debugging
-vim.lsp.set_log_level("WARN")   -- Restore normal level
-```
-- **Source**: `:help vim.lsp`
-- **Testing Use**: Detailed LSP communication debugging
-
-## Configuration Change Testing Protocol
-
-### 1. Document Current State
-```bash
-# Create baseline snapshot
-nvim --headless -c 'checkhealth' -c 'wqall' > /tmp/baseline_health.txt
-nvim --headless -c 'LspInfo' -c 'wqall' > /tmp/baseline_lsp.txt
-```
-
-### 2. Make Targeted Changes
-- Change one configuration aspect at a time
-- Document what you expect the change to accomplish
-- Note specific observability commands to verify the change
-
-### 3. Test Changes Immediately
+### Interactive Debugging
 ```vim
-:source $MYVIMRC    " Reload configuration
-:checkhealth        " Compare against baseline
-:LspInfo            " Verify LSP changes
-:messages           " Check for new errors
+" Live inspection - use this first
+:lua vim.print(vim.lsp.get_clients())
+:lua vim.print(require('lazy').plugins())
+:lua vim.print(vim.g)
+
+" Test specific functionality
+:lua require('plugin-name').setup()
+:lua pcall(require, 'broken-plugin')
 ```
 
-### 4. Verify Specific Behaviors
-```vim
-" Test specific functionality that should be affected
-" Example: If changing copilot config, test completion in insert mode
-" Example: If changing LSP config, test go-to-definition
-```
-
-## Environment Variables for Testing
-
-### `NVIM_LOG_FILE`
+### System State Check
 ```bash
-export NVIM_LOG_FILE=/tmp/nvim_test.log
-nvim # Test configuration
-# Review /tmp/nvim_test.log for errors
+# Configuration test
+nvim --headless -c 'checkhealth' -c 'qa'
+
+# Plugin loading test
+nvim --headless -c 'lua print("Plugins:", vim.tbl_count(require("lazy").plugins()))' -c 'qa'
+
+# LSP server test
+nvim --headless -c 'lua vim.defer_fn(function() print("LSP clients:", #vim.lsp.get_clients()); vim.cmd("qa") end, 2000)'
 ```
 
-## Common Testing Scenarios
+## Problem Classes & Solutions
 
-### Testing LSP Server Changes
-```vim
-:LspInfo                    " Before
-" Change server configuration
-:LspRestart                 " Apply changes
-:LspInfo                    " After - verify changes
-:lua print(vim.inspect(vim.lsp.get_clients())) " Detailed inspection
-```
-
-### Testing Plugin Configuration
-```vim
-:checkhealth <plugin_name>  " Before
-" Change plugin configuration
-:Lazy reload <plugin_name>  " Reload plugin
-:checkhealth <plugin_name>  " After - verify changes
-```
-
-### Testing Keymap Changes
-```vim
-:verbose map <key>          " Before - check current mapping
-" Change keymap configuration
-:source $MYVIMRC           " Reload
-:verbose map <key>          " After - verify new mapping
-```
-
-## Headless Testing for Automated Verification
-
-### Why Headless Testing is Superior for Configuration Verification
-
-Headless mode (`nvim --headless`) provides:
-- **Faster execution** - No UI startup overhead
-- **Isolated environment** - Tests pure configuration without UI interactions
-- **Automated verification** - Can script complex test scenarios
-- **Deterministic results** - No user input or timing issues
-- **Real plugin loading** - All plugins load normally, just without UI
-
-### Headless Testing Examples
-
-#### Test LSP Server Configuration
+### Plugin Issues
 ```bash
-# Test if specific LSP servers are running
-nvim --headless -c 'lua
-vim.defer_fn(function()
-  local clients = vim.lsp.get_clients()
-  print("Active LSP clients:", #clients)
-  for i, client in ipairs(clients) do
-    print("  " .. i .. ":", client.name, "(id:" .. client.id .. ")")
-  end
-  vim.cmd("qa")
-end, 2000)' 2>&1
+# 1. Check if plugin loaded
+:lua vim.print(require('lazy').plugins()['plugin-name'])
+# Alternative: :Lazy (shows loaded status)
+
+# 2. Test manual loading
+:lua require('lazy').load({plugins = {'plugin-name'}})
+# Alternative: :Lazy load plugin-name
+
+# 3. Check for errors
+:messages
+
+# 4. Nuclear option (backup first!)
+cp -r ~/.local/share/nvim/lazy ~/.local/share/nvim/lazy.backup
+rm -rf ~/.local/share/nvim/lazy/plugin-name
 ```
 
-#### Test Plugin Configuration Loading
+### LSP Problems
 ```bash
-# Test if plugin configuration is correct
-nvim --headless -c 'lua
-local ok, plugin = pcall(require, "plugin_name")
-if ok then
-  print("Plugin loaded:", ok)
-  print("Config:", vim.inspect(plugin.config or plugin._config))
-else
-  print("Plugin failed:", plugin)
-end
-vim.defer_fn(function() vim.cmd("qa") end, 500)' 2>&1
+# 1. Check server status
+:LspInfo
+
+# 2. Check server installation
+which lua-language-server
+which typescript-language-server
+# Or check Mason: :Mason
+
+# 3. Restart LSP
+:LspRestart
+
+# 4. Check logs
+:LspLog
 ```
 
-#### Test for Deprecation Warnings
+### Performance Issues
 ```bash
-# Capture deprecation warnings during startup
-nvim --headless -c 'lua
-local original_notify = vim.notify
-local warnings = {}
-vim.notify = function(msg, level)
-  if level == vim.log.levels.WARN and msg:match("deprecated") then
-    table.insert(warnings, msg)
-  end
-  original_notify(msg, level)
+# 1. Profile startup
+nvim --startuptime /tmp/startup.log
+sort -k2 -nr /tmp/startup.log | head -10
+
+# 2. Check memory usage
+:lua print("Memory:", collectgarbage("count"), "KB")
+
+# 3. Profile specific operations
+:profile start /tmp/profile.log
+:profile func *
+:profile file *
+# do slow operation
+:profile pause
+:profile dump
+```
+
+### Configuration Conflicts
+```bash
+# 1. Check for duplicate setups
+grep -r "setup" ~/.config/nvim/lua/ | grep -v "^--" | sort
+
+# 2. Test minimal config
+nvim --clean -u minimal.lua
+
+# 3. Check keymap conflicts
+:verbose nmap <key>
+# Or list all: :nmap | grep "<key>"
+
+# 4. Binary search config files
+# Comment out half your config, test, repeat
+```
+
+## Systematic Debugging Process
+
+### Step 1: Reproduce & Isolate
+```bash
+# Can you reproduce in clean config?
+nvim --clean
+
+# Can you reproduce with minimal config?
+echo 'require("problem-plugin")' > /tmp/minimal.lua
+nvim --clean -u /tmp/minimal.lua
+# Or test specific functionality:
+echo 'vim.cmd("colorscheme default"); require("plugin")' > /tmp/test.lua
+```
+
+### Step 2: Gather Information
+```bash
+# Capture baseline state
+nvim --headless -c 'checkhealth' -c 'qa' > /tmp/health.txt
+nvim --headless -c 'messages' -c 'qa' > /tmp/messages.txt
+nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
+```
+
+### Step 3: Test Solutions
+```bash
+# Test one change at a time
+# Document what you tried
+# Compare before/after states
+```
+
+### Step 4: Verify Fix
+```bash
+# Restart nvim completely
+# Run same health checks
+# Test related functionality
+```
+
+## Red Flags (Fix Immediately)
+
+- 🔴 `Error executing lua callback` → Plugin API breakage
+- 🔴 `attempt to call field 'X' (a nil value)` → Missing dependency
+- 🔴 `module 'X' not found` → Plugin not installed
+- 🟡 >10 deprecation warnings → API compatibility issues
+- 🟡 Startup time >1 second → Performance problem
+- 🟡 LSP servers restarting → Configuration conflict
+
+## Advanced Techniques (When Basic Fixes Fail)
+
+### Configuration Bisection
+```bash
+# When you don't know what broke
+git log --oneline -10
+git bisect start
+git bisect bad HEAD
+git bisect good <last-working-commit>
+# git will guide you through testing
+```
+
+### Deep LSP Debugging
+```vim
+# Enable debug logging
+:lua vim.lsp.set_log_level("DEBUG")
+
+# Monitor requests/responses (advanced)
+:lua local original_request = vim.lsp.buf_request
+vim.lsp.buf_request = function(bufnr, method, params, handler)
+  print("LSP:", method, vim.inspect(params))
+  return original_request(bufnr, method, params, handler)
 end
 
-vim.defer_fn(function()
-  print("Deprecation warnings found:")
-  for i, warning in ipairs(warnings) do
-    print("  " .. i .. ":", warning)
-  end
-  vim.cmd("qa")
-end, 1000)' 2>&1
+# View LSP log
+:LspLog
 ```
 
-### Real Example: Copilot LSP Investigation
-
-This headless test revealed that copilot.lua **always** starts an LSP server:
+### Memory Leak Detection
 ```bash
-nvim --headless -c 'lua
-local copilot = require("copilot")
-print("Copilot suggestion enabled:",
-  copilot._config and copilot._config.suggestion and copilot._config.suggestion.enabled)
-
-vim.defer_fn(function()
-  local clients = vim.lsp.get_clients()
-  print("Copilot LSP running despite suggestion.enabled=false:", #clients > 0)
-  vim.cmd("qa")
-end, 2000)' 2>&1
+# Track memory over time
+for i in {1..10}; do
+  nvim --headless -c 'lua print(collectgarbage("count"))' -c 'qa'
+  sleep 1
+done
 ```
 
-**Result**: Showed that disabling `suggestion.enabled` doesn't prevent LSP server startup, correcting wrong assumptions about the architecture.
-
-### Systematic Headless Test Template
-
+### Environment Testing
 ```bash
-#!/bin/bash
-# Template for testing Neovim configuration changes
-echo "=== Pre-Change Baseline ==="
-nvim --headless -c 'BASELINE_TEST_COMMANDS_HERE' -c 'qa' 2>&1
-
-echo "=== Making Configuration Changes ==="
-# Apply your configuration changes here
-
-echo "=== Post-Change Verification ==="
-nvim --headless -c 'VERIFICATION_TEST_COMMANDS_HERE' -c 'qa' 2>&1
-
-echo "=== Test Complete ==="
+# Test in different environments
+SSH_CONNECTION=test nvim    # Simulate remote
+TERM=xterm-256color nvim    # Test terminal compatibility
+DISPLAY= nvim              # Test without GUI
+TMUX= nvim                 # Test outside tmux
 ```
 
-**Key Principle**: Always establish baseline state before making changes, then use the same observability tools to verify fixes took effect. Headless testing provides automated, deterministic verification of configuration behavior.
+## Quick Reference
+
+### Must-Know Commands
+- `:checkhealth` - First line of defense
+- `:messages` - See what broke
+- `:LspInfo` - LSP status
+- `:verbose nmap <key>` - Find keymap conflicts
+- `:lua vim.print(X)` - Inspect anything
+- `:Lazy` - Plugin manager status
+- `:Mason` - LSP server manager
+
+### Common Fixes
+- Restart Neovim completely (don't just `:source`)
+- Clear plugin cache: `rm -rf ~/.local/share/nvim/lazy` (backup first!)
+- Reset LSP: `:LspRestart`
+- Test with `:lua` before changing config files
+- Check file permissions: `ls -la ~/.config/nvim/`
+- Update plugins: `:Lazy sync`
+
+### When to Escalate
+- Basic commands don't reveal the issue
+- Problem only occurs in specific environments
+- Need to understand complex plugin interactions
+- Performance issues require detailed profiling
+
+---
+
+*Focus: Find the problem fast → Fix it → Verify it works*
