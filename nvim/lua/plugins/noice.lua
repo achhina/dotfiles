@@ -116,7 +116,7 @@ return {
 	},
 	dependencies = {
 		"MunifTanjim/nui.nvim",
-		"rcarriga/nvim-notify",
-		"hrsh7th/nvim-cmp",
+		-- Note: Using snacks.notifier instead of nvim-notify for vim.notify()
+		-- but noice still needs UI components for cmdline/search/messages
 	},
 }

@@ -543,7 +543,7 @@ return {
 
 		-- Enhanced capabilities with modern LSP features
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
-		capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+		capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
 
 		-- Add semantic tokens support
 		capabilities.textDocument.semanticTokens =

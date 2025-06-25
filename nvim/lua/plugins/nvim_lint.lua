@@ -4,7 +4,7 @@ return {
 	config = function()
 		local lint = require("lint")
 
-		-- Configure linters by filetype
+		-- Configure linters by filetype (only if available)
 		lint.linters_by_ft = {
 			python = { "ruff" },
 			javascript = { "eslint_d" },
@@ -17,7 +17,7 @@ return {
 			bash = { "shellcheck" },
 			dockerfile = { "hadolint" },
 			yaml = { "yamllint" },
-			markdown = { "markdownlint" },
+			-- markdown = { "markdownlint" }, -- Disabled until markdownlint is installed
 		}
 
 		-- Auto-lint on save and text change

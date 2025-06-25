@@ -31,6 +31,7 @@ in
       aichat
       bash-language-server
       bat
+      chafa                # Image preview for fzf-lua
       clang-tools          # provides clangd
       claude-code
       cloc
@@ -68,6 +69,7 @@ in
       stylua
       starship
       tectonic
+      texlive.combined.scheme-medium # LaTeX support for render-markdown
       tldr
       tmux
       typescript
