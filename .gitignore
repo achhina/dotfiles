@@ -37,6 +37,3 @@ zsh/zsh-autocomplete
 # Home Manager generated files
 direnv/lib/hm-nix-direnv.sh
 github-copilot/apps.json
-
-# Neovim generated files
-nvim/lazy-lock.json
