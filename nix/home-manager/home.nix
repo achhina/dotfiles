@@ -70,6 +70,7 @@ in
       starship
       tectonic
       texlive.combined.scheme-medium # LaTeX support for render-markdown
+      tree-sitter # CLI for installing treesitter parsers
       tldr
       tmux
       typescript
