@@ -2,13 +2,13 @@ return {
 	"folke/noice.nvim",
 	event = "VeryLazy",
 	opts = {
-		lsp = {
-			override = {
-				["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-				["vim.lsp.util.stylize_markdown"] = true,
-				["cmp.entry.get_documentation"] = true,
-			},
-		},
+		-- Removed LSP overrides to prevent conflicts with fidget.nvim handling LSP progress
+		-- lsp = {
+		--   override = {
+		--     ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+		--     ["vim.lsp.util.stylize_markdown"] = true,
+		--   },
+		-- },
 		presets = {
 			bottom_search = true,
 			command_palette = true,
@@ -29,6 +29,26 @@ return {
 					},
 				},
 				view = "mini",
+			},
+			-- Skip LSP progress messages entirely - let fidget handle them
+			{
+				filter = {
+					event = "lsp",
+					kind = "progress",
+				},
+				opts = { skip = true },
+			},
+			-- Skip all notifications that might trigger popup issues
+			{
+				filter = {
+					event = "notify",
+					any = {
+						{ find = "Loading.*options" },
+						{ find = "nil_ls" },
+						{ find = "NixOS" },
+					},
+				},
+				opts = { skip = true },
 			},
 			-- Suppress mode notifications (visual, insert, etc)
 			{
