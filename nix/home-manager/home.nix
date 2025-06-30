@@ -7,6 +7,9 @@ let
 in
 
 {
+  imports = [
+    ./modules/packages.nix
+  ];
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "achhina";
@@ -22,76 +25,6 @@ in
   # release notes.
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages =
-    with pkgs;
-    [
-      # Cross-platform packages
-      aichat
-      bash-language-server
-      bat
-      chafa                # Image preview for fzf-lua
-      clang-tools          # provides clangd
-      claude-code
-      cloc
-      delta
-      dust
-      eza
-      fd
-      fzf
-      git
-      git-lfs
-      github-cli
-      gopls               # Go LSP
-      htop
-      jq
-      lua
-      luaPackages.luacheck
-      luaPackages.luarocks
-      lua-language-server
-      mermaid-cli
-      ncdu
-      nginx
-      nil
-      nixpkgs-fmt
-      pyright            # Python LSP
-      rust-analyzer      # Rust LSP
-      marksman           # Markdown LSP
-      yaml-language-server # YAML LSP
-      dockerfile-language-server-nodejs # Docker LSP
-      taplo              # TOML LSP
-      neovim
-      nodejs
-      pnpm
-      pre-commit
-      ripgrep
-      stylua
-      starship
-      tectonic
-      texlive.combined.scheme-medium # LaTeX support for render-markdown
-      tree-sitter # CLI for installing treesitter parsers
-      tldr
-      tmux
-      typescript
-      typescript-language-server
-      uv
-      vscode-langservers-extracted
-      wget
-      yarn
-    ]
-    ++ pkgs.lib.optionals isDarwin [
-      # macOS-specific packages
-      aerospace
-      iterm2
-      jankyborders
-      keycastr
-    ]
-    ++ pkgs.lib.optionals isLinux [
-      # Linux-specific packages
-      firefox
-      alacritty
-    ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
