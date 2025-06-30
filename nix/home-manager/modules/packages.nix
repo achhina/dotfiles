@@ -1,11 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  # System detection
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
-in
-
 {
   home.packages =
     with pkgs;
@@ -64,14 +58,14 @@ in
       wget
       yarn
     ]
-    ++ pkgs.lib.optionals isDarwin [
+    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
       # macOS-specific packages
       aerospace
       iterm2
       jankyborders
       keycastr
     ]
-    ++ pkgs.lib.optionals isLinux [
+    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
       # Linux-specific packages
       firefox
       alacritty

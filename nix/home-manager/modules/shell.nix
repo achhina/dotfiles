@@ -1,9 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  isDarwin = pkgs.stdenv.isDarwin;
-in
-
 {
   # Enable direnv for automatic environment loading
   programs.direnv = {
@@ -13,7 +9,7 @@ in
   };
 
   # Terminal emulator (macOS only)
-  programs.ghostty = pkgs.lib.mkIf isDarwin {
+  programs.ghostty = pkgs.lib.mkIf pkgs.stdenv.isDarwin {
     enable = false;
 
     settings = {
