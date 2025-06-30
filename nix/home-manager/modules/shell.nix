@@ -32,9 +32,10 @@
       "$schema" = "https://starship.rs/config-schema.json";
 
       format = let
-        # Extract working powerline character from starship preset
-        sep = ""; # This is the working character from pastel-powerline preset
-      in "[${sep}](color_orange)$os$username[${sep}](bg:color_yellow fg:color_orange)$directory[${sep}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${sep}](fg:color_blue bg:color_bg3)$docker_context$conda[${sep}](fg:color_bg3 bg:color_bg1)$time[ ${sep}](fg:color_bg1)$line_break$character";
+        opening_sep = " ";
+        closing_sep = " ";
+        sep = " ";
+      in "[${opening_sep}](color_orange)$os$username[${sep}](bg:color_yellow fg:color_orange)$directory[${sep}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${sep}](fg:color_blue bg:color_bg3)$docker_context$conda[${sep}](fg:color_bg3 bg:color_bg1)$time[${closing_sep}](fg:color_bg1)$line_break$character";
 
       palette = "gruvbox_dark";
 
