@@ -20,6 +20,7 @@
         precomposeUnicode = true;
         quotePath = false;
         pager = "delta";
+        excludesfile = "~/.config/git/ignore";
       };
 
       # Git LFS configuration

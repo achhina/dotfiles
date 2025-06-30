@@ -18,7 +18,7 @@ M.profiles = {
 		},
 		{
 			name = "Frontend: Next.js Dev",
-			type = "chrome", 
+			type = "chrome",
 			request = "launch",
 			url = "http://localhost:3000",
 			webRoot = "${workspaceFolder}",
@@ -44,7 +44,7 @@ M.profiles = {
 			skipFiles = { "<node_internals>/**", "${workspaceFolder}/node_modules/**" },
 		},
 	},
-	
+
 	-- Python development profiles
 	python = {
 		{
@@ -58,7 +58,7 @@ M.profiles = {
 			env = { PYTHONPATH = "${workspaceFolder}" },
 		},
 		{
-			name = "Python: Django Development", 
+			name = "Python: Django Development",
 			type = "python",
 			request = "launch",
 			program = "${workspaceFolder}/manage.py",
@@ -78,7 +78,7 @@ M.profiles = {
 		},
 		{
 			name = "Python: Pytest with Coverage",
-			type = "python", 
+			type = "python",
 			request = "launch",
 			module = "pytest",
 			args = { "--cov=.", "--cov-report=html", "-v" },
@@ -86,7 +86,7 @@ M.profiles = {
 			justMyCode = false,
 		},
 	},
-	
+
 	-- Rust development profiles
 	rust = {
 		{
@@ -98,7 +98,8 @@ M.profiles = {
 				local handle = io.popen("find target/debug -maxdepth 1 -type f -executable | head -1")
 				local result = handle:read("*a"):gsub("%s+", "")
 				handle:close()
-				return result ~= "" and result or vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
+				return result ~= "" and result
+					or vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
 			end,
 			cwd = "${workspaceFolder}",
 			stopOnEntry = false,
@@ -109,7 +110,11 @@ M.profiles = {
 			request = "launch",
 			program = function()
 				-- Get current package name and build test binary
-				local handle = io.popen("cargo metadata --format-version 1 | jq -r '.packages[] | select(.manifest_path | contains(\"" .. vim.fn.getcwd() .. "\")) | .name'")
+				local handle = io.popen(
+					"cargo metadata --format-version 1 | jq -r '.packages[] | select(.manifest_path | contains(\""
+						.. vim.fn.getcwd()
+						.. "\")) | .name'"
+				)
 				local package_name = handle:read("*a"):gsub("%s+", "")
 				handle:close()
 				return vim.fn.getcwd() .. "/target/debug/deps/" .. package_name:gsub("-", "_")
@@ -119,7 +124,7 @@ M.profiles = {
 			stopOnEntry = false,
 		},
 	},
-	
+
 	-- Container debugging profiles
 	container = {
 		{
@@ -139,7 +144,7 @@ M.profiles = {
 			name = "Docker: Attach to Node Container",
 			type = "node2",
 			request = "attach",
-			host = "localhost", 
+			host = "localhost",
 			port = 9229,
 			localRoot = "${workspaceFolder}",
 			remoteRoot = "/usr/src/app",
@@ -154,7 +159,7 @@ M.auto_attach = {
 	attach_to_process = function(pattern)
 		local handle = io.popen("ps aux | grep '" .. pattern .. "' | grep -v grep | awk '{print $2, $11}'")
 		local processes = {}
-		
+
 		for line in handle:lines() do
 			local pid, cmd = line:match("(%d+)%s+(.+)")
 			if pid then
@@ -162,19 +167,19 @@ M.auto_attach = {
 			end
 		end
 		handle:close()
-		
+
 		if #processes == 0 then
 			vim.notify("No processes found matching: " .. pattern, vim.log.levels.WARN)
 			return
 		end
-		
+
 		-- If multiple processes, let user choose
 		if #processes > 1 then
 			local choices = {}
 			for i, proc in ipairs(processes) do
 				table.insert(choices, i .. ": [" .. proc.pid .. "] " .. proc.cmd)
 			end
-			
+
 			local choice = vim.fn.inputlist(vim.list_extend({ "Select process:" }, choices))
 			if choice > 0 and choice <= #processes then
 				M.auto_attach.attach_to_pid(processes[choice].pid)
@@ -183,21 +188,21 @@ M.auto_attach = {
 			M.auto_attach.attach_to_pid(processes[1].pid)
 		end
 	end,
-	
+
 	attach_to_pid = function(pid)
 		local dap = require("dap")
-		
+
 		-- Try to determine process type and attach appropriately
 		local handle = io.popen("ps -p " .. pid .. " -o comm=")
 		local comm = handle:read("*a"):gsub("%s+", "")
 		handle:close()
-		
+
 		local config = {
 			name = "Attach to PID " .. pid,
 			request = "attach",
 			processId = pid,
 		}
-		
+
 		-- Set appropriate adapter based on process
 		if comm:match("python") then
 			config.type = "python"
@@ -210,21 +215,21 @@ M.auto_attach = {
 		else
 			config.type = "codelldb"
 		end
-		
+
 		dap.run(config)
 	end,
-	
+
 	-- Auto-attach to development servers
 	auto_attach_dev_servers = function()
 		-- Common development server patterns
 		local patterns = {
 			"python.*uvicorn",
-			"python.*manage.py.*runserver", 
+			"python.*manage.py.*runserver",
 			"node.*dev",
 			"npm.*start",
 			"yarn.*dev",
 		}
-		
+
 		for _, pattern in ipairs(patterns) do
 			M.auto_attach.attach_to_process(pattern)
 		end
@@ -237,23 +242,23 @@ M.workflows = {
 	debug_current_test = function()
 		local ft = vim.bo.filetype
 		local dap = require("dap")
-		
+
 		if ft == "python" then
 			-- Find current test function/class
 			local line = vim.api.nvim_get_current_line()
 			local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
-			
+
 			-- Search backwards for test function or class
 			local test_name = nil
 			for i = cursor_line, 1, -1 do
-				local l = vim.api.nvim_buf_get_lines(0, i-1, i, false)[1]
+				local l = vim.api.nvim_buf_get_lines(0, i - 1, i, false)[1]
 				local match = l:match("def (test_%w+)")
 				if match then
 					test_name = match
 					break
 				end
 			end
-			
+
 			if test_name then
 				dap.run({
 					name = "Debug Test: " .. test_name,
@@ -267,7 +272,6 @@ M.workflows = {
 			else
 				vim.notify("No test function found", vim.log.levels.WARN)
 			end
-			
 		elseif ft == "javascript" or ft == "typescript" then
 			-- Debug JavaScript/TypeScript test
 			local test_framework = M.workflows.detect_js_test_framework()
@@ -284,26 +288,32 @@ M.workflows = {
 			end
 		end
 	end,
-	
+
 	detect_js_test_framework = function()
 		-- Check package.json for test frameworks
 		local package_json = vim.fn.getcwd() .. "/package.json"
 		if vim.fn.filereadable(package_json) == 1 then
 			local content = table.concat(vim.fn.readfile(package_json), "\n")
-			if content:match("jest") then return "jest" end
-			if content:match("mocha") then return "mocha" end
-			if content:match("vitest") then return "vitest" end
+			if content:match("jest") then
+				return "jest"
+			end
+			if content:match("mocha") then
+				return "mocha"
+			end
+			if content:match("vitest") then
+				return "vitest"
+			end
 		end
 		return nil
 	end,
-	
+
 	-- Remote debugging setup
 	setup_remote_debugging = function()
 		local remote_host = vim.fn.input("Remote host: ", "localhost")
 		local remote_port = vim.fn.input("Remote port: ", "5678")
 		local local_root = vim.fn.input("Local root: ", vim.fn.getcwd())
 		local remote_root = vim.fn.input("Remote root: ", "/app")
-		
+
 		local dap = require("dap")
 		dap.run({
 			name = "Remote Debug: " .. remote_host .. ":" .. remote_port,
@@ -319,11 +329,11 @@ M.workflows = {
 			},
 		})
 	end,
-	
+
 	-- Performance profiling integration
 	profile_and_debug = function()
 		local ft = vim.bo.filetype
-		
+
 		if ft == "python" then
 			-- Use cProfile with debugging
 			local dap = require("dap")
@@ -338,7 +348,9 @@ M.workflows = {
 				postDebugTask = function()
 					-- Open profile results
 					vim.cmd("tabnew")
-					vim.cmd("terminal python -c \"import pstats; pstats.Stats('/tmp/profile.out').sort_stats('cumulative').print_stats(20)\"")
+					vim.cmd(
+						"terminal python -c \"import pstats; pstats.Stats('/tmp/profile.out').sort_stats('cumulative').print_stats(20)\""
+					)
 				end,
 			})
 		elseif ft == "javascript" or ft == "typescript" then
@@ -369,10 +381,10 @@ M.sessions = {
 				type = dap.session.config.type,
 			} or nil,
 		}
-		
+
 		local session_file = vim.fn.stdpath("data") .. "/dap_sessions/" .. (name or "default") .. ".json"
 		vim.fn.mkdir(vim.fn.fnamemodify(session_file, ":h"), "p")
-		
+
 		local file = io.open(session_file, "w")
 		if file then
 			file:write(vim.fn.json_encode(session_data))
@@ -380,14 +392,14 @@ M.sessions = {
 			vim.notify("Debug session saved: " .. name, vim.log.levels.INFO)
 		end
 	end,
-	
+
 	load_session = function(name)
 		local session_file = vim.fn.stdpath("data") .. "/dap_sessions/" .. (name or "default") .. ".json"
-		
+
 		if vim.fn.filereadable(session_file) == 1 then
 			local content = table.concat(vim.fn.readfile(session_file), "\n")
 			local session_data = vim.fn.json_decode(content)
-			
+
 			-- Restore breakpoints
 			if session_data.breakpoints then
 				local dap = require("dap")
@@ -397,7 +409,7 @@ M.sessions = {
 					end
 				end
 			end
-			
+
 			vim.notify("Debug session loaded: " .. name, vim.log.levels.INFO)
 		else
 			vim.notify("Session not found: " .. name, vim.log.levels.WARN)
@@ -408,7 +420,7 @@ M.sessions = {
 -- Setup function to register all enhancements
 function M.setup()
 	local dap = require("dap")
-	
+
 	-- Register all profiles
 	for lang, configs in pairs(M.profiles) do
 		for _, config in ipairs(configs) do
@@ -418,46 +430,57 @@ function M.setup()
 			table.insert(dap.configurations[lang], config)
 		end
 	end
-	
+
 	-- Create user commands
 	vim.api.nvim_create_user_command("DapAttachProcess", function(opts)
 		M.auto_attach.attach_to_process(opts.args)
 	end, { nargs = 1, desc = "Attach to process by pattern" })
-	
+
 	vim.api.nvim_create_user_command("DapAttachPid", function(opts)
 		M.auto_attach.attach_to_pid(opts.args)
 	end, { nargs = 1, desc = "Attach to process by PID" })
-	
+
 	vim.api.nvim_create_user_command("DapDebugTest", function()
 		M.workflows.debug_current_test()
 	end, { desc = "Debug current test function" })
-	
+
 	vim.api.nvim_create_user_command("DapRemoteDebug", function()
 		M.workflows.setup_remote_debugging()
 	end, { desc = "Setup remote debugging" })
-	
+
 	vim.api.nvim_create_user_command("DapProfile", function()
 		M.workflows.profile_and_debug()
 	end, { desc = "Profile and debug current file" })
-	
+
 	vim.api.nvim_create_user_command("DapSaveSession", function(opts)
 		M.sessions.save_session(opts.args)
 	end, { nargs = "?", desc = "Save debug session" })
-	
+
 	vim.api.nvim_create_user_command("DapLoadSession", function(opts)
 		M.sessions.load_session(opts.args)
 	end, { nargs = "?", desc = "Load debug session" })
-	
+
 	-- Auto-attach keymaps
-	vim.keymap.set("n", "<leader>dap", function() M.auto_attach.attach_to_process(vim.fn.input("Process pattern: ")) end, { desc = "Debug: Attach to Process" })
-	vim.keymap.set("n", "<leader>daa", M.auto_attach.auto_attach_dev_servers, { desc = "Debug: Auto-attach Dev Servers" })
+	vim.keymap.set("n", "<leader>dap", function()
+		M.auto_attach.attach_to_process(vim.fn.input("Process pattern: "))
+	end, { desc = "Debug: Attach to Process" })
+	vim.keymap.set(
+		"n",
+		"<leader>daa",
+		M.auto_attach.auto_attach_dev_servers,
+		{ desc = "Debug: Auto-attach Dev Servers" }
+	)
 	vim.keymap.set("n", "<leader>ddt", M.workflows.debug_current_test, { desc = "Debug: Current Test" })
 	vim.keymap.set("n", "<leader>drd", M.workflows.setup_remote_debugging, { desc = "Debug: Remote Debug" })
 	vim.keymap.set("n", "<leader>dpf", M.workflows.profile_and_debug, { desc = "Debug: Profile & Debug" })
-	
+
 	-- Session management keymaps
-	vim.keymap.set("n", "<leader>dss", function() M.sessions.save_session(vim.fn.input("Session name: ")) end, { desc = "Debug: Save Session" })
-	vim.keymap.set("n", "<leader>dsl", function() M.sessions.load_session(vim.fn.input("Session name: ")) end, { desc = "Debug: Load Session" })
+	vim.keymap.set("n", "<leader>dss", function()
+		M.sessions.save_session(vim.fn.input("Session name: "))
+	end, { desc = "Debug: Save Session" })
+	vim.keymap.set("n", "<leader>dsl", function()
+		M.sessions.load_session(vim.fn.input("Session name: "))
+	end, { desc = "Debug: Load Session" })
 end
 
 return M
