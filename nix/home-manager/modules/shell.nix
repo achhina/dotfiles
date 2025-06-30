@@ -32,9 +32,9 @@
       "$schema" = "https://starship.rs/config-schema.json";
 
       format = let
-        powerline_left = "";
-        powerline_right = "";
-      in "[${powerline_left}](color_orange)$os$username[${powerline_left}](bg:color_yellow fg:color_orange)$directory[${powerline_left}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${powerline_left}](fg:color_blue bg:color_bg3)$docker_context$conda[${powerline_left}](fg:color_bg3 bg:color_bg1)$time[ ${powerline_right}](fg:color_bg1)$line_break$character";
+        separator = ""; # U+E0B0 - Nerd Font right-pointing triangle (solid)
+        right_sep = ""; # U+E0B2 - Nerd Font right-pointing triangle (outline)
+      in "[${separator}](color_orange)$os$username[${separator}](bg:color_yellow fg:color_orange)$directory[${separator}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${separator}](fg:color_blue bg:color_bg3)$docker_context$conda[${separator}](fg:color_bg3 bg:color_bg1)$time[ ${right_sep}](fg:color_bg1)$line_break$character";
 
       palette = "gruvbox_dark";
 
