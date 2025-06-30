@@ -32,9 +32,9 @@
       "$schema" = "https://starship.rs/config-schema.json";
 
       format = let
-        separator = ""; # U+E0B0 - Nerd Font right-pointing triangle (solid)
-        right_sep = ""; # U+E0B2 - Nerd Font right-pointing triangle (outline)
-      in "[${separator}](color_orange)$os$username[${separator}](bg:color_yellow fg:color_orange)$directory[${separator}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${separator}](fg:color_blue bg:color_bg3)$docker_context$conda[${separator}](fg:color_bg3 bg:color_bg1)$time[ ${right_sep}](fg:color_bg1)$line_break$character";
+        # Extract working powerline character from starship preset
+        sep = ""; # This is the working character from pastel-powerline preset
+      in "[${sep}](color_orange)$os$username[${sep}](bg:color_yellow fg:color_orange)$directory[${sep}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${sep}](fg:color_blue bg:color_bg3)$docker_context$conda[${sep}](fg:color_bg3 bg:color_bg1)$time[ ${sep}](fg:color_bg1)$line_break$character";
 
       palette = "gruvbox_dark";
 
