@@ -31,7 +31,10 @@
     settings = {
       "$schema" = "https://starship.rs/config-schema.json";
 
-      format = "[](color_orange)$os$username[](bg:color_yellow fg:color_orange)$directory[](fg:color_yellow bg:color_aqua)$git_branch$git_status[](fg:color_blue bg:color_bg3)$docker_context$conda[](fg:color_bg3 bg:color_bg1)$time[ ](fg:color_bg1)$line_break$character";
+      format = let
+        powerline_left = "";
+        powerline_right = "";
+      in "[${powerline_left}](color_orange)$os$username[${powerline_left}](bg:color_yellow fg:color_orange)$directory[${powerline_left}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${powerline_left}](fg:color_blue bg:color_bg3)$docker_context$conda[${powerline_left}](fg:color_bg3 bg:color_bg1)$time[ ${powerline_right}](fg:color_bg1)$line_break$character";
 
       palette = "gruvbox_dark";
 
