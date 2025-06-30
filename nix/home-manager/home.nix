@@ -1,25 +1,19 @@
 { config, pkgs, ... }:
 
-let
-  # System detection
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
-in
-
 {
   imports = [
-    ./modules/packages.nix
-    ./modules/git.nix
-    ./modules/shell.nix
-  ] ++ pkgs.lib.optionals isDarwin [
-    ./modules/aerospace.nix
+    # ./modules/packages.nix
+    # ./modules/git.nix
+    # ./modules/shell.nix
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+    # ./modules/aerospace.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "achhina";
   home.homeDirectory =
-    if isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
