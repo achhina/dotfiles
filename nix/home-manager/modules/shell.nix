@@ -58,7 +58,7 @@
         symbols = {
           Windows = "󰍲";
           Ubuntu = "󰕈";
-          SUSE = "";
+          SUSE = "";
           Raspbian = "󰐿";
           Mint = "󰣭";
           Macos = "󰀵";
@@ -66,17 +66,17 @@
           Linux = "󰌽";
           Gentoo = "󰣨";
           Fedora = "󰣛";
-          Alpine = "";
-          Amazon = "";
-          Android = "";
+          Alpine = "";
+          Amazon = "";
+          Android = "";
           Arch = "󰣇";
           Artix = "󰣇";
-          EndeavourOS = "";
+          EndeavourOS = "";
           CentOS = "";
           Debian = "󰣚";
           Redhat = "󱄛";
           RedHatEnterprise = "󱄛";
-          Pop = "";
+          Pop = "";
         };
       };
 
@@ -94,15 +94,15 @@
         truncation_symbol = "…/";
         substitutions = {
           Documents = "󰈙 ";
-          Downloads = " ";
+          Downloads = " ";
           Music = "󰝚 ";
-          Pictures = " ";
+          Pictures = " ";
           Developer = "󰲋 ";
         };
       };
 
       git_branch = {
-        symbol = " ";
+        symbol = "";
         style = "bg:color_aqua";
         format = "[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)";
       };
@@ -113,61 +113,61 @@
       };
 
       nodejs = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       c = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       rust = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       golang = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       php = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       java = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       kotlin = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       haskell = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       python = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
       };
 
       docker_context = {
-        symbol = "";
+        symbol = "";
         style = "bg:color_bg3";
         format = "[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)";
       };
