@@ -585,8 +585,29 @@ return {
 			safe_setup_server(server_name, server_config)
 		end
 
-		-- Setup nil_ls (Nix LSP)
-		safe_setup_server("nil_ls", {})
+		-- Setup nil_ls (Nix LSP) with compatible capabilities
+		local nil_capabilities = vim.lsp.protocol.make_client_capabilities()
+		nil_capabilities = require("blink.cmp").get_lsp_capabilities(nil_capabilities)
+
+		-- Remove problematic dynamic registration capabilities for nil_ls
+		if nil_capabilities.workspace and nil_capabilities.workspace.didChangeConfiguration then
+			nil_capabilities.workspace.didChangeConfiguration.dynamicRegistration = false
+		end
+		if nil_capabilities.workspace and nil_capabilities.workspace.configuration then
+			nil_capabilities.workspace.configuration = false
+		end
+
+		local nil_setup_ok, nil_setup_err = pcall(function()
+			require("lspconfig").nil_ls.setup({
+				capabilities = nil_capabilities,
+				on_attach = on_attach,
+				settings = {},
+			})
+		end)
+
+		if not nil_setup_ok then
+			vim.notify("Failed to setup nil_ls: " .. nil_setup_err, vim.log.levels.WARN)
+		end
 
 		-- Setup jsonls (from vscode-langservers-extracted)
 		local jsonls_setup_ok, jsonls_setup_err = pcall(function()
