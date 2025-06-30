@@ -5,9 +5,9 @@
     enable = true;
 
     # Include private configuration (user name, email, etc.)
-    # includes = [
-    #   { path = "~/.config/secrets/git/config"; }
-    # ];
+    includes = [
+      { path = "~/.config/secrets/git/config"; }
+    ];
 
     # Core configuration
     extraConfig = {

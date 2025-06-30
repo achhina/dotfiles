@@ -2,11 +2,10 @@
 
 {
   imports = [
-    # ./modules/packages.nix
-    # ./modules/git.nix
-    # ./modules/shell.nix
-  ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-    # ./modules/aerospace.nix
+    ./modules/packages.nix
+    ./modules/git.nix
+    ./modules/shell.nix
+    ./modules/aerospace.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should

@@ -1,7 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
-  home.file.".config/aerospace/aerospace.toml".text = ''
+  home.file.".config/aerospace/aerospace.toml" = lib.mkIf pkgs.stdenv.isDarwin {
+    text = ''
     after-login-command = []
     after-startup-command = [
         # JankyBorders has a built-in detection of already running process,
@@ -157,5 +158,6 @@
     if.app-id = 'com.automattic.beeper.desktop'
     check-further-callbacks = true
     run = ['move-node-to-workspace 10']
-  '';
+    '';
+  };
 }
