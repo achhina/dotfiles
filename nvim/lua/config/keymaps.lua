@@ -157,6 +157,10 @@ function M.setup()
 	-- Better paste
 	safe_keymap("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
 
+	-- Soft line wrap navigation
+	safe_keymap("n", "j", "gj", { desc = "Move down by display line" })
+	safe_keymap("n", "k", "gk", { desc = "Move up by display line" })
+
 	-- Keep cursor centered
 	safe_keymap("n", "<C-d>", "<C-d>zz", { desc = "Scroll down and center" })
 	safe_keymap("n", "<C-u>", "<C-u>zz", { desc = "Scroll up and center" })
