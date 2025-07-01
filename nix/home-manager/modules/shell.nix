@@ -33,11 +33,11 @@
 
       format =
         let
-          opening_sep = " ";
+          opening_sep = "";
           closing_sep = " ";
           sep = " ";
         in
-        "[${opening_sep}](color_orange)$os$username[${sep}](bg:color_yellow fg:color_orange)$directory[${sep}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${sep}](fg:color_blue bg:color_bg3)$docker_context$conda[${sep}](fg:color_bg3 bg:color_bg1)$time[${closing_sep}](fg:color_bg1)$line_break$character";
+        "[${opening_sep}](color_orange)$os$username[${sep}](bg:color_yellow fg:color_orange)$directory[${sep}](fg:color_yellow bg:color_aqua)$git_branch$git_status[${sep}](fg:color_aqua bg:color_blue)$python[${sep}](fg:color_blue bg:color_bg3)$nodejs$docker_context$conda[${sep}](fg:color_bg3 bg:color_bg1)$time[${closing_sep}](fg:color_bg1)$line_break$character";
 
       palette = "gruvbox_dark";
 
@@ -115,6 +115,7 @@
       };
 
       nodejs = {
+        disabled = false;
         symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
@@ -163,6 +164,7 @@
       };
 
       python = {
+        disabled = false;
         symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
@@ -183,7 +185,7 @@
         disabled = false;
         time_format = "%R";
         style = "bg:color_bg1";
-        format = "[[  $time ](fg:color_fg0 bg:color_bg1)]($style)";
+        format = "[[  $time ](fg:color_fg0 bg:color_bg1)]($style)";
       };
 
       line_break = {
@@ -192,12 +194,12 @@
 
       character = {
         disabled = false;
-        success_symbol = "[](bold fg:color_green)";
-        error_symbol = "[](bold fg:color_red)";
-        vimcmd_symbol = "[](bold fg:color_green)";
-        vimcmd_replace_one_symbol = "[](bold fg:color_purple)";
-        vimcmd_replace_symbol = "[](bold fg:color_purple)";
-        vimcmd_visual_symbol = "[](bold fg:color_yellow)";
+        success_symbol = "[](bold fg:color_green)";
+        error_symbol = "[](bold fg:color_red)";
+        vimcmd_symbol = "[](bold fg:color_green)";
+        vimcmd_replace_one_symbol = "[](bold fg:color_purple)";
+        vimcmd_replace_symbol = "[](bold fg:color_purple)";
+        vimcmd_visual_symbol = "[](bold fg:color_yellow)";
       };
     };
   };
