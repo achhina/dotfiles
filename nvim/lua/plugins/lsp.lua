@@ -124,19 +124,9 @@ return {
 						if client.name ~= "copilot" then
 							vim.notify("LSP server disconnected: " .. client.name, vim.log.levels.WARN)
 						end
-						-- Auto-restart logic only for lspconfig-managed servers
-						vim.defer_fn(function()
-							-- Skip auto-restart for non-lspconfig servers like copilot
-							if client.name == "copilot" then
-								return -- Copilot manages its own lifecycle
-							end
-
-							local bufnr = vim.api.nvim_get_current_buf()
-							local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
-							if filetype and filetype ~= "" then
-								vim.cmd("LspRestart")
-							end
-						end, 2000)
+						-- Disable auto-restart to prevent buffer thrashing that triggers E36
+						-- The auto-restart was causing rapid buffer events that overwhelm noice
+						-- Use manual :LspRestart if needed
 					end
 				end,
 			})
@@ -554,8 +544,13 @@ return {
 		capabilities.textDocument.completion.completionItem.resolveSupport = {
 			properties = { "documentation", "detail", "additionalTextEdits" },
 		}
-		capabilities.textDocument.foldingRange = { lineFoldingOnly = true }
-		capabilities.textDocument.colorProvider = true
+		capabilities.textDocument.foldingRange = {
+			dynamicRegistration = false,
+			lineFoldingOnly = true,
+		}
+		capabilities.textDocument.colorProvider = {
+			dynamicRegistration = false,
+		}
 
 		-- Setup Nix-managed servers with error handling
 		local function safe_setup_server(name, config)
@@ -585,28 +580,15 @@ return {
 			safe_setup_server(server_name, server_config)
 		end
 
-		-- Setup nil_ls (Nix LSP) with compatible capabilities
-		local nil_capabilities = vim.lsp.protocol.make_client_capabilities()
-		nil_capabilities = require("blink.cmp").get_lsp_capabilities(nil_capabilities)
-
-		-- Remove problematic dynamic registration capabilities for nil_ls
-		if nil_capabilities.workspace and nil_capabilities.workspace.didChangeConfiguration then
-			nil_capabilities.workspace.didChangeConfiguration.dynamicRegistration = false
-		end
-		if nil_capabilities.workspace and nil_capabilities.workspace.configuration then
-			nil_capabilities.workspace.configuration = false
-		end
-
-		local nil_setup_ok, nil_setup_err = pcall(function()
+		-- Setup nil_ls (Nix LSP)
+		local nil_ls_ok, nil_ls_err = pcall(function()
 			require("lspconfig").nil_ls.setup({
-				capabilities = nil_capabilities,
+				capabilities = capabilities,
 				on_attach = on_attach,
-				settings = {},
 			})
 		end)
-
-		if not nil_setup_ok then
-			vim.notify("Failed to setup nil_ls: " .. nil_setup_err, vim.log.levels.WARN)
+		if not nil_ls_ok then
+			vim.notify("Failed to setup nil_ls: " .. nil_ls_err, vim.log.levels.WARN)
 		end
 
 		-- Setup jsonls (from vscode-langservers-extracted)
