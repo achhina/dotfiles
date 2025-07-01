@@ -8,8 +8,8 @@
       aichat
       bash-language-server
       bat
-      chafa                # Image preview for fzf-lua
-      clang-tools          # provides clangd
+      chafa # Image preview for fzf-lua
+      clang-tools # provides clangd
       claude-code
       cloc
       delta
@@ -20,7 +20,7 @@
       git
       git-lfs
       github-cli
-      gopls               # Go LSP
+      gopls # Go LSP
       htop
       jq
       lua
@@ -32,12 +32,12 @@
       nginx
       nil
       nixpkgs-fmt
-      pyright            # Python LSP
-      rust-analyzer      # Rust LSP
-      marksman           # Markdown LSP
+      pyright # Python LSP
+      rust-analyzer # Rust LSP
+      marksman # Markdown LSP
       yaml-language-server # YAML LSP
       dockerfile-language-server-nodejs # Docker LSP
-      taplo              # TOML LSP
+      taplo # TOML LSP
       neovim
       nodejs
       pnpm
@@ -46,7 +46,7 @@
       stylua
       starship
       tectonic
-      texlive.combined.scheme-medium # LaTeX support for render-markdown
+      texlivePackages.detex # LaTeX support for render-markdown
       tree-sitter # CLI for installing treesitter parsers
       tldr
       tmux
