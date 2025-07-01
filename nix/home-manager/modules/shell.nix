@@ -292,7 +292,7 @@
       lt = "eza --tree --all --level 3";
       t = "tmux";
       ta = "tmux attach || tmux new-session";
-      update = "home-manager switch --flake ~/.config/nix#achhina";
+      update = "nix-channel --update && nix flake update --flake ~/.config/nix && home-manager switch --flake ~/.config/nix#achhina";
       v = "nvim";
     };
 
