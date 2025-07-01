@@ -366,15 +366,6 @@ return {
 				})
 			end
 
-			-- Performance tracking for this client
-			if not vim.g.lsp_performance_tracking then
-				vim.g.lsp_performance_tracking = {}
-			end
-			vim.g.lsp_performance_tracking[client.name] = {
-				start_time = vim.loop.hrtime(),
-				requests = 0,
-			}
-
 			-- Resource management and limits
 			local function setup_client_limits(lsp_client)
 				if lsp_client.name == "ts_ls" then
@@ -392,32 +383,6 @@ return {
 				end
 			end
 			setup_client_limits(client)
-
-			-- Auto-cleanup for unused servers (lightweight implementation)
-			vim.defer_fn(function()
-				local active_buffers = vim.tbl_filter(function(buf)
-					return vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "buflisted")
-				end, vim.api.nvim_list_bufs())
-
-				if #active_buffers == 0 then
-					-- No active buffers, could cleanup resources
-					if vim.g.lsp_performance_tracking and vim.g.lsp_performance_tracking[client.name] then
-						local elapsed = (vim.loop.hrtime() - vim.g.lsp_performance_tracking[client.name].start_time)
-							/ 1e9
-						if elapsed > 3600 then -- 1 hour of inactivity
-							vim.notify("Consider restarting LSP server: " .. client.name, vim.log.levels.INFO)
-						end
-					end
-				end
-			end, 60000) -- Check every minute
-
-			-- Attach navic for breadcrumbs if available
-			if client.server_capabilities.documentSymbolProvider then
-				local navic_ok, navic = pcall(require, "nvim-navic")
-				if navic_ok then
-					navic.attach(client, bufnr)
-				end
-			end
 		end
 
 		-- All servers now managed by Nix
@@ -529,6 +494,13 @@ return {
 					hint = { enable = true },
 				},
 			},
+			nil_ls = {},
+			jsonls = {
+				json = {
+					schemas = require("schemastore").json.schemas(),
+					validate = { enable = true },
+				},
+			},
 		}
 
 		-- Enhanced capabilities with modern LSP features
@@ -554,12 +526,7 @@ return {
 
 		-- Setup Nix-managed servers with error handling
 		local function safe_setup_server(name, config)
-			local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
-			if not lspconfig_ok then
-				vim.notify("LSPConfig not available", vim.log.levels.ERROR)
-				return false
-			end
-
+			local lspconfig = require("lspconfig")
 			local server_setup_ok, server_setup_err = pcall(function()
 				lspconfig[name].setup({
 					capabilities = capabilities,
@@ -578,35 +545,6 @@ return {
 
 		for server_name, server_config in pairs(nix_servers) do
 			safe_setup_server(server_name, server_config)
-		end
-
-		-- Setup nil_ls (Nix LSP)
-		local nil_ls_ok, nil_ls_err = pcall(function()
-			require("lspconfig").nil_ls.setup({
-				capabilities = capabilities,
-				on_attach = on_attach,
-			})
-		end)
-		if not nil_ls_ok then
-			vim.notify("Failed to setup nil_ls: " .. nil_ls_err, vim.log.levels.WARN)
-		end
-
-		-- Setup jsonls (from vscode-langservers-extracted)
-		local jsonls_setup_ok, jsonls_setup_err = pcall(function()
-			require("lspconfig").jsonls.setup({
-				capabilities = capabilities,
-				on_attach = on_attach,
-				settings = {
-					json = {
-						schemas = require("schemastore").json.schemas(),
-						validate = { enable = true },
-					},
-				},
-			})
-		end)
-
-		if not jsonls_setup_ok then
-			vim.notify("Failed to setup jsonls: " .. jsonls_setup_err, vim.log.levels.WARN)
 		end
 	end,
 }
