@@ -35,7 +35,7 @@
         let
           opening_sep = "";
           closing_sep = "";
-          sep = " ";
+          sep = "";
         in
         "[${opening_sep}](color_orange)" +
         "$os" +
