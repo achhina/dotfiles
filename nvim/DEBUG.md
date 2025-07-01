@@ -20,6 +20,9 @@ pkill nvim; nvim --clean
 |---------|---------|----------|
 | General issues | `:checkhealth` | ❌ and ⚠️ |
 | Plugin errors | `:messages` | "Error", stack traces |
+| Autocmd errors (E36, etc) | `:set verbose=9` + `:messages` | Execution trace |
+| Error source identification | `:verbose autocmd [event]` | Where defined |
+| Startup autocmd issues | `nvim -V9verbose.log` | Detailed execution log |
 | LSP not working | `:LspInfo` | Server status |
 | Keymaps broken | `:verbose nmap <key>` | Source conflicts |
 | Slow startup | `nvim --startuptime /tmp/startup.log` | >50ms items |
@@ -121,6 +124,100 @@ nvim --clean -u minimal.lua
 # Comment out half your config, test, repeat
 ```
 
+## Autocmd Error Debugging
+
+**Note**: Autocmd errors (like E36, CursorMoved issues) are poorly reported in Neovim. This is a known limitation (GitHub issue #18082), not a configuration problem.
+
+### Official Neovim Methods
+
+```bash
+# 1. Enable verbose autocmd tracking
+:set verbose=9
+# Now every autocmd execution is logged
+# Move cursor or trigger the error to see execution trace
+
+# 2. Identify which autocmds are registered for problematic events
+:verbose autocmd CursorMoved
+:verbose autocmd BufWinEnter
+:verbose autocmd BufEnter
+# Shows where each autocmd was defined (file and line)
+
+# 3. Clear messages and reproduce error for clean trace
+:messages clear
+# trigger error (cursor movement, file opening, etc.)
+:messages
+# Look for the last messages before error occurs
+
+# 4. Startup autocmd debugging
+nvim -V9verbose.log
+# All autocmd execution logged to file - examine for problematic patterns
+
+# 5. Debug specific autocmd groups
+:verbose autocmd [GroupName]
+# Shows all autocmds in a specific group and their sources
+```
+
+### Binary Search for Problematic Autocmds
+
+When you know an autocmd is causing issues but can't identify which:
+
+```bash
+# Method 1: Disable autocmd groups systematically
+:autocmd! GroupName
+# Test if error disappears - if so, problem is in that group
+
+# Method 2: Add finish statements to plugin files
+# Edit ~/.config/nvim/lua/plugins/[suspect].lua
+# Add 'return {}' or 'finish' at different points to narrow down
+
+# Method 3: Plugin-by-plugin isolation
+:Lazy disable plugin-name
+# Restart nvim and test - binary search through plugins
+```
+
+### UI Error Specific Commands
+
+For E36 "Not enough room" and winbar/statusline errors:
+
+```vim
+# Check current window dimensions and content
+:lua print("Width:", vim.api.nvim_win_get_width(0))
+:lua print("Height:", vim.api.nvim_win_get_height(0))
+:lua print("Winbar:", vim.wo.winbar or "none")
+:lua print("Winbar length:", #(vim.wo.winbar or ""))
+
+# Test in different window sizes
+:vertical resize 40
+# trigger error
+:vertical resize 120
+# test if error persists
+```
+
+### Investigation Workflow Example
+
+Based on the breadcrumbs.lua E36 issue pattern:
+
+```bash
+# 1. Reproduce error and capture verbose output
+:set verbose=9
+:messages clear
+# move cursor or trigger error
+:messages
+
+# 2. Look for the last autocmd before error
+# Example output: "autocommand <Lua 1012: ~/.config/nvim/lua/plugins/breadcrumbs.lua:26>"
+
+# 3. Examine that specific file and line
+# breadcrumbs.lua:26 was the CursorMoved autocmd setting winbar
+
+# 4. Test in isolation
+:autocmd! [group-name]  # disable suspected autocmd group
+# or temporarily disable the plugin entirely
+
+# 5. Verify fix
+# error should disappear when problematic autocmd is disabled
+```
+
 ## Systematic Debugging Process
 
 ### Step 1: Reproduce & Isolate
@@ -165,6 +262,16 @@ nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
 - 🟡 >10 deprecation warnings → API compatibility issues
 - 🟡 Startup time >1 second → Performance problem
 - 🟡 LSP servers restarting → Configuration conflict
+
+## Common Issues Requiring Investigation (Not Immediate Red Flags)
+
+**These require systematic debugging but are normal Neovim limitations:**
+
+- 🟠 `E36: Not enough room` → Investigate with verbose autocmd debugging (see Autocmd Error Debugging section)
+- 🟠 Generic "Error detected while processing [Event] Autocommands" → Use `:verbose autocmd [Event]` to identify source
+- 🟠 Plugin conflicts in tmux/terminal environments → Test window dimensions and UI plugin compatibility
+
+**Expected Investigation Time**: 10-30 minutes using systematic debugging workflows above.
 
 ## Advanced Techniques (When Basic Fixes Fail)
 

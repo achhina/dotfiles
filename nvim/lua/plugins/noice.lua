@@ -38,18 +38,6 @@ return {
 				},
 				opts = { skip = true },
 			},
-			-- Skip all notifications that might trigger popup issues
-			{
-				filter = {
-					event = "notify",
-					any = {
-						{ find = "Loading.*options" },
-						{ find = "nil_ls" },
-						{ find = "NixOS" },
-					},
-				},
-				opts = { skip = true },
-			},
 			-- Suppress mode notifications (visual, insert, etc)
 			{
 				filter = { event = "msg_showmode" },
