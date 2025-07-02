@@ -87,14 +87,3 @@ All modifications to this repository must follow this protocol to ensure changes
 -   *Example:* A Nix package addition must include the change to `packages.nix` and the resulting `flake.lock` in the same commit.
 
 This protocol is mandatory for all changes, from adding a shell alias to updating a Neovim plugin.
-
-## 4. Important Commands & Aliases
-
--   `hm`: Apply the Home Manager configuration.
--   `update`: Update Nix channels and flakes, and apply the new configuration.
--   `v`: Open Neovim.
--   `t`: Manage Tmux sessions.
--   `l`, `ll`, `lt`: Directory listings with `eza`.
--   `gcd`: Change directory to the root of the current Git repository.
-
-By following these instructions, you will be able to effectively manage and extend this dotfiles repository.
