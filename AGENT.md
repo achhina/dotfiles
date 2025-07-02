@@ -60,15 +60,33 @@ These are tools installed by Home Manager to manage dependencies *within your de
     -   **Governing File:** `.pre-commit-config.yaml`.
     -   **How to Update:** Run `pre-commit autoupdate`.
 
-## 3. How to Make Changes (The Declarative Workflow)
+## 3. The Change Workflow: A Strict Protocol
 
-The preferred method for making changes is to modify the Nix configuration and then apply it.
+All modifications to this repository must follow this protocol to ensure changes are small, verifiable, and atomic.
 
-1.  **Identify the correct Nix module:** Locate the relevant file in `/nix/home-manager/modules/`.
-2.  **Modify the module:** Make the desired changes to the Nix expressions.
-3.  **Apply the changes:** Run the alias `hm`. This is a shortcut for `home-manager switch --flake ~/.config/nix#achhina`.
-4.  **Verify the changes:** Test the changes to ensure they work as expected.
-5.  **Commit the changes:** Commit both the changes to the Nix module and the updated `/nix/flake.lock` file.
+**1. Plan the Atomic Change**
+-   **Define a single, clear goal.** What is the one thing that should be different after this change?
+-   **Identify the responsible component.** Using Section 2, determine which management tier (Nix, Neovim's `lazy.nvim`, etc.) controls this component.
+
+**2. Establish a Verifiable Baseline**
+-   **Capture the "before" state.** Before making any edits, run commands to prove the current state.
+-   *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail). For Neovim, follow the testing standards in `nvim/AGENT.md`.
+
+**3. Execute the Idempotent Change**
+-   **Modify only the necessary files** for the single planned change.
+-   **Apply the change** using the correct tier-specific command (`hm`, `:Lazy sync`, etc.). An idempotent change should be safely repeatable.
+
+**4. Verify the Outcome**
+-   **Capture the "after" state.** Run the *exact same commands* from Step 2.
+-   **Confirm success.** The output must match the goal defined in Step 1.
+-   **Check for regressions.** Ensure no other parts of the system were negatively affected.
+
+**5. Commit Atomically**
+-   **Commit the single, verified change.** The commit must be self-contained.
+-   **Write a clear commit message.** Describe the *why* behind the change, not just the *what*.
+-   *Example:* A Nix package addition must include the change to `packages.nix` and the resulting `flake.lock` in the same commit.
+
+This protocol is mandatory for all changes, from adding a shell alias to updating a Neovim plugin.
 
 ## 4. Important Commands & Aliases
 
