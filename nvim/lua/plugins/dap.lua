@@ -278,7 +278,7 @@ return {
 		end,
 	},
 
-	-- Simple DAP navigation without telescope dependency
+	-- Simple DAP navigation using built-in vim functionality
 	{
 		"mfussenegger/nvim-dap",
 		keys = {

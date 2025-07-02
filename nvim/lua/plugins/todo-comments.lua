@@ -4,7 +4,7 @@ return {
 		"folke/todo-comments.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		event = { "BufReadPost", "BufNewFile" },
-		cmd = { "TodoTrouble", "TodoTelescope", "TodoLocList", "TodoQuickFix" },
+		cmd = { "TodoTrouble", "TodoLocList", "TodoQuickFix" },
 		keys = {
 			{
 				"<leader>st",
@@ -111,7 +111,7 @@ return {
 				},
 			})
 
-			-- Note: Using fzf-lua for TODO search instead of telescope
+			-- Note: Using fzf-lua for TODO search functionality
 
 			-- Set up autocommands for better workflow
 			local todo_group = vim.api.nvim_create_augroup("TodoComments", { clear = true })

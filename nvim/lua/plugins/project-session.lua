@@ -56,7 +56,7 @@ return {
 					"/opt/*",
 				},
 
-				-- Show hidden files in telescope
+				-- Show hidden files in project picker
 				show_hidden = false,
 
 				-- When set to false, you will get a message when project.nvim changes your
@@ -69,12 +69,11 @@ return {
 				-- * win
 				scope_chdir = "global",
 
-				-- Path where project.nvim will store the project history for use in
-				-- telescope
+				-- Path where project.nvim will store the project history
 				datapath = vim.fn.stdpath("data"),
 			})
 
-			-- Note: project.nvim works without telescope, uses its own project detection
+			-- Note: project.nvim works independently, uses its own project detection
 		end,
 	},
 
