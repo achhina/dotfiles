@@ -52,67 +52,9 @@ return {
 				},
 			})
 
-			-- 2-character jumping (better than flash.nvim, snacks doesn't have this)
-			require("mini.jump2d").setup({
-				spotter = require("mini.jump2d").gen_pattern_spotter("[%w%p]"),
-				allowed_lines = {
-					blank = true,
-					cursor_before = true,
-					cursor_at = true,
-					cursor_after = true,
-					fold = true,
-				},
-				allowed_windows = {
-					current = true,
-					not_current = false,
-				},
-				hooks = {
-					before_start = function()
-						vim.wo.scrolloff = 0
-					end,
-					after_jump = function()
-						vim.wo.scrolloff = 5
-					end,
-				},
-				mappings = {
-					start_jumping = "<leader><leader>",
-				},
-				silent = true,
-				view = {
-					dim = true,
-					n_steps_ahead = 0,
-				},
-			})
+			-- 2-character jumping handled by flash.nvim plugin
 
-			-- Session management (snacks doesn't have sessions)
-			require("mini.sessions").setup({
-				autoread = false,
-				autowrite = true,
-				directory = vim.fn.stdpath("data") .. "/sessions",
-				file = "",
-				force = { read = false, write = true, delete = false },
-				hooks = {
-					pre = { read = nil, write = nil, delete = nil },
-					post = { read = nil, write = nil, delete = nil },
-				},
-				verbose = { read = false, write = true, delete = true },
-			})
-
-			-- Session management keymaps
-			vim.keymap.set("n", "<leader>Ss", function()
-				require("mini.sessions").select()
-			end, { desc = "Select session" })
-
-			vim.keymap.set("n", "<leader>Sw", function()
-				local session_name = vim.fn.input("Session name: ")
-				if session_name ~= "" then
-					require("mini.sessions").write(session_name)
-				end
-			end, { desc = "Write session" })
-
-			vim.keymap.set("n", "<leader>Sd", function()
-				require("mini.sessions").select("delete")
-			end, { desc = "Delete session" })
+			-- Session management handled by auto-session plugin
 		end,
 	},
 }
