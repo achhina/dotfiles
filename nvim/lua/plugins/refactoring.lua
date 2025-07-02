@@ -169,12 +169,25 @@ return {
 				show_success_message = true, -- shows a message with information about the refactor on success
 			})
 
-			-- Load refactoring Telescope extension if available
-			pcall(require("telescope").load_extension, "refactoring")
-
-			-- Add telescope picker for refactoring operations
+			-- Use fzf-lua for refactoring operations menu
 			vim.keymap.set({ "n", "x" }, "<leader>rr", function()
-				require("telescope").extensions.refactoring.refactors()
+				-- Create a simple selection menu using vim.ui.select
+				local refactoring = require("refactoring")
+				local refactors = {
+					"Extract Function",
+					"Extract Variable",
+					"Inline Function",
+					"Inline Variable",
+					"Extract Block",
+					"Extract Block To File",
+				}
+				vim.ui.select(refactors, {
+					prompt = "Select refactor:",
+				}, function(choice)
+					if choice then
+						refactoring.refactor(choice)
+					end
+				end)
 			end, { desc = "Refactoring menu" })
 
 			-- Language-specific refactoring keymaps

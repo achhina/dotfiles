@@ -56,31 +56,31 @@ local function create_lsp_keymap(bufnr)
 		return safe_keymap("i", keys, func, { desc = full_desc }, bufnr)
 	end
 
-	-- Check telescope availability for LSP functions
-	local has_telescope, telescope_builtin = pcall(require, "telescope.builtin")
+	-- Check fzf-lua availability for LSP functions
+	local has_fzf, fzf_lua = pcall(require, "fzf-lua")
 
-	-- Core LSP navigation with telescope fallbacks
+	-- Core LSP navigation with fzf-lua fallbacks
 	nmap("gd", vim.lsp.buf.definition, "Goto Definition")
 	nmap("gI", vim.lsp.buf.implementation, "Goto Implementation")
 	nmap("<leader>D", vim.lsp.buf.type_definition, "Type Definition")
 
-	-- References with telescope or fallback
-	if has_telescope and telescope_builtin.lsp_references then
-		nmap("gr", telescope_builtin.lsp_references, "Goto References")
+	-- References with fzf-lua or fallback
+	if has_fzf and fzf_lua.lsp_references then
+		nmap("gr", fzf_lua.lsp_references, "Goto References")
 	else
 		nmap("gr", vim.lsp.buf.references, "Goto References")
 	end
 
-	-- Document symbols with telescope or fallback
-	if has_telescope and telescope_builtin.lsp_document_symbols then
-		nmap("<leader>sy", telescope_builtin.lsp_document_symbols, "Document Symbols")
+	-- Document symbols with fzf-lua or fallback
+	if has_fzf and fzf_lua.lsp_document_symbols then
+		nmap("<leader>sy", fzf_lua.lsp_document_symbols, "Document Symbols")
 	else
 		nmap("<leader>sy", vim.lsp.buf.document_symbol, "Document Symbols")
 	end
 
-	-- Workspace symbols with telescope or fallback
-	if has_telescope and telescope_builtin.lsp_dynamic_workspace_symbols then
-		nmap("<leader>ws", telescope_builtin.lsp_dynamic_workspace_symbols, "Workspace Symbols")
+	-- Workspace symbols with fzf-lua or fallback
+	if has_fzf and fzf_lua.lsp_workspace_symbols then
+		nmap("<leader>ws", fzf_lua.lsp_workspace_symbols, "Workspace Symbols")
 	else
 		nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace Symbols")
 	end

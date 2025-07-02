@@ -74,8 +74,7 @@ return {
 				datapath = vim.fn.stdpath("data"),
 			})
 
-			-- Load telescope extension
-			pcall(require("telescope").load_extension, "projects")
+			-- Note: project.nvim works without telescope, uses its own project detection
 		end,
 	},
 
@@ -166,28 +165,44 @@ return {
 		end,
 	},
 
-	-- Enhanced project navigation keymaps
+	-- Enhanced project navigation keymaps using fzf-lua
 	{
-		"nvim-telescope/telescope.nvim",
+		"ibhagwan/fzf-lua",
 		optional = true,
 		keys = {
 			{
 				"<leader>sp",
 				function()
-					require("telescope").extensions.projects.projects({})
+					-- Use fzf-lua to select from recent projects
+					local projects = require("project_nvim").get_recent_projects()
+					if #projects > 0 then
+						local fzf = require("fzf-lua")
+						fzf.fzf_exec(projects, {
+							prompt = "Projects> ",
+							actions = {
+								["default"] = function(selected)
+									vim.cmd("cd " .. selected[1])
+								end,
+							},
+						})
+					else
+						vim.notify("No recent projects found", vim.log.levels.WARN)
+					end
 				end,
 				desc = "Search projects",
 			},
 			{
 				"<leader>sP",
 				function()
-					-- Search files in all projects
+					-- Search files in recent project
 					local projects = require("project_nvim").get_recent_projects()
 					if #projects > 0 then
-						require("telescope.builtin").find_files({
-							cwd = projects[1], -- Use most recent project
-							prompt_title = "Files in " .. vim.fn.fnamemodify(projects[1], ":t"),
+						require("fzf-lua").files({
+							cwd = projects[1],
+							prompt = "Files in " .. vim.fn.fnamemodify(projects[1], ":t") .. "> ",
 						})
+					else
+						vim.notify("No recent projects found", vim.log.levels.WARN)
 					end
 				end,
 				desc = "Search files in recent project",

@@ -8,12 +8,26 @@ return {
 		keys = {
 			{
 				"<leader>st",
-				"<cmd>TodoTelescope<cr>",
+				function()
+					-- Use fzf-lua to search for TODO comments
+					require("fzf-lua").live_grep({
+						prompt = "TODOs> ",
+						cmd = "rg --column --line-number --no-heading --color=always --smart-case "
+							.. "'\\b(TODO|HACK|WARN|PERF|NOTE|TEST|FIX|FIXME)\\b'",
+					})
+				end,
 				desc = "Search TODOs",
 			},
 			{
 				"<leader>sT",
-				"<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>",
+				function()
+					-- Search specific TODO keywords
+					require("fzf-lua").live_grep({
+						prompt = "TODO/FIX> ",
+						cmd = "rg --column --line-number --no-heading --color=always --smart-case "
+							.. "'\\b(TODO|FIX|FIXME)\\b'",
+					})
+				end,
 				desc = "Search TODO/FIX/FIXME",
 			},
 			{
@@ -97,8 +111,7 @@ return {
 				},
 			})
 
-			-- Integration with Telescope
-			pcall(require("telescope").load_extension, "todo-comments")
+			-- Note: Using fzf-lua for TODO search instead of telescope
 
 			-- Set up autocommands for better workflow
 			local todo_group = vim.api.nvim_create_augroup("TodoComments", { clear = true })

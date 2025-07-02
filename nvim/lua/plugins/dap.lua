@@ -278,51 +278,51 @@ return {
 		end,
 	},
 
-	-- Telescope integration for DAP
+	-- Simple DAP navigation without telescope dependency
 	{
-		"nvim-telescope/telescope-dap.nvim",
-		dependencies = {
-			"nvim-telescope/telescope.nvim",
-			"mfussenegger/nvim-dap",
-		},
-		config = function()
-			require("telescope").load_extension("dap")
-		end,
+		"mfussenegger/nvim-dap",
 		keys = {
 			{
 				"<leader>dfc",
 				function()
-					require("telescope").extensions.dap.configurations()
+					-- Show DAP configurations using vim.ui.select
+					local dap = require("dap")
+					local configs = {}
+					for ft, config_list in pairs(dap.configurations) do
+						for _, config in ipairs(config_list) do
+							table.insert(configs, ft .. ": " .. config.name)
+						end
+					end
+					vim.ui.select(configs, {
+						prompt = "Debug Configurations:",
+					}, function(choice)
+						if choice then
+							vim.notify("Selected: " .. choice, vim.log.levels.INFO)
+						end
+					end)
 				end,
 				desc = "Debug: Configurations",
 			},
 			{
 				"<leader>dfb",
 				function()
-					require("telescope").extensions.dap.list_breakpoints()
+					-- List breakpoints using quickfix
+					local dap = require("dap")
+					local breakpoints = dap.list_breakpoints()
+					local qf_list = {}
+					for _, bp in pairs(breakpoints) do
+						for _, item in ipairs(bp) do
+							table.insert(qf_list, {
+								filename = item.file,
+								lnum = item.line,
+								text = "Breakpoint",
+							})
+						end
+					end
+					vim.fn.setqflist(qf_list)
+					vim.cmd("copen")
 				end,
 				desc = "Debug: List Breakpoints",
-			},
-			{
-				"<leader>dfv",
-				function()
-					require("telescope").extensions.dap.variables()
-				end,
-				desc = "Debug: Variables",
-			},
-			{
-				"<leader>dff",
-				function()
-					require("telescope").extensions.dap.frames()
-				end,
-				desc = "Debug: Frames",
-			},
-			{
-				"<leader>dfc",
-				function()
-					require("telescope").extensions.dap.commands()
-				end,
-				desc = "Debug: Commands",
 			},
 		},
 	},
