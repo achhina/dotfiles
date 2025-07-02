@@ -17,6 +17,7 @@
       eza
       fd
       fzf
+      gemini-cli
       git
       git-lfs
       github-cli
