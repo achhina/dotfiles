@@ -33,28 +33,28 @@
 
       format =
         let
-          opening_sep = "";
-          closing_sep = "";
+          opening_glpyh = "";
+          closing_glyph = "";
           sep = "";
         in
-        "[${opening_sep}](color_orange)" +
-        "$os" +
-        "$username" +
-        "[${sep}](bg:color_yellow fg:color_orange)" +
-        "$directory" +
-        "[${sep}](fg:color_yellow bg:color_aqua)" +
-        "$git_branch" +
-        "$git_status" +
-        "[${sep}](fg:color_aqua bg:color_blue)" +
-        "$python" +
-        "[${sep}](fg:color_blue bg:color_bg3)" +
-        "$nodejs" +
-        "$docker_context" +
-        "$conda" +
-        "[${sep}](fg:color_bg3 bg:color_bg1)" +
-        "$time" +
-        "[${closing_sep}](fg:color_bg1)" +
-        "$line_break$character";
+        "[${opening_glpyh}](color_orange)"
+        + "$os"
+        + "$username"
+        + "[${sep}](bg:color_yellow fg:color_orange)"
+        + "$directory"
+        + "[${sep}](fg:color_yellow bg:color_aqua)"
+        + "$git_branch"
+        + "$git_status"
+        + "[${sep}](fg:color_aqua bg:color_blue)"
+        + "$python"
+        + "$nodejs"
+        + "[${sep}](fg:color_blue bg:color_bg3)"
+        + "$docker_context"
+        + "$conda"
+        + "[${sep}](fg:color_bg3 bg:color_bg1)"
+        + "$time"
+        + "[${closing_glyph}](fg:color_bg1)"
+        + "$line_break$character";
 
       palette = "gruvbox_dark";
 
