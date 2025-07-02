@@ -2,18 +2,17 @@
 
 This document provides a comprehensive guide for an AI agent to understand and manage this dotfiles repository.
 
-## 1. Core Philosophy & Technology
+## 1. Guiding Principles & Architecture
 
-This repository uses a **declarative approach** to manage a development environment across macOS and Linux systems. The core technologies are:
+This repository treats the entire development environment as a unified, version-controlled software project. Its architecture is guided by a few core principles:
 
--   **[Nix](https://nixos.org/):** The foundation for package and environment management.
--   **[Home Manager](https://github.com/nix-community/home-manager):** Manages user-level packages and dotfiles declaratively.
--   **[Neovim](https://neovim.io/):** The primary text editor, configured in Lua.
--   **[Zsh](https://www.zsh.org/):** The shell, configured with Oh My Zsh and Starship.
+-   **Total Declarative Control.** The environment is defined as code. **Nix and Home Manager** serve as the single source of truth, ensuring that the system is **bit-for-bit reproducible**. The `flake.nix` is the main entry point, and the goal is to eliminate all manual setup.
 
-The main entry point for the entire configuration is `/nix/flake.nix`. All system packages and most application configurations are defined within the Nix modules located in `/nix/home-manager/modules/`.
+-   **Structured by Function.** The configuration is organized into **logical tiers** based on their function and stability, not just by tool name. This separates the foundational **Declarative Core** (`nix/`) from the frequently-tweaked **Interactive Environment** (`nvim/`, `aerospace/`) and the stable **Supporting Tools** (Git, etc.). This structure makes the system easier to reason about and safer to modify.
 
-**Primary Goal:** Maintain a reproducible, cross-platform, and keyboard-driven development environment.
+-   **Engineered for Portability.** The use of Nix, conditional logic (`pkgs.stdenv.isDarwin`), and a focus on cross-platform tools ensures the environment is **portable across macOS and Linux** on different architectures.
+
+-   **Optimized for Flow.** The choice of tools and extensive custom configurations (Neovim, Aerospace, Zsh aliases, fzf-tab) are heavily biased towards a **fast, keyboard-driven workflow**. The primary goal is to minimize friction and maximize developer efficiency.
 
 ## 2. Dependency Management: A Tiered Approach
 
