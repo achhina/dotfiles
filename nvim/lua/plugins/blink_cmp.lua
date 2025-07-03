@@ -10,7 +10,6 @@ return {
 		},
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer" },
-			cmdline = { "path", "cmdline" },
 			providers = {
 				copilot = {
 					name = "copilot",
