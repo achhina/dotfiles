@@ -45,7 +45,16 @@ return {
 		},
 		explorer = { enabled = false }, -- Keep oil.nvim as primary file explorer
 		indent = { enabled = true }, -- Modern indent guides
-		input = { enabled = true }, -- Better vim.ui.input
+		input = {
+			enabled = true, -- Better vim.ui.input
+			win = {
+				keys = {
+					n_esc = { "<esc>", "cancel", mode = "n" },
+					i_esc = { "<esc>", "cancel", mode = "i" },
+					q = "cancel",
+				},
+			},
+		},
 		picker = { enabled = false }, -- Keep fzf-lua as primary picker
 		notifier = {
 			enabled = true,

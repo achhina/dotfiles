@@ -27,6 +27,7 @@ return {
 					["<C-d>"] = "preview-page-down",
 					["<C-u>"] = "preview-page-up",
 					["<S-left>"] = "preview-page-reset",
+					["<Esc>"] = "abort",
 				},
 				fzf = {
 					["ctrl-q"] = "select-all+accept",
