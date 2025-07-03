@@ -127,8 +127,7 @@ function M.setup()
 	vim.g.maplocalleader = " "
 
 	-- General keymaps with validation
-	-- Use <leader><Esc> to clear search highlighting instead of <Esc> to avoid conflicts with fzf-lua
-	safe_keymap("n", "<leader><Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlighting" })
+	safe_keymap("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlighting" })
 	safe_keymap("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
 	safe_keymap("i", "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save file from insert mode" })
 
