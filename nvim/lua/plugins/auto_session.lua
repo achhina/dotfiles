@@ -1,6 +1,6 @@
 return {
 	"rmagatti/auto-session",
-	lazy = false,
+	enabled = false, -- Disabled - using persistence.nvim instead to prevent session conflicts
 
 	---@type table
 	opts = {

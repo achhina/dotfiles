@@ -9,26 +9,26 @@ return {
 	---@type snacks.Config
 	opts = {
 		-- Enable most snacks modules for comprehensive functionality
-		bigfile = { enabled = true }, -- Handle large files better
+		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
 		dashboard = {
 			enabled = true,
 			preset = {
 				keys = {
-					{ icon = " ", key = "f", desc = "Find File", action = ":FzfLua files" },
+					{ icon = " ", key = "f", desc = "Find File", action = ":lua require('fzf-lua').files()" },
 					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-					{ icon = " ", key = "g", desc = "Find Text", action = ":FzfLua live_grep" },
-					{ icon = " ", key = "r", desc = "Recent Files", action = ":FzfLua oldfiles" },
+					{ icon = " ", key = "g", desc = "Find Text", action = ":lua require('fzf-lua').live_grep()" },
+					{ icon = " ", key = "r", desc = "Recent Files", action = ":lua require('fzf-lua').oldfiles()" },
 					{
 						icon = " ",
 						key = "c",
 						desc = "Config",
-						action = ":FzfLua files cwd=" .. vim.fn.stdpath("config"),
+						action = ":lua require('fzf-lua').files({cwd='" .. vim.fn.stdpath("config") .. "'})",
 					},
 					{
 						icon = " ",
 						key = "s",
 						desc = "Restore Session",
-						action = ":lua require('mini.sessions').select()",
+						action = ":lua require('persistence').load()",
 					},
 					{ icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
 					{ icon = " ", key = "q", desc = "Quit", action = ":qa" },

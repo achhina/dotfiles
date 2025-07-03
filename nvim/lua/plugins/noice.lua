@@ -2,6 +2,16 @@ return {
 	"folke/noice.nvim",
 	event = "VeryLazy",
 	opts = {
+		cmdline = {
+			enabled = true,
+			view = "cmdline_popup",
+			format = {
+				cmdline = { pattern = "^:", icon = "", lang = "vim" },
+				search_down = { kind = "search", pattern = "^/", icon = " ", lang = "regex" },
+				search_up = { kind = "search", pattern = "^%?", icon = " ", lang = "regex" },
+				filter = { pattern = "^:%s*!", icon = "$", lang = "bash" },
+			},
+		},
 		-- Removed LSP overrides to prevent conflicts with fidget.nvim handling LSP progress
 		-- lsp = {
 		--   override = {

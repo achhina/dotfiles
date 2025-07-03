@@ -36,9 +36,9 @@ function M.load_options()
 	-- Set completeopt to have a better completion experience
 	vim.o.completeopt = "menuone,noselect"
 
-	-- Enhanced command-line completion
+	-- Enhanced command-line completion (handled by noice.nvim)
 	vim.o.wildmenu = true
-	vim.o.wildmode = "list:longest,full"
+	vim.o.wildmode = "full"
 	vim.o.wildoptions = "pum,tagfile"
 
 	-- NOTE: You should make sure your terminal supports this

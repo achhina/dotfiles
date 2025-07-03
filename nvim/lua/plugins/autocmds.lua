@@ -175,7 +175,11 @@ autocmd("BufEnter", {
 					-- Check if buffer hasn't been accessed recently
 					local last_used = vim.api.nvim_buf_get_var(buf, "last_used") or 0
 					if current_time - last_used > 300 then -- 5 minutes
-						pcall(vim.api.nvim_buf_delete, buf, { force = false })
+						-- Don't delete buffers with active LSP clients
+						local clients = vim.lsp.get_clients({ bufnr = buf })
+						if #clients == 0 then
+							pcall(vim.api.nvim_buf_delete, buf, { force = false })
+						end
 					end
 				end
 			end
@@ -198,8 +202,8 @@ autocmd("FileType", {
 -- Development workflow automation
 local dev_group = augroup("DevelopmentWorkflow", { clear = true })
 
--- Auto-reload files when they change on disk
-autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+-- Auto-reload files when they change on disk (reduced frequency to prevent LSP disruption)
+autocmd({ "FocusGained", "CursorHold" }, {
 	group = dev_group,
 	pattern = "*",
 	command = "if mode() != 'c' | checktime | endif",
@@ -238,66 +242,6 @@ autocmd({ "BufEnter", "FocusGained" }, {
 			require("gitsigns").refresh()
 		end
 	end,
-})
-
--- Performance optimizations
-local perf_group = augroup("PerformanceOptimizations", { clear = true })
-
--- Disable certain features for large files
-autocmd("BufReadPre", {
-	group = perf_group,
-	callback = function()
-		local max_filesize = 1024 * 1024 * 2 -- 2MB
-		local filename = vim.fn.expand("<afile>")
-
-		if filename == "" then
-			return
-		end
-
-		local ok, stats = pcall(vim.loop.fs_stat, filename)
-		if ok and stats and stats.size > max_filesize then
-			vim.notify("Large file detected. Optimizing for performance.", vim.log.levels.INFO)
-
-			-- Disable expensive features
-			vim.opt_local.swapfile = false
-			vim.opt_local.foldmethod = "manual"
-			vim.opt_local.undolevels = -1
-			vim.opt_local.undoreload = 0
-			vim.opt_local.list = false
-
-			-- Disable treesitter
-			vim.schedule(function()
-				pcall(vim.treesitter.stop)
-			end)
-
-			-- Disable LSP for very large files
-			if stats.size > max_filesize * 5 then -- 10MB
-				vim.schedule(function()
-					vim.diagnostic.disable(0)
-				end)
-			end
-		end
-	end,
-})
-
--- Session management automation
-local session_group = augroup("SessionManagement", { clear = true })
-
--- Auto-load session for project directories
-autocmd("VimEnter", {
-	group = session_group,
-	callback = function()
-		-- Only auto-load if no arguments were passed
-		if vim.fn.argc(-1) == 0 then
-			local has_persistence, persistence = pcall(require, "persistence")
-			if has_persistence then
-				vim.defer_fn(function()
-					persistence.load()
-				end, 100)
-			end
-		end
-	end,
-	nested = true,
 })
 
 -- UI/UX improvements
