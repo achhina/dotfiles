@@ -38,7 +38,7 @@ function M.load_options()
 
 	-- Enhanced command-line completion
 	vim.o.wildmenu = true
-	vim.o.wildmode = "longest:full,full"
+	vim.o.wildmode = "list:longest,full"
 	vim.o.wildoptions = "pum,tagfile"
 
 	-- NOTE: You should make sure your terminal supports this
