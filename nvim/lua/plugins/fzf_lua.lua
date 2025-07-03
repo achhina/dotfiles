@@ -27,7 +27,6 @@ return {
 					["<C-d>"] = "preview-page-down",
 					["<C-u>"] = "preview-page-up",
 					["<S-left>"] = "preview-page-reset",
-					["<Esc>"] = "abort",
 				},
 				fzf = {
 					["ctrl-q"] = "select-all+accept",
@@ -142,6 +141,17 @@ return {
 
 		-- Resume last picker
 		vim.keymap.set("n", "<leader>sR", fzf.resume, { desc = "Search Resume" })
+
+		-- Fix escape key in fzf terminal buffers
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = "fzf",
+			callback = function()
+				-- Map escape in terminal mode to close fzf
+				vim.keymap.set("t", "<Esc>", "<C-c>", { buffer = true, silent = true })
+				-- Map escape in normal mode within fzf buffer to close fzf
+				vim.keymap.set("n", "<Esc>", "<C-c>", { buffer = true, silent = true })
+			end,
+		})
 
 		-- Diagnostic keymaps
 		vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
