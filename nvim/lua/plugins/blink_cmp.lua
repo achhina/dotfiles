@@ -10,6 +10,7 @@ return {
 		},
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer" },
+			cmdline = { "path", "cmdline" },
 			providers = {
 				copilot = {
 					name = "copilot",
@@ -28,6 +29,11 @@ return {
 				border = "rounded",
 				draw = {
 					treesitter = { "lsp" },
+				},
+			},
+			accept = {
+				auto_brackets = {
+					enabled = true,
 				},
 			},
 		},
