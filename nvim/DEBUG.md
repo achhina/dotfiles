@@ -25,6 +25,9 @@ pkill nvim; nvim --clean
 | Startup autocmd issues | `nvim -V9verbose.log` | Detailed execution log |
 | LSP not working | `:LspInfo` | Server status |
 | Keymaps broken | `:verbose nmap <key>` | Source conflicts |
+| Terminal mode issues | `:tmap` + `:lua print(vim.fn.mode())` | Missing terminal mappings |
+| Buffer keymap conflicts | `:lua vim.print(vim.api.nvim_buf_get_keymap(0,'t'))` | Buffer-local vs global |
+| Mode transition problems | `:autocmd ModeChanged` | Stuck in wrong mode |
 | Slow startup | `nvim --startuptime /tmp/startup.log` | >50ms items |
 
 ## Core Debugging Commands
@@ -267,7 +270,7 @@ nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
 
 **These require systematic debugging but are normal Neovim limitations:**
 
-- 🟠 `E36: Not enough room` → Investigate with verbose autocmd debugging (see Autocmd Error Debugging section)
+- 🟠 `E36: Not enough room` or escape key not working → Check `:tmap`, `:lua print(vim.fn.mode())`, and buffer filetype
 - 🟠 Generic "Error detected while processing [Event] Autocommands" → Use `:verbose autocmd [Event]` to identify source
 - 🟠 Plugin conflicts in tmux/terminal environments → Test window dimensions and UI plugin compatibility
 
@@ -308,6 +311,15 @@ for i in {1..10}; do
   nvim --headless -c 'lua print(collectgarbage("count"))' -c 'qa'
   sleep 1
 done
+```
+
+### User Interaction Testing
+```vim
+# Simulate key sequences for debugging
+:lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), 'x', false)
+
+# Test plugin interactions headless
+nvim --headless -c 'lua require("fzf-lua").files()' -c 'qa'
 ```
 
 ### Environment Testing
