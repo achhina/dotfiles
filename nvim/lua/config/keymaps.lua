@@ -285,10 +285,6 @@ function M.load_test_keymaps(bufnr)
 		neotest.run.run({ strategy = "dap" })
 	end, "Debug nearest test")
 
-	tmap("<leader>tD", function()
-		neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
-	end, "Debug all tests in file")
-
 	-- Test UI and output
 	tmap("<leader>ts", function()
 		neotest.summary.toggle()
@@ -311,8 +307,11 @@ function M.load_test_keymaps(bufnr)
 		neotest.run.stop()
 	end, "Stop running tests")
 
-	-- Notify that test keymaps are loaded
-	vim.notify("Test keymaps loaded for " .. vim.bo[bufnr].filetype, vim.log.levels.INFO)
+	-- Notify that unified test keymaps are loaded
+	vim.notify(
+		"Unified test keymaps loaded for " .. vim.bo[bufnr].filetype .. " (neotest + debug-profiles)",
+		vim.log.levels.INFO
+	)
 end
 
 return M

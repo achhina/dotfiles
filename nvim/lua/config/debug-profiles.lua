@@ -470,7 +470,6 @@ function M.setup()
 		M.auto_attach.auto_attach_dev_servers,
 		{ desc = "Debug: Auto-attach Dev Servers" }
 	)
-	vim.keymap.set("n", "<leader>ddt", M.workflows.debug_current_test, { desc = "Debug: Current Test" })
 	vim.keymap.set("n", "<leader>drd", M.workflows.setup_remote_debugging, { desc = "Debug: Remote Debug" })
 	vim.keymap.set("n", "<leader>dpf", M.workflows.profile_and_debug, { desc = "Debug: Profile & Debug" })
 
