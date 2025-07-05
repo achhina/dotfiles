@@ -116,29 +116,27 @@ return {
 		},
 		config = function()
 			require("venv-selector").setup({
-				settings = {
-					options = {
-						notify_user_on_venv_activation = true,
+				options = {
+					notify_user_on_venv_activation = true,
+				},
+				search = {
+					my_venvs = {
+						command = "fd 'pyvenv.cfg' ~/.virtualenvs --max-depth 2",
 					},
-					search = {
-						my_venvs = {
-							command = "fd 'pyvenv.cfg' ~/.virtualenvs --max-depth 2",
-						},
-						pipenv = {
-							command = "fd 'pyvenv.cfg' ~/.local/share/virtualenvs --max-depth 2",
-						},
-						poetry = {
-							command = "fd 'pyvenv.cfg' ~/Library/Caches/pypoetry/virtualenvs --max-depth 2",
-						},
-						conda = {
-							command = "fd 'pyvenv.cfg' ~/miniconda3/envs --max-depth 2",
-						},
-						pyenv = {
-							command = "fd 'pyvenv.cfg' ~/.pyenv/versions --max-depth 2",
-						},
-						workspace = {
-							command = "fd 'pyvenv.cfg' . --max-depth 4 --type f",
-						},
+					pipenv = {
+						command = "fd 'pyvenv.cfg' ~/.local/share/virtualenvs --max-depth 2",
+					},
+					poetry = {
+						command = "fd 'pyvenv.cfg' ~/Library/Caches/pypoetry/virtualenvs --max-depth 2",
+					},
+					conda = {
+						command = "fd 'pyvenv.cfg' ~/miniconda3/envs --max-depth 2",
+					},
+					pyenv = {
+						command = "fd 'pyvenv.cfg' ~/.pyenv/versions --max-depth 2",
+					},
+					workspace = {
+						command = "fd 'pyvenv.cfg' . --max-depth 4 --type f",
 					},
 				},
 			})

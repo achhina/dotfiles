@@ -68,41 +68,36 @@ return {
 			},
 		})
 
-		-- Test keymaps
-		vim.keymap.set("n", "<leader>tn", function()
-			require("neotest").run.run()
-		end, { desc = "Run nearest test" })
+		-- Load test keymaps for supported filetypes
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = { "python", "javascript", "typescript", "javascriptreact", "typescriptreact", "go", "rust" },
+			callback = function(args)
+				-- Only load test keymaps if we're in a buffer that likely contains tests
+				local bufnr = args.buf
+				local filename = vim.fn.expand("%:t")
 
-		vim.keymap.set("n", "<leader>tf", function()
-			require("neotest").run.run(vim.fn.expand("%"))
-		end, { desc = "Run current file tests" })
+				-- Check if this looks like a test file
+				local is_test_file = filename:match("test")
+					or filename:match("spec")
+					or filename:match("_test%.")
+					or filename:match("%.test%.")
 
-		vim.keymap.set("n", "<leader>td", function()
-			require("neotest").run.run({ strategy = "dap" })
-		end, { desc = "Debug nearest test" })
+				-- Or if neotest can discover tests in this file
+				local has_tests = false
+				vim.schedule(function()
+					-- Use neotest to check if there are discoverable tests
+					local ok, tree = pcall(require("neotest").discover, { bufnr })
+					if ok and tree then
+						has_tests = #tree:children() > 0
+					end
 
-		vim.keymap.set("n", "<leader>tD", function()
-			require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
-		end, { desc = "Debug all tests in file" })
-
-		vim.keymap.set("n", "<leader>ts", function()
-			require("neotest").summary.toggle()
-		end, { desc = "Toggle test summary" })
-
-		vim.keymap.set("n", "<leader>to", function()
-			require("neotest").output.open({ enter = true, auto_close = true })
-		end, { desc = "Show test output" })
-
-		vim.keymap.set("n", "<leader>tO", function()
-			require("neotest").output_panel.toggle()
-		end, { desc = "Toggle test output panel" })
-
-		vim.keymap.set("n", "<leader>tr", function()
-			require("neotest").run.run_last()
-		end, { desc = "Run last test" })
-
-		vim.keymap.set("n", "<leader>tS", function()
-			require("neotest").run.stop()
-		end, { desc = "Stop running tests" })
+					-- Load test keymaps if this is a test file or has discoverable tests
+					if is_test_file or has_tests then
+						require("config.keymaps").load_test_keymaps(bufnr)
+					end
+				end)
+			end,
+			desc = "Load test keymaps for test files",
+		})
 	end,
 }

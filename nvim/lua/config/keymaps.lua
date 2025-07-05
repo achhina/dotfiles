@@ -257,4 +257,62 @@ function M.load_dap_keymaps()
 	end
 end
 
+-- Test keymap loader for neotest sessions
+function M.load_test_keymaps(bufnr)
+	-- Validate that neotest is available
+	local has_neotest, neotest = pcall(require, "neotest")
+	if not has_neotest then
+		vim.notify("Neotest not available for buffer " .. bufnr, vim.log.levels.WARN)
+		return
+	end
+
+	-- Helper function for buffer-local test keymaps
+	local function tmap(keys, func, desc)
+		local full_desc = desc and ("Test: " .. desc) or nil
+		return safe_keymap("n", keys, func, { desc = full_desc }, bufnr)
+	end
+
+	-- Core test execution
+	tmap("<leader>tn", function()
+		neotest.run.run()
+	end, "Run nearest test")
+
+	tmap("<leader>tf", function()
+		neotest.run.run(vim.fn.expand("%"))
+	end, "Run current file tests")
+
+	tmap("<leader>td", function()
+		neotest.run.run({ strategy = "dap" })
+	end, "Debug nearest test")
+
+	tmap("<leader>tD", function()
+		neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
+	end, "Debug all tests in file")
+
+	-- Test UI and output
+	tmap("<leader>ts", function()
+		neotest.summary.toggle()
+	end, "Toggle test summary")
+
+	tmap("<leader>to", function()
+		neotest.output.open({ enter = true, auto_close = true })
+	end, "Show test output")
+
+	tmap("<leader>tO", function()
+		neotest.output_panel.toggle()
+	end, "Toggle test output panel")
+
+	-- Test session management
+	tmap("<leader>tr", function()
+		neotest.run.run_last()
+	end, "Run last test")
+
+	tmap("<leader>tS", function()
+		neotest.run.stop()
+	end, "Stop running tests")
+
+	-- Notify that test keymaps are loaded
+	vim.notify("Test keymaps loaded for " .. vim.bo[bufnr].filetype, vim.log.levels.INFO)
+end
+
 return M
