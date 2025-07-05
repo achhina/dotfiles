@@ -21,6 +21,9 @@
       macosOptionAsAlt = true;
       macosTitlebarStyle = "hidden";
       macosIcon = "chalkboard";
+
+      # Compromise, because when left on it's harder to autoupdate OS.
+      confirm-close-surface = false;
     };
   };
 
