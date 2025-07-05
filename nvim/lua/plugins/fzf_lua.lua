@@ -101,6 +101,9 @@ return {
 			},
 		})
 
+		-- Search namespace
+		vim.keymap.set("n", "<leader>s", "", { desc = "+search" })
+
 		-- File pickers
 		vim.keymap.set("n", "<leader>sf", fzf.files, { desc = "Search Files" })
 		vim.keymap.set("n", "<leader>fr", fzf.oldfiles, { desc = "Find recently opened files" })

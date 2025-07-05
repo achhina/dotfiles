@@ -326,6 +326,7 @@ return {
 			"DBUIFindBuffer",
 		},
 		keys = {
+			{ "<leader>D", "", desc = "+database" },
 			{ "<leader>Db", "<cmd>DBUIToggle<cr>", desc = "Toggle DBUI" },
 			{ "<leader>Df", "<cmd>DBUIFindBuffer<cr>", desc = "Find DB buffer" },
 			{ "<leader>Dr", "<cmd>DBUIRenameBuffer<cr>", desc = "Rename DB buffer" },

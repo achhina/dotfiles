@@ -27,6 +27,9 @@ return {
 			vim.keymap.set(mode, lhs, rhs, opts)
 		end
 
+		-- Git namespace
+		map("n", "<leader>g", "", { desc = "+git" })
+
 		-- Git status and operations
 		map("n", "<leader>gg", "<cmd>Git<cr>", { desc = "Git status" })
 		map("n", "<leader>gG", "<cmd>Git<cr>", { desc = "Git status (full screen)" })

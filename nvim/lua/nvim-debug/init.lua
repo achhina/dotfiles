@@ -149,6 +149,7 @@ function M.setup()
 	end
 
 	-- Nvim debug operations (grouped under dC* to avoid DAP conflicts)
+	map("n", "<leader>dC", "", { desc = "+nvim-debug" })
 	map("n", "<leader>dCs", function()
 		run_debug_with_autoopen("capture_state")
 	end, { desc = "Debug: Capture state" })
