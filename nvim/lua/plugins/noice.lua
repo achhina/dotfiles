@@ -12,13 +12,12 @@ return {
 				filter = { pattern = "^:%s*!", icon = "$", lang = "bash" },
 			},
 		},
-		-- Removed LSP overrides to prevent conflicts with fidget.nvim handling LSP progress
-		-- lsp = {
-		--   override = {
-		--     ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-		--     ["vim.lsp.util.stylize_markdown"] = true,
-		--   },
-		-- },
+		lsp = {
+			override = {
+				["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+				["vim.lsp.util.stylize_markdown"] = true,
+			},
+		},
 		presets = {
 			bottom_search = true,
 			command_palette = true,
