@@ -460,7 +460,8 @@ function M.setup()
 		M.sessions.load_session(opts.args)
 	end, { nargs = "?", desc = "Load debug session" })
 
-	-- Auto-attach keymaps
+	-- Advanced debug features grouped logically
+	-- da* = attach operations
 	vim.keymap.set("n", "<leader>dap", function()
 		M.auto_attach.attach_to_process(vim.fn.input("Process pattern: "))
 	end, { desc = "Debug: Attach to Process" })
@@ -470,10 +471,12 @@ function M.setup()
 		M.auto_attach.auto_attach_dev_servers,
 		{ desc = "Debug: Auto-attach Dev Servers" }
 	)
-	vim.keymap.set("n", "<leader>drd", M.workflows.setup_remote_debugging, { desc = "Debug: Remote Debug" })
-	vim.keymap.set("n", "<leader>dpf", M.workflows.profile_and_debug, { desc = "Debug: Profile & Debug" })
 
-	-- Session management keymaps
+	-- dr* = remote/advanced debugging
+	vim.keymap.set("n", "<leader>drd", M.workflows.setup_remote_debugging, { desc = "Debug: Remote Debug" })
+	vim.keymap.set("n", "<leader>drf", M.workflows.profile_and_debug, { desc = "Debug: Profile & Debug" })
+
+	-- ds* = session management
 	vim.keymap.set("n", "<leader>dss", function()
 		M.sessions.save_session(vim.fn.input("Session name: "))
 	end, { desc = "Debug: Save Session" })

@@ -250,19 +250,11 @@ function M.setup()
 		M.performance.start_performance_monitoring()
 	end
 
-	-- Keymaps for inline debugging
-	vim.keymap.set("n", "<leader>dev", M.inline_edit.edit_variable, { desc = "Debug: Edit Variable" })
-	vim.keymap.set("n", "<leader>dee", M.inline_edit.evaluate_expression, { desc = "Debug: Evaluate Expression" })
-	vim.keymap.set("n", "<leader>dew", M.inline_edit.add_watch, { desc = "Debug: Add Watch" })
+	-- Note: Most inline-debug keymaps removed to avoid conflicts with DAP
+	-- DAP already provides better evaluate (<leader>de), breakpoint management, etc.
+	-- Only keeping unique functionality that doesn't conflict
 
-	-- Enhanced breakpoint keymaps
-	vim.keymap.set(
-		"n",
-		"<leader>dbc",
-		M.breakpoints.set_conditional_breakpoint,
-		{ desc = "Debug: Conditional Breakpoint" }
-	)
-	vim.keymap.set("n", "<leader>dbl", M.breakpoints.set_log_point, { desc = "Debug: Log Point" })
+	-- Enhanced breakpoint features (unique, no conflicts)
 	vim.keymap.set(
 		"n",
 		"<leader>dbg",
@@ -270,11 +262,9 @@ function M.setup()
 		{ desc = "Debug: Create Breakpoint Group" }
 	)
 
-	-- Session management keymaps
+	-- Session workspace management (unique features)
 	vim.keymap.set("n", "<leader>dws", M.session.auto_save_workspace, { desc = "Debug: Save Workspace" })
 	vim.keymap.set("n", "<leader>dwr", M.session.restore_workspace, { desc = "Debug: Restore Workspace" })
-	vim.keymap.set("n", "<leader>drr", M.session.start_recording, { desc = "Debug: Start Recording" })
-	vim.keymap.set("n", "<leader>drs", M.session.stop_recording, { desc = "Debug: Stop Recording" })
 
 	-- User commands
 	vim.api.nvim_create_user_command(

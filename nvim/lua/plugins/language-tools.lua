@@ -326,10 +326,10 @@ return {
 			"DBUIFindBuffer",
 		},
 		keys = {
-			{ "<leader>db", "<cmd>DBUIToggle<cr>", desc = "Toggle DBUI" },
-			{ "<leader>df", "<cmd>DBUIFindBuffer<cr>", desc = "Find DB buffer" },
-			{ "<leader>dr", "<cmd>DBUIRenameBuffer<cr>", desc = "Rename DB buffer" },
-			{ "<leader>dq", "<cmd>DBUILastQueryInfo<cr>", desc = "Last query info" },
+			{ "<leader>Db", "<cmd>DBUIToggle<cr>", desc = "Toggle DBUI" },
+			{ "<leader>Df", "<cmd>DBUIFindBuffer<cr>", desc = "Find DB buffer" },
+			{ "<leader>Dr", "<cmd>DBUIRenameBuffer<cr>", desc = "Rename DB buffer" },
+			{ "<leader>Dq", "<cmd>DBUILastQueryInfo<cr>", desc = "Last query info" },
 		},
 		init = function()
 			-- Your DBUI configuration
