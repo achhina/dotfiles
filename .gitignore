@@ -39,3 +39,5 @@ direnv/lib/hm-nix-direnv.sh
 github-copilot/apps.json
 starship.toml
 aerospace/aerospace.toml
+git/config
+git/ignore
