@@ -1,0 +1,298 @@
+*debug.txt*    Neovim Debug Plugin                                      *debug*
+
+Author: Local Configuration
+Version: 1.0
+License: MIT
+
+==============================================================================
+CONTENTS                                                      *debug-contents*
+
+    1. Introduction .......................... |debug-introduction|
+    2. Installation .......................... |debug-installation|
+    3. Usage ................................. |debug-usage|
+    4. Commands .............................. |debug-commands|
+    5. Functions ............................. |debug-functions|
+    6. Keymaps ............................... |debug-keymaps|
+    7. Configuration ......................... |debug-configuration|
+    8. Examples .............................. |debug-examples|
+
+==============================================================================
+INTRODUCTION                                              *debug-introduction*
+
+The Debug plugin provides a comprehensive set of tools for debugging your
+Neovim configuration, investigating issues, and monitoring performance. It
+includes functions for state capture, profiling, conflict detection, and
+general troubleshooting.
+
+Key features:
+- Lazy-loaded functions for minimal startup impact
+- Comprehensive state capture and logging
+- Performance profiling and monitoring
+- Keymap and plugin conflict detection
+- Error investigation and context analysis
+- Configuration reload and cache management
+- Session backup and restoration
+
+==============================================================================
+INSTALLATION                                              *debug-installation*
+
+Add the following to your lazy.nvim configuration:
+
+>lua
+    {
+        dir = vim.fn.stdpath("config") .. "/lua/debug",
+        name = "debug",
+        config = function()
+            require("debug").setup()
+        end,
+    }
+<
+
+==============================================================================
+USAGE                                                            *debug-usage*
+
+The main interface is through the `:Debug` command:
+
+    :Debug                    " List all available functions
+    :Debug <function_name>    " Run a specific debug function
+
+All debug output is logged to `~/.local/share/nvim/debug/neovim-debug.log`
+and organized by timestamp and function type.
+
+==============================================================================
+COMMANDS                                                      *debug-commands*
+
+                                                                      *:Debug*
+:Debug [function_name]
+    Main debug command. When called without arguments, lists all available
+    debug functions. When called with a function name, executes that function.
+
+    Tab completion is available for function names.
+
+==============================================================================
+FUNCTIONS                                                    *debug-functions*
+
+State Capture Functions ~
+                                                          *debug-capture_state*
+capture_state()
+    Captures current Neovim state including:
+    - Recent messages and errors
+    - Open buffers and windows
+    - Current working directory and file
+    - LSP client status
+    - Cursor position and context
+
+                                                         *debug-capture_config*
+capture_config()
+    Captures current configuration including:
+    - Neovim version and build info
+    - Important options and settings
+    - Loaded plugins (lazy.nvim)
+    - Environment variables
+    - Global variables
+
+                                                    *debug-capture_performance*
+capture_performance()
+    Captures performance metrics including:
+    - Lua memory usage
+    - Startup time information
+    - Buffer, window, and tab counts
+    - Recent errors and warnings
+    - TreeSitter parser status
+
+Profiling Functions ~
+                                                          *debug-start_profile*
+start_profile()
+    Starts comprehensive profiling with smart defaults. Profiles both
+    functions and files for complete performance analysis.
+
+                                                           *debug-stop_profile*
+stop_profile()
+    Stops active profiling session and saves results to a timestamped file
+    in `~/.local/share/nvim/debug/profiles/`.
+
+                                                         *debug-profile_startup*
+profile_startup()
+    Prepares startup profiling. Provides instructions for profiling Neovim
+    startup time by creating a startup script and helper command.
+
+Conflict Detection Functions ~
+                                                          *debug-check_keymaps*
+check_keymaps()
+    Analyzes all keymaps across different modes to detect conflicts and
+    overlaps. Provides detailed information about:
+    - Keymaps by mode (Normal, Insert, Visual, etc.)
+    - Duplicate key bindings
+    - Conflicting mappings
+
+                                                         *debug-check_autocmds*
+check_autocmds()
+    Analyzes autocmds to detect potential issues:
+    - Lists autocmds by event and group
+    - Identifies duplicate autocmds
+    - Validates autocmd chains
+
+                                                          *debug-check_plugins*
+check_plugins()
+    Analyzes plugin configuration and status:
+    - Lists loaded vs not loaded plugins
+    - Identifies plugins with errors
+    - Detects potential plugin conflicts
+    - Shows plugin loading performance
+
+Investigation Functions ~
+                                                       *debug-trace_last_error*
+trace_last_error()
+    Provides enhanced error context and investigation:
+    - Last error message and exception details
+    - Recent errors from message history
+    - Current buffer and cursor context
+    - LSP diagnostics at cursor position
+
+                                                         *debug-inspect_cursor*
+inspect_cursor()
+    Comprehensive cursor position analysis:
+    - Buffer and line information
+    - Character under cursor
+    - TreeSitter node information
+    - Syntax highlighting stack
+    - LSP client status
+    - Diagnostics and marks
+
+                                                        *debug-health_summary*
+health_summary()
+    Condensed health check summary:
+    - Key component health status
+    - System dependency check
+    - Plugin loading status
+    - Recent error count
+
+Utility Functions ~
+                                                           *debug-reset_cache*
+reset_cache()
+    Clears various Neovim caches:
+    - Lua module cache (non-vim modules)
+    - Garbage collection
+    - LSP client cache
+    - TreeSitter parser cache
+    - Plugin cache (lazy.nvim)
+
+                                                          *debug-reload_config*
+reload_config()
+    Safely reloads Neovim configuration:
+    - Clears config module cache
+    - Reloads init.lua
+    - Reloads colorscheme
+    - Reloads plugins
+    - Preserves cursor position
+
+                                                          *debug-backup_session*
+backup_session()
+    Creates a session backup file:
+    - Saves current working directory
+    - Lists all open buffers
+    - Preserves cursor position
+    - Creates timestamped session file
+
+Helper Functions ~
+                                                           *debug-list_profiles*
+list_profiles()
+    Lists all available profile files with timestamps and sizes.
+
+                                                         *debug-profile_status*
+profile_status()
+    Shows current profiling status and duration.
+
+                                                          *debug-list_sessions*
+list_sessions()
+    Lists all available session backup files.
+
+                                                        *debug-restore_session*
+restore_session(session_name)
+    Restores a previously saved session backup.
+
+==============================================================================
+KEYMAPS                                                        *debug-keymaps*
+
+The plugin provides the following default keymaps:
+
+    <leader>ds    capture_state      " Capture current state
+    <leader>dc    capture_config     " Capture configuration
+    <leader>dp    capture_performance " Capture performance info
+    <leader>dP    start_profile      " Start profiling
+    <leader>dS    stop_profile       " Stop profiling
+    <leader>dk    check_keymaps      " Check keymap conflicts
+    <leader>da    check_autocmds     " Check autocmd issues
+    <leader>di    inspect_cursor     " Inspect cursor context
+    <leader>dh    health_summary     " Show health summary
+    <leader>dr    reload_config      " Reload configuration
+
+All keymaps are created with appropriate descriptions for which-key integration.
+
+==============================================================================
+CONFIGURATION                                            *debug-configuration*
+
+The plugin requires minimal configuration. Simply call the setup function:
+
+>lua
+    require("debug").setup()
+<
+
+This will:
+- Create the `:Debug` command with tab completion
+- Set up all default keymaps
+- Initialize the lazy-loading system
+
+Log Files ~
+All debug output is saved to:
+    `~/.local/share/nvim/debug/neovim-debug.log`
+
+Profile files are saved to:
+    `~/.local/share/nvim/debug/profiles/`
+
+Session backups are saved to:
+    `~/.local/share/nvim/debug/sessions/`
+
+==============================================================================
+EXAMPLES                                                      *debug-examples*
+
+Basic Usage ~
+>
+    :Debug                    " List all functions
+    :Debug capture_state      " Capture current state
+    :Debug start_profile      " Start profiling
+    :Debug stop_profile       " Stop profiling after some time
+<
+
+Investigating Issues ~
+>
+    :Debug trace_last_error   " Investigate recent errors
+    :Debug inspect_cursor     " Analyze cursor position
+    :Debug check_keymaps      " Find keymap conflicts
+<
+
+Performance Analysis ~
+>
+    :Debug capture_performance " Get performance snapshot
+    :Debug start_profile       " Begin profiling
+    " ... perform actions to profile ...
+    :Debug stop_profile        " End profiling
+<
+
+Configuration Maintenance ~
+>
+    :Debug backup_session      " Backup current session
+    :Debug reset_cache         " Clear caches
+    :Debug reload_config       " Reload configuration
+<
+
+Using Keymaps ~
+>
+    <leader>ds    " Quick state capture
+    <leader>dk    " Check for keymap conflicts
+    <leader>di    " Inspect current cursor position
+    <leader>dr    " Reload configuration
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

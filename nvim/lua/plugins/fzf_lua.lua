@@ -32,6 +32,22 @@ return {
 					["ctrl-q"] = "select-all+accept",
 				},
 			},
+			actions = {
+				files = {
+					["default"] = require("fzf-lua.actions").file_edit,
+					["ctrl-q"] = function(selected, opts)
+						require("fzf-lua.actions").file_sel_to_qf(selected, opts)
+						vim.cmd("copen")
+					end,
+				},
+				buffers = {
+					["default"] = require("fzf-lua.actions").buf_edit,
+					["ctrl-q"] = function(selected, opts)
+						require("fzf-lua.actions").buf_sel_to_qf(selected, opts)
+						vim.cmd("copen")
+					end,
+				},
+			},
 			previewers = {
 				cat = {
 					cmd = "cat",
@@ -160,5 +176,83 @@ return {
 		vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
 		vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 		vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
+
+		-- Quickfix keymaps (using Trouble by default)
+		vim.keymap.set(
+			"n",
+			"<leader>qd",
+			"<cmd>Trouble diagnostics open focus=true<cr>",
+			{ desc = "Diagnostics (Trouble)" }
+		)
+		vim.keymap.set(
+			"n",
+			"<leader>qe",
+			"<cmd>Trouble diagnostics open focus=true filter.severity=vim.diagnostic.severity.ERROR<cr>",
+			{ desc = "Errors (Trouble)" }
+		)
+		vim.keymap.set(
+			"n",
+			"<leader>qo",
+			"<cmd>Trouble qflist open focus=true<cr>",
+			{ desc = "Open quickfix (Trouble)" }
+		)
+		vim.keymap.set("n", "<leader>qc", "<cmd>Trouble qflist close<cr>", { desc = "Close quickfix (Trouble)" })
+
+		-- Traditional quickfix (for when you need the actual quickfix list)
+		vim.keymap.set("n", "<leader>qD", function()
+			vim.diagnostic.setqflist()
+			vim.cmd("copen")
+		end, { desc = "Diagnostics to traditional quickfix" })
+		vim.keymap.set("n", "<leader>qE", function()
+			vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })
+			vim.cmd("copen")
+		end, { desc = "Errors to traditional quickfix" })
+		vim.keymap.set("n", "<leader>qO", ":copen<CR>", { desc = "Open traditional quickfix", silent = true })
+		vim.keymap.set("n", "<leader>qC", ":cclose<CR>", { desc = "Close traditional quickfix", silent = true })
+
+		-- Quickfix navigation with error handling
+		vim.keymap.set("n", "]q", function()
+			local qf_list = vim.fn.getqflist()
+			if #qf_list == 0 then
+				vim.notify("No quickfix items", vim.log.levels.WARN)
+				return
+			end
+			local ok = pcall(vim.cmd, "cnext")
+			if not ok then
+				vim.cmd("cfirst")
+				vim.notify("Wrapped to first quickfix item", vim.log.levels.INFO)
+			end
+		end, { desc = "Next quickfix item", silent = true })
+
+		vim.keymap.set("n", "[q", function()
+			local qf_list = vim.fn.getqflist()
+			if #qf_list == 0 then
+				vim.notify("No quickfix items", vim.log.levels.WARN)
+				return
+			end
+			local ok = pcall(vim.cmd, "cprev")
+			if not ok then
+				vim.cmd("clast")
+				vim.notify("Wrapped to last quickfix item", vim.log.levels.INFO)
+			end
+		end, { desc = "Previous quickfix item", silent = true })
+
+		vim.keymap.set("n", "]Q", function()
+			local qf_list = vim.fn.getqflist()
+			if #qf_list == 0 then
+				vim.notify("No quickfix items", vim.log.levels.WARN)
+				return
+			end
+			vim.cmd("clast")
+		end, { desc = "Last quickfix item", silent = true })
+
+		vim.keymap.set("n", "[Q", function()
+			local qf_list = vim.fn.getqflist()
+			if #qf_list == 0 then
+				vim.notify("No quickfix items", vim.log.levels.WARN)
+				return
+			end
+			vim.cmd("cfirst")
+		end, { desc = "First quickfix item", silent = true })
 	end,
 }

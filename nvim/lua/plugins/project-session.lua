@@ -83,21 +83,21 @@ return {
 		event = "BufReadPre",
 		keys = {
 			{
-				"<leader>qs",
+				"<leader>Ss",
 				function()
 					require("persistence").load()
 				end,
 				desc = "Restore session",
 			},
 			{
-				"<leader>ql",
+				"<leader>Sl",
 				function()
 					require("persistence").load({ last = true })
 				end,
 				desc = "Restore last session",
 			},
 			{
-				"<leader>qd",
+				"<leader>Sd",
 				function()
 					require("persistence").stop()
 				end,
