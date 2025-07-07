@@ -140,6 +140,11 @@
       run = ['move-node-to-workspace 4']
 
       [[on-window-detected]]
+      if.app-id = 'si.filips.firefoxpwa.runtime'
+      check-further-callbacks = true
+      run = ['move-node-to-workspace 4']
+
+      [[on-window-detected]]
       if.app-id = 'md.obsidian'
       check-further-callbacks = true
       run = ['move-node-to-workspace 9']
