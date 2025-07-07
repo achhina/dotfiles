@@ -18,6 +18,7 @@
       fd
       fzf
       gemini-cli
+      tmux-mem-cpu-load
       git
       git-lfs
       github-cli

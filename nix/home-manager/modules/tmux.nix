@@ -50,10 +50,6 @@
 
     plugins = with pkgs.tmuxPlugins; [
       {
-        plugin = tmux-mem-cpu-load;
-        extraConfig = "";
-      }
-      {
         plugin = vim-tmux-navigator;
         extraConfig = "";
       }
