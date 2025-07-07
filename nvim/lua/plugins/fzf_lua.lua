@@ -37,14 +37,14 @@ return {
 					["default"] = require("fzf-lua.actions").file_edit,
 					["ctrl-q"] = function(selected, opts)
 						require("fzf-lua.actions").file_sel_to_qf(selected, opts)
-						vim.cmd("copen")
+						vim.cmd("Trouble qflist open focus=true")
 					end,
 				},
 				buffers = {
 					["default"] = require("fzf-lua.actions").buf_edit,
 					["ctrl-q"] = function(selected, opts)
 						require("fzf-lua.actions").buf_sel_to_qf(selected, opts)
-						vim.cmd("copen")
+						vim.cmd("Trouble qflist open focus=true")
 					end,
 				},
 			},
@@ -120,6 +120,9 @@ return {
 		-- Search namespace
 		vim.keymap.set("n", "<leader>s", "", { desc = "+search" })
 
+		-- Quickfix namespace
+		vim.keymap.set("n", "<leader>q", "", { desc = "+quickfix" })
+
 		-- File pickers
 		vim.keymap.set("n", "<leader>sf", fzf.files, { desc = "Search Files" })
 		vim.keymap.set("n", "<leader>fr", fzf.oldfiles, { desc = "Find recently opened files" })
@@ -177,19 +180,19 @@ return {
 		vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 		vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 
-		-- Quickfix keymaps (using Trouble by default)
-		vim.keymap.set(
-			"n",
-			"<leader>qd",
-			"<cmd>Trouble diagnostics open focus=true<cr>",
-			{ desc = "Diagnostics (Trouble)" }
-		)
-		vim.keymap.set(
-			"n",
-			"<leader>qe",
-			"<cmd>Trouble diagnostics open focus=true filter.severity=vim.diagnostic.severity.ERROR<cr>",
-			{ desc = "Errors (Trouble)" }
-		)
+		-- Quickfix keymaps (use Trouble's native diagnostics mode for tree view)
+		vim.keymap.set("n", "<leader>qd", function()
+			vim.diagnostic.setqflist({ open = false }) -- Populate quickfix for ]q/[q navigation
+			vim.cmd("cclose") -- Close any open quickfix window
+			vim.cmd("Trouble diagnostics open focus=true") -- Use diagnostics mode for tree view
+		end, { desc = "Workspace diagnostics tree (Trouble)" })
+
+		vim.keymap.set("n", "<leader>qe", function()
+			vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR, open = false }) -- Populate quickfix for ]q/[q
+			vim.cmd("cclose") -- Close any open quickfix window
+			vim.cmd("Trouble diagnostics open focus=true filter.severity=vim.diagnostic.severity.ERROR") -- Errors only in tree
+		end, { desc = "Workspace errors tree (Trouble)" })
+
 		vim.keymap.set(
 			"n",
 			"<leader>qo",

@@ -96,5 +96,49 @@ return {
 			"<cmd>Trouble qflist toggle<cr>",
 			desc = "Quickfix List (Trouble)",
 		},
+
+		-- Trouble navigation (when in Trouble window)
+		{
+			"]t",
+			function()
+				if vim.bo.filetype == "trouble" then
+					require("trouble").next()
+				else
+					-- Traditional quickfix navigation
+					local qf_list = vim.fn.getqflist()
+					if #qf_list == 0 then
+						vim.notify("No quickfix items", vim.log.levels.WARN)
+						return
+					end
+					local ok = pcall(vim.cmd, "cnext")
+					if not ok then
+						vim.cmd("cfirst")
+						vim.notify("Wrapped to first quickfix item", vim.log.levels.INFO)
+					end
+				end
+			end,
+			desc = "Next item (Trouble or quickfix)",
+		},
+		{
+			"[t",
+			function()
+				if vim.bo.filetype == "trouble" then
+					require("trouble").prev()
+				else
+					-- Traditional quickfix navigation
+					local qf_list = vim.fn.getqflist()
+					if #qf_list == 0 then
+						vim.notify("No quickfix items", vim.log.levels.WARN)
+						return
+					end
+					local ok = pcall(vim.cmd, "cprev")
+					if not ok then
+						vim.cmd("clast")
+						vim.notify("Wrapped to last quickfix item", vim.log.levels.INFO)
+					end
+				end
+			end,
+			desc = "Previous item (Trouble or quickfix)",
+		},
 	},
 }
