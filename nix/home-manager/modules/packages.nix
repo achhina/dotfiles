@@ -7,6 +7,7 @@
       # Cross-platform packages
       aichat
       bash-language-server
+      bandwhich
       bat
       chafa # Image preview for fzf-lua
       clang-tools # provides clangd
@@ -24,6 +25,7 @@
       github-cli
       gopls # Go LSP
       htop
+      ifstat-legacy
       jq
       lua
       luaPackages.luacheck

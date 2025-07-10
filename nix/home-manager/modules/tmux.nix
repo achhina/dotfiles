@@ -33,8 +33,9 @@
           display-popup -E "tmux new -A -s popup -t aichat"
       }
 
-      # Status bar position
+      # Status bar position and update interval
       set-option -g status-position top
+      set-option -g status-interval 2
 
       # Optimize nvim
       set-option -g focus-events on
@@ -72,8 +73,18 @@
         extraConfig = "";
       }
       {
-        plugin = tmux-powerline;
-        extraConfig = "";
+        plugin = catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavour 'mocha'
+          set -g @catppuccin_window_status_style "rounded"
+          set -g status-right-length 150
+          set -g status-left-length 150
+          set -g status-left "#{E:@catppuccin_status_host}"
+          set -ag status-left "#{E:@catppuccin_status_session}"
+          set -ag status-left "#[fg=#94e2d5]#[fg=#11111b,bg=#94e2d5]󰖩 #[fg=#cdd6f4,bg=#313244] #(~/.config/tmux/scripts/network.sh) #[fg=#313244]#{@catppuccin_status_right_separator}"
+          set -g status-right "#[fg=#89b4fa]#[fg=#11111b,bg=#89b4fa]󰊚 #[fg=#cdd6f4,bg=#313244] #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0 --colors) #[fg=#313244]#{@catppuccin_status_right_separator}"
+          set -ag status-right "#{E:@catppuccin_status_date_time}"
+        '';
       }
       {
         plugin = resurrect;
