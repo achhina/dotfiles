@@ -23,6 +23,7 @@
       git
       git-lfs
       github-cli
+      go
       gopls # Go LSP
       htop
       ifstat-legacy
