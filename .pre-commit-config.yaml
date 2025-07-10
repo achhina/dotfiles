@@ -12,8 +12,8 @@ repos:
         args:
           - '--fix'
       - id: ruff-format
-  - repo: 'https://github.com/syntaqx/git-hooks'
-    rev: v0.0.18
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
     hooks:
       - id: shellcheck
   - repo: 'https://github.com/lunarmodules/luacheck'
