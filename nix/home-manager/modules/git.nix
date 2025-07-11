@@ -75,6 +75,13 @@
       aliases = {
         co = "pr checkout";
       };
+
+      hosts = {
+        "github.com" = {
+          git_protocol = "ssh";
+          user = "achhina";
+        };
+      };
     };
   };
 }
