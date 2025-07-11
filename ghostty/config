@@ -1,7 +1,0 @@
-theme = catppuccin-mocha
-font-family = Fira Code
-
-# MacOS settings
-macos-option-as-alt = true
-macos-titlebar-style = hidden
-macos-icon = chalkboard

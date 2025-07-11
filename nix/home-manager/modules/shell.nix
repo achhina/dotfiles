@@ -8,22 +8,23 @@
     nix-direnv.enable = true;
   };
 
-  # Terminal emulator (macOS only)
-  programs.ghostty = pkgs.lib.mkIf pkgs.stdenv.isDarwin {
-    enable = false;
+  # Terminal emulator
+  programs.ghostty = {
+    enable = true;
+    package = null;  # Don't install ghostty, just manage config
 
     settings = {
       # Theme and font settings
       theme = "catppuccin-mocha";
       fontFamily = "Fira Code";
 
+      # Compromise, because when left on it's harder to autoupdate OS.
+      confirm-close-surface = false;
+    } // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
       # MacOS settings
       macosOptionAsAlt = true;
       macosTitlebarStyle = "hidden";
       macosIcon = "chalkboard";
-
-      # Compromise, because when left on it's harder to autoupdate OS.
-      confirm-close-surface = false;
     };
   };
 
