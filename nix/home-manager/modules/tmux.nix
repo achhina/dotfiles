@@ -47,6 +47,47 @@
       # Override tmux-pain-control
       # <Prefix-l> to clear screen
       bind l send-keys 'C-l'
+
+      # Configure statusline after catppuccin is loaded
+      set -g status-right-length 150
+      set -g status-left-length 150
+
+      # Configure statusline using proper catppuccin modules
+      set -g status-left "#{E:@catppuccin_status_host}"
+      set -ag status-left "#{E:@catppuccin_status_session}"
+
+      # Custom network module (manual styling since catppuccin doesn't have network module)
+      set -ag status-left "#[fg=#{@thm_teal}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_teal}]󰖩 #[fg=#{@thm_teal},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/network.sh) #[fg=#{@thm_surface_0}]"
+
+      # Use catppuccin CPU module (it exists) with custom colors
+      set -g @catppuccin_cpu_text " #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0)"
+      set -g @catppuccin_status_cpu_color "#{@thm_blue}"
+
+      # Fix CPU icon background to use blue instead of yellow
+      set -g @catppuccin_cpu_color "#{@thm_blue}"
+      set -g @catppuccin_status_cpu_icon_bg "#{@thm_blue}"
+      set -g @catppuccin_status_cpu_icon_fg "#{@thm_crust}"
+
+      # Customize CPU data background to match other modules
+      set -g @catppuccin_status_cpu_text_bg "#{@thm_surface_0}"
+      set -g @catppuccin_status_cpu_text_fg "#{@thm_fg}"
+
+      # Customize CPU load colors to match statusline
+      set -g @cpu_low_bg_color "#{@thm_surface_0}"
+      set -g @cpu_low_fg_color "#{@thm_fg}"
+      set -g @cpu_medium_bg_color "#{@thm_surface_0}"
+      set -g @cpu_medium_fg_color "#{@thm_yellow}"
+      set -g @cpu_high_bg_color "#{@thm_surface_0}"
+      set -g @cpu_high_fg_color "#{@thm_red}"
+
+      # Build statusline
+      set -g status-right "#{E:@catppuccin_status_cpu}"
+      set -ag status-right "#{E:@catppuccin_status_date_time}"
+
+      # Center windows and show only window number (override catppuccin)
+      set -g status-justify centre
+      set -g window-status-format "#[fg=#11111b,bg=#{@thm_overlay_2}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
+      set -g window-status-current-format "#[fg=#11111b,bg=#{@thm_mauve}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
     '';
 
     plugins = with pkgs.tmuxPlugins; [
@@ -77,13 +118,6 @@
         extraConfig = ''
           set -g @catppuccin_flavour 'mocha'
           set -g @catppuccin_window_status_style "rounded"
-          set -g status-right-length 150
-          set -g status-left-length 150
-          set -g status-left "#{E:@catppuccin_status_host}"
-          set -ag status-left "#{E:@catppuccin_status_session}"
-          set -ag status-left "#[fg=#94e2d5]#[fg=#11111b,bg=#94e2d5]󰖩 #[fg=#cdd6f4,bg=#313244] #(~/.config/tmux/scripts/network.sh) #[fg=#313244]#{@catppuccin_status_right_separator}"
-          set -g status-right "#[fg=#89b4fa]#[fg=#11111b,bg=#89b4fa]󰊚 #[fg=#cdd6f4,bg=#313244] #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0 --colors) #[fg=#313244]#{@catppuccin_status_right_separator}"
-          set -ag status-right "#{E:@catppuccin_status_date_time}"
         '';
       }
       {
