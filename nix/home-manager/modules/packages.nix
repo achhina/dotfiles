@@ -22,7 +22,6 @@
       tmux-mem-cpu-load
       git
       git-lfs
-      github-cli
       go
       gopls # Go LSP
       htop
