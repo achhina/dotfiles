@@ -37,7 +37,7 @@
         navigate = true; # use n and N to move between diff sections
         line-numbers = true;
         side-by-side = true;
-        syntax-theme = "Dracula";
+        syntax-theme = "gruvbox-dark";
         features = "decorations";
         decorations = {
           commit-decoration-style = "bold yellow box ul";
