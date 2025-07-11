@@ -7,6 +7,7 @@
     prefix = "C-a";
     mouse = true;
     escapeTime = 10;
+    keyMode = "vi";
 
     extraConfig = ''
       # Override ~/.tmux/plugins
@@ -42,7 +43,7 @@
       set-option -as terminal-overrides ",xterm-256color:RGB"
 
       # Remove tmux-copycat plugin and just use tmux regex search
-      bind-key / copy-mode \; send-key ?
+      bind-key / copy-mode \; send-keys ?
 
       # Override tmux-pain-control
       # <Prefix-l> to clear screen
