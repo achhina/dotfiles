@@ -60,6 +60,10 @@
       vscode-langservers-extracted
       wget
       yarn
+
+      # GitHub CLI extensions
+      gh-dash # Interactive dashboard for PRs and issues
+      gh-copilot # AI-powered command suggestions
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
       # macOS-specific packages

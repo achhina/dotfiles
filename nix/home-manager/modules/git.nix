@@ -33,26 +33,95 @@
 
       # Delta (diff tool) configuration
       interactive.diffFilter = "delta --color-only";
-      delta.navigate = true; # use n and N to move between diff sections
+      delta = {
+        navigate = true; # use n and N to move between diff sections
+        line-numbers = true;
+        side-by-side = true;
+        syntax-theme = "Dracula";
+        features = "decorations";
+        decorations = {
+          commit-decoration-style = "bold yellow box ul";
+          file-style = "bold yellow ul";
+          file-decoration-style = "none";
+        };
+      };
 
       # Merge and diff settings
-      merge.conflictstyle = "diff3";
-      diff.colorMoved = "default";
+      merge = {
+        conflictstyle = "diff3";
+        tool = "vimdiff";
+      };
+      diff = {
+        colorMoved = "default";
+        algorithm = "histogram";
+      };
+
+      # Performance and security improvements
+      credential.helper = "osxkeychain";
+      rerere.enabled = true; # Remember conflict resolutions
+      branch.autosetupmerge = "always";
+      branch.autosetuprebase = "always";
+      push.default = "simple";
+      push.autoSetupRemote = true;
+
+      # Better logging
+      log.date = "relative";
+
+      # Improved status
+      status = {
+        showUntrackedFiles = "all";
+        submoduleSummary = true;
+      };
     };
 
     # Git aliases
     aliases = {
+      # Basic operations
       s = "status";
+      a = "add";
       cm = "commit --message";
-      root = "rev-parse --show-toplevel";
       amend = "commit --amend --no-edit";
+
+      # Branch and checkout operations
+      co = "checkout";
+      cob = "checkout -b";
+      br = "branch";
+
+      # Stash operations
+      ss = "stash save";
+      sa = "stash apply";
+      sd = "stash drop";
+      sl = "stash list";
+
+      # Reset and undo operations
       unstage = "reset HEAD --";
       undo = "reset --soft HEAD^";
+
+      # Repository navigation
+      root = "rev-parse --show-toplevel";
+
+      # Information and inspection
       whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -";
       whatis = "show -s --pretty='tformat:%h (%s, %ad)' --date=short";
       pip = "shortlog --summary --email --numbered --regexp-ignore-case --extended-regexp";
       aliases = "!git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'";
       diffstat = "diff --stat -r";
+
+      # Enhanced logging
+      lg = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
+      lga = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all";
+      lol = "log --graph --decorate --pretty=oneline --abbrev-commit";
+      lola = "log --graph --decorate --pretty=oneline --abbrev-commit --all";
+
+      # Productivity workflows
+      acp = "!f() { git add -A && git commit -m \"$1\" && git push; }; f";
+      acm = "!f() { git add -u && git commit -m \"$1\"; }; f";
+      pushf = "push --force-with-lease";
+
+      # Remote operations
+      pom = "push origin main";
+      puma = "pull upstream main";
+      fetch-all = "fetch --all --prune";
     };
 
     # Global ignore patterns
@@ -73,7 +142,30 @@
       prefer_editor_prompt = "disabled";
 
       aliases = {
+        # PR workflow
         co = "pr checkout";
+        prc = "pr create";
+        prd = "pr create --draft";
+        prv = "pr view";
+        prm = "pr merge";
+        prl = "pr list";
+        prr = "pr review";
+        prs = "pr status";
+
+        # Issue management
+        ic = "issue create";
+        iv = "issue view";
+        il = "issue list";
+
+        # Repository operations
+        rv = "repo view";
+        rf = "repo fork";
+        rc = "repo clone";
+
+        # Release management
+        rl = "release list";
+        rcr = "release create";
+        rv-rel = "release view";
       };
 
       hosts = {
