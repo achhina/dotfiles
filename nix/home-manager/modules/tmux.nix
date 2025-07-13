@@ -3,7 +3,7 @@
 {
   # Tmuxinator project templates
   xdg.configFile."tmuxinator/dev.yml".text = ''
-    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    name: <%= @args[0] || File.basename(ENV['PWD']).gsub(/^\./, 'dot') %>
     root: <%= @args[1] || ENV['PWD'] %>
     startup_window: editor
     windows:
@@ -21,7 +21,7 @@
   '';
 
   xdg.configFile."tmuxinator/fullstack.yml".text = ''
-    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    name: <%= @args[0] || File.basename(ENV['PWD']).gsub(/^\./, 'dot') %>
     root: <%= @args[1] || ENV['PWD'] %>
     startup_window: frontend
     windows:
@@ -45,7 +45,7 @@
   '';
 
   xdg.configFile."tmuxinator/research.yml".text = ''
-    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    name: <%= @args[0] || File.basename(ENV['PWD']).gsub(/^\./, 'dot') %>
     root: <%= @args[1] || ENV['PWD'] %>
     startup_window: main
     windows:
@@ -65,7 +65,7 @@
   '';
 
   xdg.configFile."tmuxinator/dynamic.yml".text = ''
-    name: <%= @settings['name'] || @args[0] || File.basename(ENV['PWD']) %>
+    name: <%= @settings['name'] || @args[0] || File.basename(ENV['PWD']).gsub(/^\./, 'dot') %>
     root: <%= @settings['path'] || @args[1] || ENV['PWD'] %>
     startup_window: <%= @settings['startup'] || 'main' %>
     windows:
@@ -137,6 +137,12 @@
       bind M select-layout main-vertical
       bind m select-layout main-horizontal
       bind T select-layout tiled
+
+      # FZF session picker (replaces default sessionist Prefix+g)
+      bind g display-popup -E "tmux list-sessions | sed -E 's/:.*$//' | grep -v \"^$(tmux display-message -p '#S')\$\" | fzf --reverse --preview='tmux capture-pane -p -t {}' | xargs tmux switch-client -t"
+
+      # Enhanced choose-tree with better formatting
+      bind s choose-tree -Zs -O time -f '#{?pane_format,#{pane_current_command},#{?window_format,#{window_name},#{session_name}}}'
 
       # Configure statusline after catppuccin is loaded
       set -g status-right-length 150

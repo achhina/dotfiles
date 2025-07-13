@@ -260,6 +260,48 @@
       # https://github.com/orgs/community/discussions/35615#discussioncomment-10491333
       function \$ { "$@"; }
 
+      # Session management utilities
+      function tmux-clean() {
+          local current_session=$(tmux display-message -p '#S' 2>/dev/null)
+          local sessions_to_kill=$(tmux list-sessions -F '#S' | grep -v "^$current_session$")
+
+          if [ -z "$sessions_to_kill" ]; then
+              echo "No sessions to clean (only current session '$current_session' exists)"
+              return 0
+          fi
+
+          echo "Killing tmux sessions except current ('$current_session'):"
+          echo "$sessions_to_kill" | while read session; do
+              echo "  ✗ Killing session: $session"
+              tmux kill-session -t "$session"
+          done
+          echo "Done! Cleaned $(echo "$sessions_to_kill" | wc -l | tr -d ' ') sessions"
+      }
+
+      function tmux-here() {
+          local session_name=$(basename "$PWD" | tr '.' '_')
+          tmux new-session -d -s "$session_name" -c "$PWD" || tmux switch-client -t "$session_name"
+      }
+
+      function mux-here() {
+          if [ -f ".tmuxinator.yml" ]; then
+              tmuxinator start .
+          else
+              tmuxinator start dev
+          fi
+      }
+
+      function ts() {
+          if [ $# -eq 0 ]; then
+              # No arguments - show FZF picker
+              local session=$(tmux list-sessions -F '#S' | fzf --reverse --preview='tmux capture-pane -p -t {}')
+              [ -n "$session" ] && tmux switch-client -t "$session"
+          else
+              # With argument - switch directly
+              tmux switch-client -t "$1"
+          fi
+      }
+
 
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
@@ -315,6 +357,18 @@
       lt = "eza --tree --all --level 3";
       t = "tmux";
       ta = "tmux attach || tmux new-session";
+
+      # Session management aliases
+      tl = "tmux list-sessions";
+      tk = "tmux kill-session -t";
+      tn = "tmux new-session -s";
+      tclean = "tmux-clean";
+
+      # Tmuxinator shortcuts
+      mux = "tmuxinator start";
+      muxl = "tmuxinator list";
+      muxd = "tmuxinator debug";
+
       update = "nix-channel --update && nix flake update --flake ~/.config/nix && home-manager switch --flake ~/.config/nix#achhina";
       v = "nvim";
     };
