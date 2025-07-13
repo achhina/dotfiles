@@ -408,14 +408,14 @@ return {
 			},
 			pyright = {
 				python = {
-					pythonPath = function()
+					pythonPath = (function()
 						-- Auto-detect virtual environment
 						local venv_path = os.getenv("VIRTUAL_ENV")
 						if venv_path then
 							return venv_path .. "/bin/python"
 						end
 						return vim.fn.exepath("python3") or vim.fn.exepath("python")
-					end,
+					end)(),
 					analysis = {
 						typeCheckingMode = "standard",
 						autoSearchPaths = true,

@@ -37,6 +37,7 @@
       nil
       nixpkgs-fmt
       pyright # Python LSP
+      ruff # Python linter/formatter
       rust-analyzer # Rust LSP
       marksman # Markdown LSP
       yaml-language-server # YAML LSP
