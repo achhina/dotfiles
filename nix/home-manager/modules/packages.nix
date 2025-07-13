@@ -59,6 +59,7 @@
       uv
       vscode-langservers-extracted
       wget
+      yamllint
       yarn
 
       # GitHub CLI extensions
