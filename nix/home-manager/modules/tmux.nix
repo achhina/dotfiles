@@ -3,8 +3,8 @@
 {
   # Tmuxinator project templates
   xdg.configFile."tmuxinator/dev.yml".text = ''
-    name: dev
-    root: ~/
+    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    root: <%= @args[1] || ENV['PWD'] %>
     startup_window: editor
     windows:
       - editor:
@@ -21,8 +21,8 @@
   '';
 
   xdg.configFile."tmuxinator/fullstack.yml".text = ''
-    name: fullstack
-    root: ~/
+    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    root: <%= @args[1] || ENV['PWD'] %>
     startup_window: frontend
     windows:
       - frontend:
@@ -45,8 +45,8 @@
   '';
 
   xdg.configFile."tmuxinator/research.yml".text = ''
-    name: research
-    root: ~/
+    name: <%= @args[0] || File.basename(ENV['PWD']) %>
+    root: <%= @args[1] || ENV['PWD'] %>
     startup_window: main
     windows:
       - main:
@@ -62,6 +62,24 @@
       - notes:
           panes:
             - nvim notes.md
+  '';
+
+  xdg.configFile."tmuxinator/dynamic.yml".text = ''
+    name: <%= @settings['name'] || @args[0] || File.basename(ENV['PWD']) %>
+    root: <%= @settings['path'] || @args[1] || ENV['PWD'] %>
+    startup_window: <%= @settings['startup'] || 'main' %>
+    windows:
+      - main:
+          layout: <%= @settings['layout'] || 'main-vertical' %>
+          panes:
+            - <%= @settings['editor'] || 'nvim' %>
+            - # <%= @settings['command'] || 'terminal' %>
+      - server:
+          panes:
+            - # <%= @settings['server'] || 'server commands' %>
+      - monitor:
+          panes:
+            - <%= @settings['monitor'] || 'htop' %>
   '';
 
   programs.tmux = {
