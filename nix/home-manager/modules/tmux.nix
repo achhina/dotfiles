@@ -1,6 +1,69 @@
 { pkgs, ... }:
 
 {
+  # Tmuxinator project templates
+  xdg.configFile."tmuxinator/dev.yml".text = ''
+    name: dev
+    root: ~/
+    startup_window: editor
+    windows:
+      - editor:
+          layout: main-vertical
+          panes:
+            - nvim
+            - # terminal for commands
+      - server:
+          panes:
+            - # for running servers/builds
+      - logs:
+          panes:
+            - # for monitoring logs/processes
+  '';
+
+  xdg.configFile."tmuxinator/fullstack.yml".text = ''
+    name: fullstack
+    root: ~/
+    startup_window: frontend
+    windows:
+      - frontend:
+          layout: main-vertical
+          panes:
+            - nvim
+            - npm start
+            - npm test
+      - backend:
+          layout: main-vertical
+          panes:
+            - nvim
+            - # server commands
+            - # database/api tools
+      - monitoring:
+          layout: even-horizontal
+          panes:
+            - htop
+            - tail -f logs/app.log
+  '';
+
+  xdg.configFile."tmuxinator/research.yml".text = ''
+    name: research
+    root: ~/
+    startup_window: main
+    windows:
+      - main:
+          layout: even-horizontal
+          panes:
+            - nvim
+            - # documentation/web browsing
+      - repl:
+          layout: even-vertical
+          panes:
+            - # language REPL/console
+            - # testing/experiments
+      - notes:
+          panes:
+            - nvim notes.md
+  '';
+
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
@@ -8,6 +71,7 @@
     mouse = true;
     escapeTime = 10;
     keyMode = "vi";
+    tmuxinator.enable = true;
 
     extraConfig = ''
       # Override ~/.tmux/plugins
@@ -48,6 +112,13 @@
       # Override tmux-pain-control
       # <Prefix-l> to clear screen
       bind l send-keys 'C-l'
+
+      # Quick layout switching
+      bind H select-layout even-horizontal
+      bind V select-layout even-vertical
+      bind M select-layout main-vertical
+      bind m select-layout main-horizontal
+      bind T select-layout tiled
 
       # Configure statusline after catppuccin is loaded
       set -g status-right-length 150
