@@ -17,7 +17,6 @@ return {
 				"icon",
 				"permissions",
 				"size",
-				"mtime",
 			},
 			-- Buffer-specific options
 			buf_options = {
