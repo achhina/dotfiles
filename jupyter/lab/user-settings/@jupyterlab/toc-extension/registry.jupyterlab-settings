@@ -1,0 +1,46 @@
+{
+    // Table of Contents
+    // @jupyterlab/toc-extension:registry
+    // Table of contents settings.
+    // ************************************
+
+    // Collapsible Sections
+    // Whether sections should be collapsible.
+    "collapsibleSections": true,
+
+    // Sync Collapse State
+    // Whether to sync collapse state with notebook.
+    "syncCollapseState": true,
+
+    // Include Output Headers
+    // Whether to include headers from cell outputs.
+    "includeOutputHeaders": false,
+
+    // Max Depth
+    // Maximum depth of headers to show.
+    "maximalDepth": 4,
+
+    // Number Headers
+    // Whether to number the headers.
+    "numberHeaders": false,
+
+    // Number Offset
+    // Offset for header numbering.
+    "numberingH1": true,
+
+    // Show Code Cells
+    // Whether to show code cells in TOC.
+    "showCodeCells": false,
+
+    // Show Markdown Cells
+    // Whether to show markdown cells in TOC.
+    "showMarkdownCells": true,
+
+    // Show Tags
+    // Whether to show cell tags in TOC.
+    "showTags": false,
+
+    // Auto Generate TOC
+    // Whether to automatically generate TOC.
+    "autoGenerate": true
+}

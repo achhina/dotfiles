@@ -1,0 +1,70 @@
+{
+    // Terminal
+    // @jupyterlab/terminal-extension:plugin
+    // Terminal settings.
+    // ************************************
+
+    // Font Family
+    // The font family used by the terminal.
+    "fontFamily": "Monaco, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace",
+
+    // Font Size
+    // The font size used by the terminal.
+    "fontSize": 14,
+
+    // Line Height
+    // The line height used by the terminal.
+    "lineHeight": 1.3,
+
+    // Theme
+    // Terminal color theme.
+    "theme": "dark",
+
+    // Cursor Blink
+    // Whether the cursor should blink.
+    "cursorBlink": true,
+
+    // Cursor Style
+    // The style of the cursor.
+    "cursorStyle": "block",
+
+    // Scrollback Buffer Size
+    // Number of lines to keep in scrollback buffer.
+    "scrollback": 1000,
+
+    // Bell Style
+    // How to handle the terminal bell.
+    "bellStyle": "none",
+
+    // Copy on Select
+    // Whether to copy text when selecting.
+    "copyOnSelect": false,
+
+    // Paste on Right Click
+    // Whether to paste on right click.
+    "pasteOnRightClick": true,
+
+    // Screen Reader Support
+    // Whether to enable screen reader support.
+    "screenReaderMode": false,
+
+    // Fast Scroll Modifier
+    // Modifier key for fast scrolling.
+    "fastScrollModifier": "alt",
+
+    // Fast Scroll Sensitivity
+    // Sensitivity for fast scrolling.
+    "fastScrollSensitivity": 5,
+
+    // Scroll Sensitivity
+    // Sensitivity for normal scrolling.
+    "scrollSensitivity": 1,
+
+    // Word Separator
+    // Characters considered word separators.
+    "wordSeparator": " ()[]{}',\"",
+
+    // Shell Integration
+    // Whether to enable shell integration features.
+    "shellIntegration": true
+}

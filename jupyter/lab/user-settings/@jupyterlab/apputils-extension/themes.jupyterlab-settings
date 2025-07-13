@@ -10,5 +10,25 @@
 
     // Selected Theme
     // Application-level visual styling theme. Ignored when Adaptive Theme is enabled.
-    "theme": "JupyterLab Dark High Contrast"
+    "theme": "JupyterLab Dark High Contrast",
+
+    // Theme Scrollbars
+    // Whether to theme the scrollbars.
+    "theme-scrollbars": true,
+
+    // Increase Font Size
+    // Whether to increase the base font size.
+    "increaseFontSize": false,
+
+    // Override Theme Font Size
+    // Override the theme's default font size.
+    "overrideFontSize": null,
+
+    // Override Theme Font Family
+    // Override the theme's default font family.
+    "overrideFontFamily": null,
+
+    // Syntax Highlighting Theme
+    // The syntax highlighting theme to use.
+    "syntaxHighlightingTheme": "default"
 }

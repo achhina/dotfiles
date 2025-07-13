@@ -6,5 +6,93 @@
 
     // Automatically Start Preferred Kernel
     // Whether to automatically start the preferred kernel.
-    "autoStartDefaultKernel": true
+    "autoStartDefaultKernel": true,
+
+    // Code Folding
+    // Whether to enable code folding.
+    "codeFolding": true,
+
+    // Line Numbers
+    // Whether to show line numbers in cells.
+    "lineNumbers": true,
+
+    // Match Brackets
+    // Whether to highlight matching brackets.
+    "matchBrackets": true,
+
+    // Tab Size
+    // Number of spaces for tab indentation.
+    "tabSize": 4,
+
+    // Insert Spaces
+    // Whether to insert spaces when pressing tab.
+    "insertSpaces": true,
+
+    // Font Family
+    // The font family used in notebook cells.
+    "fontFamily": "Monaco, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace",
+
+    // Font Size
+    // The font size used in notebook cells.
+    "fontSize": 14,
+
+    // Line Height
+    // The line height used in notebook cells.
+    "lineHeight": 1.4,
+
+    // Word Wrap Column
+    // Column where text wraps.
+    "wordWrapColumn": 80,
+
+    // Show Trailing Space
+    // Whether to highlight trailing whitespace.
+    "showTrailingSpace": true,
+
+    // Auto Closing Brackets
+    // Whether to close brackets automatically.
+    "autoClosingBrackets": true,
+
+    // Rulers
+    // Rulers to display in notebook cells.
+    "rulers": [80],
+
+    // Max Number Outputs
+    // Maximum number of outputs to display per cell.
+    "maxNumberOutputs": 50,
+
+    // Prompt to Delete Cell
+    // Whether to prompt before deleting cells.
+    "promptToDeleteCell": true,
+
+    // Recording Timing
+    // Whether to record timing for cell execution.
+    "recordTiming": true,
+
+    // Scroll Past End
+    // Whether to allow scrolling past the end of the notebook.
+    "scrollPastEnd": true,
+
+    // Default Cell Type
+    // The default cell type for new cells.
+    "defaultCell": "code",
+
+    // Kernel Shutdown Behavior
+    // How to handle kernel shutdown.
+    "kernelShutdown": "unload",
+
+    // Side By Side Left Margin Override
+    // Override for left margin in side-by-side view.
+    "sideBySideLeftMarginOverride": "10px",
+
+    // Side By Side Right Margin Override
+    // Override for right margin in side-by-side view.
+    "sideBySideRightMarginOverride": "10px",
+
+    // Side By Side Output Ratio
+    // Ratio for output area in side-by-side view.
+    "sideBySideOutputRatio": 1,
+
+    // Window Mode
+    // Whether to enable windowed notebook mode.
+    "windowingMode": "full"
 }

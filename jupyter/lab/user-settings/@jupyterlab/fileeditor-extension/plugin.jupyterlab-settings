@@ -1,0 +1,58 @@
+{
+    // Text Editor
+    // @jupyterlab/fileeditor-extension:plugin
+    // Text editor settings.
+    // ****************************************
+
+    // Auto Closing Brackets
+    // Whether to close brackets automatically.
+    "autoClosingBrackets": true,
+
+    // Code Folding
+    // Whether to enable code folding.
+    "codeFolding": true,
+
+    // Line Numbers
+    // Whether to show line numbers in editor.
+    "lineNumbers": true,
+
+    // Line Wrap
+    // How to wrap long lines.
+    "lineWrap": "on",
+
+    // Match Brackets
+    // Whether to highlight matching brackets.
+    "matchBrackets": true,
+
+    // Tab Size
+    // Number of spaces for tab indentation.
+    "tabSize": 4,
+
+    // Word Wrap Column
+    // Column where text wraps.
+    "wordWrapColumn": 80,
+
+    // Insert Spaces
+    // Whether to insert spaces when pressing tab.
+    "insertSpaces": true,
+
+    // Rulers
+    // Rulers to display in the editor.
+    "rulers": [80],
+
+    // Show Trailing Whitespace
+    // Whether to highlight trailing whitespace.
+    "showTrailingSpace": true,
+
+    // Font Family
+    // The font family used by the editor.
+    "fontFamily": "Monaco, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace",
+
+    // Font Size
+    // The font size used by the editor.
+    "fontSize": 14,
+
+    // Line Height
+    // The line height used by the editor.
+    "lineHeight": 1.4
+}

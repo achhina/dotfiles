@@ -1,0 +1,42 @@
+{
+    // Variable Inspector
+    // @jupyterlab/inspector-extension:inspector
+    // Variable inspector settings.
+    // ********************************************
+
+    // Kernel History Position
+    // Position of kernel history in inspector.
+    "kernelHistoryPosition": "bottom",
+
+    // Show Variable Inspector
+    // Whether to show the variable inspector automatically.
+    "autoShow": false,
+
+    // Collapse Variable Inspector on Startup
+    // Whether to collapse the variable inspector on startup.
+    "collapseOnStartup": false,
+
+    // Max Array Preview Length
+    // Maximum length for array previews.
+    "maxArrayPreviewLength": 10,
+
+    // Max String Preview Length
+    // Maximum length for string previews.
+    "maxStringPreviewLength": 100,
+
+    // Show Variable Types
+    // Whether to show variable types.
+    "showTypes": true,
+
+    // Show Variable Shapes
+    // Whether to show shapes for arrays/dataframes.
+    "showShapes": true,
+
+    // Update on Kernel Idle
+    // Whether to update inspector when kernel becomes idle.
+    "updateOnKernelIdle": true,
+
+    // Refresh Rate
+    // How often to refresh the inspector (in milliseconds).
+    "refreshRate": 1000
+}

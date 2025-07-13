@@ -1,0 +1,30 @@
+{
+    // Document Manager
+    // @jupyterlab/docmanager-extension:plugin
+    // Document manager settings.
+    // ******************************************
+
+    // Auto Save
+    // Whether to automatically save documents.
+    "autosave": true,
+
+    // Auto Save Interval
+    // Auto save interval in seconds.
+    "autosaveInterval": 120,
+
+    // Default File Browser Visibility
+    // Whether the file browser is visible by default.
+    "defaultFileBrowserVisibility": "visible",
+
+    // Last Modified Check Margin
+    // The margin for last modified check.
+    "lastModifiedCheckMargin": 500,
+
+    // Rename Untitled File on First Save
+    // Whether to rename untitled files on first save.
+    "renameUntitledFileOnSave": true,
+
+    // Confirm on Close
+    // Whether to show confirmation dialog when closing unsaved files.
+    "confirmOnClose": true
+}
