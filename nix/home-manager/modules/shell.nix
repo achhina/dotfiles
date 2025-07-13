@@ -11,21 +11,23 @@
   # Terminal emulator
   programs.ghostty = {
     enable = true;
-    package = null;  # Don't install ghostty, just manage config
+    package = null; # Don't install ghostty, just manage config
 
-    settings = {
-      # Theme and font settings
-      theme = "catppuccin-mocha";
-      fontFamily = "Fira Code";
+    settings =
+      {
+        # Theme and font settings
+        theme = "catppuccin-mocha";
+        font-family = "FiraCode Nerd Font Mono";
 
-      # Compromise, because when left on it's harder to autoupdate OS.
-      confirm-close-surface = false;
-    } // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
-      # MacOS settings
-      macosOptionAsAlt = true;
-      macosTitlebarStyle = "hidden";
-      macosIcon = "chalkboard";
-    };
+        # Compromise, because when left on it's harder to autoupdate OS.
+        confirm-close-surface = false;
+      }
+      // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+        # MacOS settings
+        macos-option-as-alt = true;
+        macos-titlebar-style = "hidden";
+        macos-icon = "chalkboard";
+      };
   };
 
   # Starship prompt configuration
