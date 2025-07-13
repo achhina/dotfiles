@@ -8,7 +8,9 @@
     ./modules/aerospace.nix
     ./modules/tmux.nix
     ./modules/tridactyl.nix
+    ./modules/jupyter.nix
   ];
+
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
