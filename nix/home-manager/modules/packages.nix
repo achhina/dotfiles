@@ -38,6 +38,7 @@
       nixpkgs-fmt
       pyright # Python LSP
       python312Packages.black # Python formatter for IPython autoformatter
+      python312Packages.ipython # Enhanced Python REPL
       ruff # Python linter/formatter
       rust-analyzer # Rust LSP
       marksman # Markdown LSP

@@ -40,8 +40,13 @@ return {
 			require("mini.comment").setup({
 				options = {
 					custom_commentstring = function()
-						return require("ts_context_commentstring.internal").calculate_commentstring()
-							or vim.bo.commentstring
+						-- Use built-in commentstring or treesitter if available
+						local success, ts_commentstring = pcall(require, "ts_context_commentstring.internal")
+						if success then
+							return ts_commentstring.calculate_commentstring() or vim.bo.commentstring
+						else
+							return vim.bo.commentstring
+						end
 					end,
 				},
 				mappings = {
