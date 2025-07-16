@@ -1,5 +1,5 @@
 {
-  description = "Home Manager configuration for achhina";
+  description = "Home Manager configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -38,6 +38,6 @@
           inherit modules;
         };
     in {
-      homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
+      homeConfigurations."${builtins.getEnv "USER"}" = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
     };
 }

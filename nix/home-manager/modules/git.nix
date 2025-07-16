@@ -171,7 +171,7 @@
       hosts = {
         "github.com" = {
           git_protocol = "ssh";
-          user = "achhina";
+          user = config.home.username;
         };
       };
     };

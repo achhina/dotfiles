@@ -27,6 +27,7 @@
         macos-option-as-alt = true;
         macos-titlebar-style = "hidden";
         macos-icon = "chalkboard";
+        macos-auto-secure-input = true;
       };
   };
 
@@ -227,6 +228,12 @@
     };
   };
 
+  # Home Manager managed scripts
+  home.file."bin/update" = {
+    source = ../files/update;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
@@ -335,6 +342,13 @@
       FPATH="$HOME/.docker/completions:$FPATH"
       autoload -Uz compinit
       compinit
+
+      # Environment refresh function for tmux sessions
+      refresh-env() {
+        unset __HM_SESS_VARS_SOURCED
+        source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+        echo "Environment refreshed from Home Manager"
+      }
     '';
 
     oh-my-zsh = {
@@ -352,8 +366,8 @@
       config = "$XDG_CONFIG_HOME";
       g = "git";
       gcd = "$(git rev-parse --show-toplevel)";
-      hm = "home-manager switch --flake ~/.config/nix#achhina";
-      home-manager = "home-manager switch --flake ~/.config/nix#achhina";
+      hm = "home-manager switch --flake ~/.config/nix#$USER";
+      home-manager = "home-manager switch --flake ~/.config/nix#$USER";
       l = "eza";
       ll = "eza --header --all --long --git --color=always --icons=auto";
       lt = "eza --tree --all --level 3";
@@ -371,7 +385,6 @@
       muxl = "tmuxinator list";
       muxd = "tmuxinator debug";
 
-      update = "nix-channel --update && nix flake update --flake ~/.config/nix && home-manager switch --flake ~/.config/nix#achhina";
       v = "nvim";
     };
 

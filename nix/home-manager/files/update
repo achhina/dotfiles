@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+run_cmd() {
+  echo "→ $*"
+  "$@"
+}
+
+echo "🔄 Starting system update..."
+run_cmd nix-channel --update
+run_cmd nix flake update --flake ~/.config/nix
+run_cmd home-manager switch --flake ~/.config/nix#$USER
+echo "✅ Update complete!"
