@@ -92,6 +92,12 @@
     tmuxinator.enable = true;
 
     extraConfig = ''
+      # Automatically renumber windows when one is closed
+      set-option -g renumber-windows on
+
+      # Update environment variables when attaching to sessions
+      set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH"
+
       # Override ~/.tmux/plugins
       setenv -g TMUX_PLUGIN_MANAGER_PATH "$XDG_CONFIG_HOME/tmux/plugins/"
 
@@ -101,6 +107,9 @@
       # Source tmux config
       unbind r
       bind r source-file $XDG_CONFIG_HOME/tmux/tmux.conf
+
+      # Refresh environment variables (Prefix + R)
+      bind R send-keys 'refresh-env' Enter
 
       # Uses VISUAL/EDITOR to determine key bindings but you can't use Esc to exit
       # out of tmux command prompt because escape is mapped to switch mode
