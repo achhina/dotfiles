@@ -41,6 +41,7 @@
       python312Packages.ipython # Enhanced Python REPL
       ruff # Python linter/formatter
       rust-analyzer # Rust LSP
+      shellcheck # Shell script linter
       marksman # Markdown LSP
       yaml-language-server # YAML LSP
       dockerfile-language-server-nodejs # Docker LSP
