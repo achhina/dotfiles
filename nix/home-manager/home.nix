@@ -13,7 +13,7 @@
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = builtins.getEnv "USER";
+  home.username = "achhina";
   home.homeDirectory =
     if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
 

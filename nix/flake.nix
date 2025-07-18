@@ -38,6 +38,6 @@
           inherit modules;
         };
     in {
-      homeConfigurations."${builtins.getEnv "USER"}" = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
+      homeConfigurations.default = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
     };
 }

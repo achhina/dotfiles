@@ -366,8 +366,8 @@
       config = "$XDG_CONFIG_HOME";
       g = "git";
       gcd = "$(git rev-parse --show-toplevel)";
-      hm = "home-manager switch --flake ~/.config/nix#$USER";
-      home-manager = "home-manager switch --flake ~/.config/nix#$USER";
+      hm = "home-manager switch --flake ~/.config/nix#default";
+      home-manager = "home-manager switch --flake ~/.config/nix#default";
       l = "eza";
       ll = "eza --header --all --long --git --color=always --icons=auto";
       lt = "eza --tree --all --level 3";

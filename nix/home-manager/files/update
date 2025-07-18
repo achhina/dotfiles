@@ -9,5 +9,5 @@ run_cmd() {
 echo "🔄 Starting system update..."
 run_cmd nix-channel --update
 run_cmd nix flake update --flake ~/.config/nix
-run_cmd home-manager switch --flake ~/.config/nix#$USER
+run_cmd home-manager switch --flake ~/.config/nix#default
 echo "✅ Update complete!"
