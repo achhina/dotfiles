@@ -34,10 +34,21 @@ tmux/plugins/**
 # Artifacts
 zsh/zsh-autocomplete
 
-# Home Manager generated files
+# Home Manager generated files and symlinks
 direnv/lib/hm-nix-direnv.sh
 github-copilot/apps.json
 starship.toml
 aerospace/aerospace.toml
 git/config
 git/ignore
+gh/
+gh-copilot/
+gh-dash/
+ghostty/
+jupyter/
+tmux/
+tmuxinator/
+tridactyl/
+nix/nix.conf
+result
+home-manager/
