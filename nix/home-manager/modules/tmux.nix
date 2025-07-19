@@ -164,26 +164,6 @@
       # Custom network module (manual styling since catppuccin doesn't have network module)
       set -ag status-left "#[fg=#{@thm_teal}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_teal}]󰖩 #[fg=#{@thm_teal},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/network.sh) #[fg=#{@thm_surface_0}]"
 
-      # Use catppuccin CPU module (it exists) with custom colors
-      set -g @catppuccin_cpu_text " #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0)"
-      set -g @catppuccin_status_cpu_color "#{@thm_blue}"
-
-      # Fix CPU icon background to use blue instead of yellow
-      set -g @catppuccin_cpu_color "#{@thm_blue}"
-      set -g @catppuccin_status_cpu_icon_bg "#{@thm_blue}"
-      set -g @catppuccin_status_cpu_icon_fg "#{@thm_crust}"
-
-      # Customize CPU data background to match other modules
-      set -g @catppuccin_status_cpu_text_bg "#{@thm_surface_0}"
-      set -g @catppuccin_status_cpu_text_fg "#{@thm_fg}"
-
-      # Customize CPU load colors to match statusline
-      set -g @cpu_low_bg_color "#{@thm_surface_0}"
-      set -g @cpu_low_fg_color "#{@thm_fg}"
-      set -g @cpu_medium_bg_color "#{@thm_surface_0}"
-      set -g @cpu_medium_fg_color "#{@thm_yellow}"
-      set -g @cpu_high_bg_color "#{@thm_surface_0}"
-      set -g @cpu_high_fg_color "#{@thm_red}"
 
       # Build statusline
       set -g status-right "#{E:@catppuccin_status_cpu}"
@@ -223,6 +203,27 @@
         extraConfig = ''
           set -g @catppuccin_flavour 'mocha'
           set -g @catppuccin_window_status_style "rounded"
+          
+          # Use catppuccin CPU module (it exists) with custom colors
+          set -g @catppuccin_cpu_text " #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0)"
+          set -g @catppuccin_status_cpu_color "#{@thm_blue}"
+
+          # Fix CPU icon background to use blue instead of yellow
+          set -g @catppuccin_cpu_color "#{@thm_blue}"
+          set -g @catppuccin_status_cpu_icon_bg "#{@thm_blue}"
+          set -g @catppuccin_status_cpu_icon_fg "#{@thm_crust}"
+
+          # Customize CPU data background to match other modules
+          set -g @catppuccin_status_cpu_text_bg "#{@thm_surface_0}"
+          set -g @catppuccin_status_cpu_text_fg "#{@thm_fg}"
+
+          # Customize CPU load colors to match statusline
+          set -g @cpu_low_bg_color "#{@thm_surface_0}"
+          set -g @cpu_low_fg_color "#{@thm_fg}"
+          set -g @cpu_medium_bg_color "#{@thm_surface_0}"
+          set -g @cpu_medium_fg_color "#{@thm_yellow}"
+          set -g @cpu_high_bg_color "#{@thm_surface_0}"
+          set -g @cpu_high_fg_color "#{@thm_red}"
         '';
       }
       {
