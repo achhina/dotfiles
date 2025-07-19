@@ -228,7 +228,7 @@
       {
         plugin = resurrect;
         extraConfig = ''
-          set -g @resurrect-processes '"~nvim->nvim" "~claude->claude -c"'
+          set -g @resurrect-processes '"~nvim->nvim" "~claude->claude -c" "python" "node" "ipython"'
           set -g @resurrect-capture-pane-contents 'on'
         '';
       }
