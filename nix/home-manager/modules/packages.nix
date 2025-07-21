@@ -34,6 +34,7 @@ in
       htop
       ifstat-legacy
       jq
+      lazygit
       lua
       luaPackages.luacheck
       luaPackages.luarocks
