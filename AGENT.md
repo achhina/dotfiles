@@ -87,3 +87,11 @@ All modifications to this repository must follow this protocol to ensure changes
 -   *Example:* A Nix package addition must include the change to `packages.nix` and the resulting `flake.lock` in the same commit.
 
 This protocol is mandatory for all changes, from adding a shell alias to updating a Neovim plugin.
+
+## 4. Environment Inspection
+
+This setup uses **Nix flakes exclusively** - no channels. Key inspection commands:
+
+-   **View package changes:** `nix profile diff-closures` (shows Home Manager changes via user profile symlinks)
+-   **Search packages:** `nix search nixpkgs` (global registry, latest unstable) vs `nix search .#` (your pinned versions)
+-   **Profile types:** User profiles (imperative `nix profile install`) vs Home Manager generations (declarative, this setup)
