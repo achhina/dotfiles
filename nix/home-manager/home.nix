@@ -51,16 +51,25 @@
         "nix-command"
         "flakes"
       ];
-      substituters = [
-        "https://cache.nixos.org/"
-        "https://nix-community.cachix.org"
-      ];
-      # Public key from https://nix-community.org/cache/
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-    };
+    } // (
+      let
+        # Check if user is trusted by attempting to read nix.conf or checking if we can write to /nix/store
+        isTrusted = builtins.pathExists /etc/nix/nix.conf &&
+                   (builtins.match ".*trusted-users.*${config.home.username}.*"
+                    (builtins.readFile /etc/nix/nix.conf) != null);
+      in
+      if isTrusted then {
+        substituters = [
+          "https://cache.nixos.org/"
+          "https://nix-community.cachix.org"
+        ];
+        # Public key from https://nix-community.org/cache/
+        trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
+      } else {}
+    );
   };
 
   # Let Home Manager install and manage itself.
