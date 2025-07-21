@@ -38,6 +38,8 @@
           inherit modules;
         };
     in {
+      homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
+      # Alias for backward compatibility
       homeConfigurations.default = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
     };
 }

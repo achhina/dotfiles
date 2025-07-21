@@ -11,7 +11,6 @@ NC='\033[0m' # No Color
 # Global variables
 STASH_NAME="update-script-$(date +%s)"
 STASHED=false
-FLAKE_DIR="$HOME/.config/nix"
 
 run_cmd() {
   echo -e "${BLUE}→${NC} $*"
@@ -78,7 +77,7 @@ restore_stash() {
 }
 
 commit_flake_lock() {
-  cd "$FLAKE_DIR"
+  cd "$HOME/.config/nix"
 
   # Check if flake.lock actually changed
   if git diff-index --quiet HEAD -- flake.lock 2>/dev/null; then
@@ -176,11 +175,11 @@ main() {
 
   # Update flake inputs
   log_info "Updating flake inputs..."
-  run_cmd nix flake update --flake "$FLAKE_DIR"
+  run_cmd nix flake update --flake ~/.config/nix
 
   # Commit flake.lock changes if any and check if there were changes
   local lock_changed=false
-  if ! git diff-index --quiet HEAD -- "$FLAKE_DIR/flake.lock" 2>/dev/null; then
+  if ! git diff-index --quiet HEAD -- ~/.config/nix/flake.lock 2>/dev/null; then
     commit_flake_lock
     lock_changed=true
   else
@@ -190,7 +189,7 @@ main() {
   # Only apply home-manager if flake.lock changed or if there are local config changes
   if [ "$lock_changed" = true ] || ! git diff-index --quiet HEAD -- 2>/dev/null; then
     log_info "Applying home-manager configuration..."
-    run_cmd home-manager switch --flake "$FLAKE_DIR#default"
+    run_cmd hm
   else
     log_info "Skipping home-manager switch - no changes detected"
   fi
