@@ -1,5 +1,14 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
+let
+  # Personal configuration - adjust these as needed
+  isTrusted = true; # Set to false on untrusted systems
+in
 {
   imports = [
     ./modules/packages.nix
@@ -11,9 +20,11 @@
     ./modules/jupyter.nix
   ];
 
+  # Home Manager configuration
+  home.username = "achhina";
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "achhina";
   home.homeDirectory =
     if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
 
@@ -51,24 +62,22 @@
         "nix-command"
         "flakes"
       ];
-    } // (
-      let
-        # Check if user is trusted by attempting to read nix.conf or checking if we can write to /nix/store
-        isTrusted = builtins.pathExists /etc/nix/nix.conf &&
-                   (builtins.match ".*trusted-users.*${config.home.username}.*"
-                    (builtins.readFile /etc/nix/nix.conf) != null);
-      in
-      if isTrusted then {
-        substituters = [
-          "https://cache.nixos.org/"
-          "https://nix-community.cachix.org"
-        ];
-        # Public key from https://nix-community.org/cache/
-        trusted-public-keys = [
-          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        ];
-      } else {}
+    }
+    // (
+      if isTrusted then
+        {
+          substituters = [
+            "https://cache.nixos.org/"
+            "https://nix-community.cachix.org"
+          ];
+          # Public key from https://nix-community.org/cache/
+          trusted-public-keys = [
+            "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+            "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+          ];
+        }
+      else
+        { }
     );
   };
 
