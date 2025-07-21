@@ -178,12 +178,22 @@ main() {
   log_info "Updating flake inputs..."
   run_cmd nix flake update --flake "$FLAKE_DIR"
 
-  # Commit flake.lock changes if any
-  commit_flake_lock
+  # Commit flake.lock changes if any and check if there were changes
+  local lock_changed=false
+  if ! git diff-index --quiet HEAD -- "$FLAKE_DIR/flake.lock" 2>/dev/null; then
+    commit_flake_lock
+    lock_changed=true
+  else
+    log_info "No flake.lock changes - inputs are already up to date"
+  fi
 
-  # Apply home-manager configuration
-  log_info "Applying home-manager configuration..."
-  run_cmd home-manager switch --flake "$FLAKE_DIR#default"
+  # Only apply home-manager if flake.lock changed or if there are local config changes
+  if [ "$lock_changed" = true ] || ! git diff-index --quiet HEAD -- 2>/dev/null; then
+    log_info "Applying home-manager configuration..."
+    run_cmd home-manager switch --flake "$FLAKE_DIR#default"
+  else
+    log_info "Skipping home-manager switch - no changes detected"
+  fi
 
   # Restore any stashed changes
   restore_stash
