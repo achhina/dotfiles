@@ -41,5 +41,15 @@
       homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
       # Alias for backward compatibility
       homeConfigurations.default = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
+
+      # Development shells for different project types
+      devShells = forAllSystems (system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        in
+        import ./modules/devshells.nix { inherit pkgs; });
     };
 }
