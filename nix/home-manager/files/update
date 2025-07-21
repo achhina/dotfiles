@@ -186,7 +186,7 @@ main() {
 
   # Always apply home-manager configuration to ensure system is up to date
   log_info "Applying home-manager configuration..."
-  run_cmd hm
+  run_cmd home-manager switch --flake ~/.config/nix
 
   # Restore any stashed changes
   restore_stash
