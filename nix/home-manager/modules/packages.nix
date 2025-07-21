@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   # Pin bash-language-server to working version
@@ -13,7 +13,7 @@ in
     [
       # Cross-platform packages
       aichat
-      oldPkgs.bash-language-server  # Pinned to working version
+      oldPkgs.bash-language-server # Pinned to working version
       bandwhich
       bat
       chafa # Image preview for fzf-lua
