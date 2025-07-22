@@ -57,7 +57,6 @@
       };
 
       # Performance and security improvements
-      credential.helper = "osxkeychain";
       rerere.enabled = true; # Remember conflict resolutions
       branch.autosetupmerge = "always";
       branch.autosetuprebase = "always";
@@ -72,6 +71,9 @@
         showUntrackedFiles = "all";
         submoduleSummary = true;
       };
+    } // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+      # macOS-specific settings
+      credential.helper = "osxkeychain";
     };
 
     # Git aliases
