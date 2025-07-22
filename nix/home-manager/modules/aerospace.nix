@@ -13,7 +13,6 @@
       after-startup-command = [
         "exec-and-forget ${config.home.homeDirectory}/.nix-profile/bin/borders"
       ];
-      start-at-login = true;
 
       on-focused-monitor-changed = ["move-mouse monitor-lazy-center"];
 
