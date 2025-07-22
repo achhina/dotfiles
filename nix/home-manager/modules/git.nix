@@ -87,6 +87,14 @@
       cob = "checkout -b";
       br = "branch";
 
+      # Modern Git commands (available in Git 2.23+)
+      sw = "switch";                    # Switch branches
+      swc = "switch -c";                # Create and switch to new branch
+      swd = "switch --detach";          # Switch to commit in detached HEAD
+      restore = "restore";              # Restore files from index/commit
+      rs = "restore --staged";          # Unstage files (modern alternative to reset HEAD)
+      rw = "restore --worktree";        # Restore working tree files
+
       # Stash operations
       ss = "stash save";
       sa = "stash apply";
