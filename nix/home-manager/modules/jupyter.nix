@@ -96,10 +96,9 @@ in
       builtins.toJSON {
         autosave = true;
         autosaveInterval = 120;
-        defaultFileBrowserVisibility = "visible";
         lastModifiedCheckMargin = 500;
         renameUntitledFileOnSave = true;
-        confirmOnClose = true;
+        confirmClosingDocument = true;
       };
 
     # File browser settings
