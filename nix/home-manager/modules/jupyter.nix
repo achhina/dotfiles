@@ -34,10 +34,6 @@ in
           "adaptive-theme" = true;
           theme = "JupyterLab Dark High Contrast";
           "theme-scrollbars" = true;
-          increaseFontSize = false;
-          overrideFontSize = null;
-          overrideFontFamily = null;
-          syntaxHighlightingTheme = "default";
         };
 
     # Notification settings
@@ -48,48 +44,40 @@ in
 
     # Notebook settings
     ".config/jupyter/lab/user-settings/@jupyterlab/notebook-extension/tracker.jupyterlab-settings".text =
-      builtins.toJSON (
-        commonEditorSettings
-        // {
-          autoStartDefaultKernel = true;
-          maxNumberOutputs = 50;
-          promptToDeleteCell = true;
-          recordTiming = true;
-          scrollPastEnd = true;
-          defaultCell = "code";
-          kernelShutdown = "unload";
-          sideBySideLeftMarginOverride = "10px";
-          sideBySideRightMarginOverride = "10px";
-          sideBySideOutputRatio = 1;
-          windowingMode = "full";
-        }
-      );
+      builtins.toJSON {
+        autoStartDefaultKernel = true;
+        maxNumberOutputs = 50;
+        recordTiming = true;
+        scrollPastEnd = true;
+        defaultCell = "code";
+        kernelShutdown = false;
+        sideBySideLeftMarginOverride = "10px";
+        sideBySideRightMarginOverride = "10px";
+        sideBySideOutputRatio = 1;
+        windowingMode = "full";
+        codeCellConfig = commonEditorSettings;
+      };
 
     # File editor settings
     ".config/jupyter/lab/user-settings/@jupyterlab/fileeditor-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON (
-        commonEditorSettings
-        // {
+      builtins.toJSON {
+        editorConfig = commonEditorSettings // {
           lineWrap = "on";
-        }
-      );
+        };
+      };
 
     # Console settings
     ".config/jupyter/lab/user-settings/@jupyterlab/console-extension/tracker.jupyterlab-settings".text =
-      builtins.toJSON
-        (
-          commonEditorSettings
-          // {
-            promptCellConfig = {
-              showHiddenCellsButton = true;
-              defaultCollapsed = false;
-              collapsedMetadata = {
-                inputHidden = false;
-                outputHidden = false;
-              };
-            };
-          }
-        );
+      builtins.toJSON {
+        promptCellConfig = {
+          showHiddenCellsButton = true;
+          defaultCollapsed = false;
+          collapsedMetadata = {
+            inputHidden = false;
+            outputHidden = false;
+          };
+        };
+      };
 
     # Document manager settings
     ".config/jupyter/lab/user-settings/@jupyterlab/docmanager-extension/plugin.jupyterlab-settings".text =
@@ -107,16 +95,8 @@ in
         showLastModifiedColumn = true;
         showFileSizeColumn = true;
         showHiddenFiles = false;
-        navigableView = true;
-        sortBy = "name";
         sortNotebooksFirst = true;
-        useCheckboxes = true;
-        fileSizeColumnWidth = 100;
-        lastModifiedColumnWidth = 140;
-        nameColumnWidth = 300;
-        refreshInterval = 30;
-        confirmDelete = true;
-        showFileExtensions = true;
+        showFileCheckboxes = true;
       };
 
     # Terminal settings
@@ -136,29 +116,14 @@ in
     ".config/jupyter/lab/user-settings/@jupyterlab/completer-extension/manager.jupyterlab-settings".text =
       builtins.toJSON {
         autoCompletion = true;
-        includePerfectMatches = true;
         showDocumentationPanel = true;
-        rankingFunction = "default";
-        maxVisibleItems = 20;
-        caseSensitive = false;
-        completionThreshold = 1;
         providerTimeout = 1000;
-        streaming = true;
-        suppressContinuousHintingTimeout = 500;
-        waitForBusyKernel = true;
       };
 
     # Status bar settings
     ".config/jupyter/lab/user-settings/@jupyterlab/statusbar-extension/plugin.jupyterlab-settings".text =
       builtins.toJSON {
-        showStatusBar = true;
-        showLineColumn = true;
-        showRunningKernel = true;
-        showMemoryUsage = true;
-        showTrustedStatus = true;
-        showRunningSessions = true;
-        position = "bottom";
-        compactMode = false;
+        visible = true;
       };
   };
 }
