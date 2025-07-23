@@ -128,17 +128,8 @@ in
           lineHeight = 1.3;
           theme = "dark";
           cursorBlink = true;
-          cursorStyle = "block";
           scrollback = 1000;
-          bellStyle = "none";
-          copyOnSelect = false;
-          pasteOnRightClick = true;
           screenReaderMode = false;
-          fastScrollModifier = "alt";
-          fastScrollSensitivity = 5;
-          scrollSensitivity = 1;
-          wordSeparator = " ()[]{}',\"";
-          shellIntegration = true;
         };
 
     # Code completer settings
