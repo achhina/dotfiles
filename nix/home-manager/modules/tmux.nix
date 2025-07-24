@@ -133,6 +133,12 @@
       set-option -g focus-events on
       set-option -as terminal-overrides ",xterm-256color:RGB"
 
+      # Bell notifications for Ghostty
+      set -g allow-passthrough on
+      set -g bell-action any
+      set -g monitor-bell on
+      set -g visual-bell off
+
       # Remove tmux-copycat plugin and just use tmux regex search
       bind-key / copy-mode \; send-keys ?
 
@@ -203,7 +209,7 @@
         extraConfig = ''
           set -g @catppuccin_flavour 'mocha'
           set -g @catppuccin_window_status_style "rounded"
-          
+
           # Use catppuccin CPU module (it exists) with custom colors
           set -g @catppuccin_cpu_text " #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0)"
           set -g @catppuccin_status_cpu_color "#{@thm_blue}"
