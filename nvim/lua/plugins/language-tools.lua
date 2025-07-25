@@ -152,7 +152,7 @@ return {
 						local venv_paths = { ".venv", "venv", ".env" }
 						for _, path in ipairs(venv_paths) do
 							if vim.fn.isdirectory(path) == 1 then
-								venv_selector.retrieve_from_cache()
+								require("venv-selector.cached_venv").retrieve()
 								break
 							end
 						end
