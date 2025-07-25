@@ -17,14 +17,6 @@ return {
 				require("neotest-python")({
 					dap = { justMyCode = false },
 					args = { "--log-level", "DEBUG" },
-					is_test_file = function(file_path)
-						-- Only exclude node_modules, let neotest handle the rest
-						if string.match(file_path, "/node_modules/") then
-							return false
-						end
-						-- Use default neotest-python test detection
-						return vim.endswith(file_path, ".py")
-					end,
 				}),
 				require("neotest-go")({
 					experimental = {
@@ -47,6 +39,16 @@ return {
 			discovery = {
 				enabled = true,
 				concurrent = 1,
+				filter_dir = function(name, _, _)
+					-- Exclude node_modules and other common non-test directories
+					local excluded_dirs = { "node_modules", ".git", "__pycache__", "dist", "build", ".tox" }
+					for _, excluded in ipairs(excluded_dirs) do
+						if name == excluded then
+							return false
+						end
+					end
+					return true
+				end,
 			},
 			running = {
 				concurrent = true,
