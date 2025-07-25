@@ -150,12 +150,12 @@ return {
 					enable = true,
 					swap_next = {
 						["<leader>sa"] = "@parameter.inner",
-						["<leader>sf"] = "@function.outer",
+						["<leader>swf"] = "@function.outer",
 						["<leader>sc"] = "@class.outer",
 					},
 					swap_previous = {
 						["<leader>sA"] = "@parameter.inner",
-						["<leader>sF"] = "@function.outer",
+						["<leader>swF"] = "@function.outer",
 						["<leader>sC"] = "@class.outer",
 					},
 				},

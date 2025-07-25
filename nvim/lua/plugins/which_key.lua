@@ -2,7 +2,11 @@ return {
 	"folke/which-key.nvim",
 	dependencies = { "echasnovski/mini.icons" },
 	event = "VeryLazy",
-	opts = {},
+	opts = {
+		spec = {
+			{ "<leader>sw", group = "Swap" },
+		},
+	},
 	keys = {
 		{
 			"<leader>?",
