@@ -3,7 +3,11 @@ return {
 	dependencies = "rafamadriz/friendly-snippets",
 	version = "*",
 	opts = {
-		keymap = { preset = "default" },
+		keymap = {
+			preset = "default",
+			["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
+			["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
+		},
 		appearance = {
 			use_nvim_cmp_as_default = true,
 			nerd_font_variant = "mono",
@@ -31,7 +35,9 @@ return {
 				},
 			},
 			list = {
-				selection = { "auto_insert" },
+				selection = {
+					auto_insert = true,
+				},
 			},
 			accept = {
 				auto_brackets = {
