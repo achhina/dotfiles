@@ -25,12 +25,13 @@ let
     fi
 
     # Send OSC 777 notification sequence
+    esc=$'\033'
     if [[ -n "$TMUX" ]]; then
         # Inside tmux: use manual passthrough syntax
-        printf '\033Ptmux;\033\033]777;notify;%s;%s\033\033\\\033\\' "$title" "$body"
+        printf "''${esc}Ptmux;''${esc}''${esc}]777;notify;%s;%s''${esc}''${esc}\\''${esc}\\" "$title" "$body"
     else
         # Outside tmux: send directly
-        printf '\033]777;notify;%s;%s\033\\' "$title" "$body"
+        printf "''${esc}]777;notify;%s;%s''${esc}\\" "$title" "$body"
     fi
   '';
   # Pin bash-language-server to working version
