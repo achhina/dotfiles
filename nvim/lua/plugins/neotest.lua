@@ -17,6 +17,27 @@ return {
 				require("neotest-python")({
 					dap = { justMyCode = false },
 					args = { "--log-level", "DEBUG" },
+					is_test_file = function(file_path)
+						-- Only exclude certain directories, but allow all .py files
+						local exclude_dirs = {
+							"node_modules",
+							".git",
+							"__pycache__",
+							"dist",
+							"build",
+							".tox",
+						}
+
+						-- Check if file path contains any excluded directory
+						for _, dir in ipairs(exclude_dirs) do
+							if string.match(file_path, "/" .. dir .. "/") then
+								return false
+							end
+						end
+
+						-- Allow all Python files (let pytest handle test detection)
+						return string.match(file_path, "%.py$")
+					end,
 				}),
 				require("neotest-go")({
 					experimental = {
