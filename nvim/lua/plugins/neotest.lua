@@ -18,28 +18,12 @@ return {
 					dap = { justMyCode = false },
 					args = { "--log-level", "DEBUG" },
 					is_test_file = function(file_path)
-						-- Exclude certain directories from scanning
-						local exclude_dirs = {
-							"node_modules",
-							".git",
-							"__pycache__",
-							"dist",
-							"build",
-							".tox",
-						}
-
-						-- Check if file path contains any excluded directory
-						for _, dir in ipairs(exclude_dirs) do
-							if string.match(file_path, "/" .. dir .. "/") then
-								return false
-							end
+						-- Only exclude node_modules, let neotest handle the rest
+						if string.match(file_path, "/node_modules/") then
+							return false
 						end
-
-						-- Only consider files that match test patterns
-						return string.match(file_path, "test_.*%.py$")
-							or string.match(file_path, ".*_test%.py$")
-							or string.match(file_path, "/tests/.*%.py$")
-							or string.match(file_path, "conftest%.py$")
+						-- Use default neotest-python test detection
+						return vim.endswith(file_path, ".py")
 					end,
 				}),
 				require("neotest-go")({
