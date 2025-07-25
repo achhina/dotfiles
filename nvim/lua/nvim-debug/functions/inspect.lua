@@ -207,7 +207,7 @@ function M.inspect_cursor()
 	end
 
 	-- LSP info
-	local clients = vim.lsp.get_active_clients({ bufnr = buf })
+	local clients = vim.lsp.get_clients({ bufnr = buf })
 	if #clients > 0 then
 		table.insert(output, "ACTIVE LSP CLIENTS:")
 		for _, client in ipairs(clients) do
@@ -264,7 +264,7 @@ function M.health_summary()
 	table.insert(output, "COMPONENT STATUS:")
 
 	-- LSP check
-	local lsp_clients = vim.lsp.get_active_clients()
+	local lsp_clients = vim.lsp.get_clients()
 	table.insert(
 		output,
 		string.format("LSP: %s (%d active clients)", #lsp_clients > 0 and "✓" or "✗", #lsp_clients)
