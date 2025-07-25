@@ -18,7 +18,7 @@ return {
 					dap = { justMyCode = false },
 					args = { "--log-level", "DEBUG" },
 					is_test_file = function(file_path)
-						-- Only exclude certain directories, but allow all .py files
+						-- Exclude certain directories from scanning
 						local exclude_dirs = {
 							"node_modules",
 							".git",
@@ -35,8 +35,11 @@ return {
 							end
 						end
 
-						-- Allow all Python files (let pytest handle test detection)
-						return string.match(file_path, "%.py$")
+						-- Only consider files that match test patterns
+						return string.match(file_path, "test_.*%.py$")
+							or string.match(file_path, ".*_test%.py$")
+							or string.match(file_path, "/tests/.*%.py$")
+							or string.match(file_path, "conftest%.py$")
 					end,
 				}),
 				require("neotest-go")({
