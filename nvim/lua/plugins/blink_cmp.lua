@@ -31,7 +31,7 @@ return {
 				},
 			},
 			list = {
-				selection = "auto_insert",
+				selection = { "auto_insert" },
 			},
 			accept = {
 				auto_brackets = {
