@@ -17,16 +17,6 @@ return {
 				require("neotest-python")({
 					dap = { justMyCode = false },
 					args = { "--log-level", "DEBUG" },
-					python = function()
-						-- Check for virtual environment in current directory
-						local venv_paths = { ".venv/bin/python", "venv/bin/python", ".env/bin/python" }
-						for _, path in ipairs(venv_paths) do
-							if vim.fn.filereadable(path) == 1 then
-								return path
-							end
-						end
-						return "python"
-					end,
 					is_test_file = function(file_path)
 						-- Only exclude certain directories, but allow all .py files
 						local exclude_dirs = {
