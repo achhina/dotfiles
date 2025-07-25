@@ -175,10 +175,10 @@
       set -g status-right "#{E:@catppuccin_status_cpu}"
       set -ag status-right "#{E:@catppuccin_status_date_time}"
 
-      # Center windows and show only window number (override catppuccin)
+      # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
       set -g window-status-format "#[fg=#11111b,bg=#{@thm_overlay_2}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
-      set -g window-status-current-format "#[fg=#11111b,bg=#{@thm_mauve}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
+      set -g window-status-current-format "#[fg=#11111b,bg=#{@thm_mauve}]#[fg=#181825,reverse]#[none] #I:#W #[fg=#181825,reverse]#[none]"
     '';
 
     plugins = with pkgs.tmuxPlugins; [
