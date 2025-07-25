@@ -30,6 +30,9 @@ return {
 					treesitter = { "lsp" },
 				},
 			},
+			list = {
+				selection = "preselect",
+			},
 			accept = {
 				auto_brackets = {
 					enabled = true,

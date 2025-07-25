@@ -25,6 +25,3 @@ require("lazy").setup("plugins", {})
 
 -- Load options, keymaps, autocmds
 require("config")
-
--- Set up compatibility layer for deprecated LSP functions
-require("config.compat").setup()
