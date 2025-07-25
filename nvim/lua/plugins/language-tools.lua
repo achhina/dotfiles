@@ -140,25 +140,6 @@ return {
 					},
 				},
 			})
-
-			-- Auto-activate virtual environment when entering Python files
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = "python",
-				callback = function()
-					-- Try to auto-detect and activate venv
-					local venv_selector = require("venv-selector")
-					if venv_selector.venv() == nil then
-						-- Look for common venv indicators
-						local venv_paths = { ".venv", "venv", ".env" }
-						for _, path in ipairs(venv_paths) do
-							if vim.fn.isdirectory(path) == 1 then
-								require("venv-selector.cached_venv").retrieve()
-								break
-							end
-						end
-					end
-				end,
-			})
 		end,
 	},
 
