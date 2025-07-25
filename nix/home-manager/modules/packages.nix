@@ -104,6 +104,7 @@ let
     yamllint                 # YAML linter
     nixpkgs-fmt              # Nix formatter
     ruff                     # Python linter/formatter
+    nodePackages.prettier    # JavaScript/TypeScript/HTML/CSS/JSON formatter
   ];
 
   # Programming language runtimes and tools
