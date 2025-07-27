@@ -107,7 +107,7 @@ local function create_lsp_keymap(bufnr)
 		nmap("<leader>co", vim.lsp.buf.outgoing_calls, "Outgoing calls")
 	end
 	if vim.lsp.buf.type_hierarchy then
-		nmap("<leader>th", vim.lsp.buf.type_hierarchy, "Type Hierarchy")
+		nmap("<leader>lT", vim.lsp.buf.type_hierarchy, "Type Hierarchy")
 	end
 	if vim.lsp.codelens and vim.lsp.codelens.run then
 		nmap("<leader>cl", vim.lsp.codelens.run, "Code Lens action")
@@ -175,11 +175,11 @@ function M.setup()
 	safe_keymap("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
 	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
 
-	-- Toggle options
-	safe_keymap("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
-	safe_keymap("n", "<leader>tn", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
-	safe_keymap("n", "<leader>tr", "<cmd>set relativenumber!<CR>", { desc = "Toggle relative numbers" })
-	safe_keymap("n", "<leader>ts", "<cmd>set spell!<CR>", { desc = "Toggle spell check" })
+	-- Options toggle (moved from <leader>t to avoid test conflicts)
+	safe_keymap("n", "<leader>ow", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
+	safe_keymap("n", "<leader>on", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
+	safe_keymap("n", "<leader>or", "<cmd>set relativenumber!<CR>", { desc = "Toggle relative numbers" })
+	safe_keymap("n", "<leader>os", "<cmd>set spell!<CR>", { desc = "Toggle spell check" })
 
 	-- Macro shortcuts
 	safe_keymap("n", "Q", "@q", { desc = "Execute macro q" })
@@ -257,61 +257,80 @@ function M.load_dap_keymaps()
 	end
 end
 
--- Test keymap loader for neotest sessions
-function M.load_test_keymaps(bufnr)
-	-- Validate that neotest is available
+-- Global test keymaps (always available)
+-- Test execution
+safe_keymap("n", "<leader>tn", function()
 	local has_neotest, neotest = pcall(require, "neotest")
-	if not has_neotest then
-		vim.notify("Neotest not available for buffer " .. bufnr, vim.log.levels.WARN)
-		return
-	end
-
-	-- Helper function for buffer-local test keymaps
-	local function tmap(keys, func, desc)
-		local full_desc = desc and ("Test: " .. desc) or nil
-		return safe_keymap("n", keys, func, { desc = full_desc }, bufnr)
-	end
-
-	-- Core test execution
-	tmap("<leader>tn", function()
+	if has_neotest then
 		neotest.run.run()
-	end, "Run nearest test")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Run nearest test" })
 
-	tmap("<leader>tf", function()
+safe_keymap("n", "<leader>tf", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.run.run(vim.fn.expand("%"))
-	end, "Run current file tests")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Run current file tests" })
 
-	tmap("<leader>td", function()
+safe_keymap("n", "<leader>td", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.run.run({ strategy = "dap" })
-	end, "Debug nearest test")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Debug nearest test" })
 
-	-- Test UI and output
-	tmap("<leader>ts", function()
+-- Test UI and output
+safe_keymap("n", "<leader>ts", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.summary.toggle()
-	end, "Toggle test summary")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Toggle test summary" })
 
-	tmap("<leader>to", function()
+safe_keymap("n", "<leader>to", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.output.open({ enter = true, auto_close = true })
-	end, "Show test output")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Show test output" })
 
-	tmap("<leader>tO", function()
+safe_keymap("n", "<leader>tO", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.output_panel.toggle()
-	end, "Toggle test output panel")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Toggle test output panel" })
 
-	-- Test session management
-	tmap("<leader>tr", function()
+-- Test session management
+safe_keymap("n", "<leader>tr", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.run.run_last()
-	end, "Run last test")
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Run last test" })
 
-	tmap("<leader>tS", function()
+safe_keymap("n", "<leader>tS", function()
+	local has_neotest, neotest = pcall(require, "neotest")
+	if has_neotest then
 		neotest.run.stop()
-	end, "Stop running tests")
-
-	-- Notify that unified test keymaps are loaded
-	vim.notify(
-		"Unified test keymaps loaded for " .. vim.bo[bufnr].filetype .. " (neotest + debug-profiles)",
-		vim.log.levels.INFO
-	)
-end
+	else
+		vim.notify("Neotest not available", vim.log.levels.WARN)
+	end
+end, { desc = "Stop running tests" })
 
 return M

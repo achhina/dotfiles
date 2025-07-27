@@ -97,9 +97,9 @@ return {
 			end, { desc = "Diff against last commit" })
 
 			-- Toggles
-			map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "Toggle git blame line" })
-			map("n", "<leader>tB", gitsigns.toggle_linehl, { desc = "Toggle git blame highlights" })
-			map("n", "<leader>td", gitsigns.toggle_deleted, { desc = "Toggle git show deleted" })
+			map("n", "<leader>gtb", gitsigns.toggle_current_line_blame, { desc = "Toggle git blame line" })
+			map("n", "<leader>gtl", gitsigns.toggle_linehl, { desc = "Toggle git blame highlights" })
+			map("n", "<leader>gtd", gitsigns.toggle_deleted, { desc = "Toggle git show deleted" })
 
 			-- Text object
 			map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Select git hunk" })

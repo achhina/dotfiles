@@ -5,6 +5,9 @@ return {
 	opts = {
 		spec = {
 			{ "<leader>sw", group = "Swap" },
+			{ "<leader>t", group = "Test" },
+			{ "<leader>gt", group = "Git Toggle" },
+			{ "<leader>o", group = "Options" },
 		},
 	},
 	keys = {

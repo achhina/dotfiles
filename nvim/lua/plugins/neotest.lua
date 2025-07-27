@@ -77,37 +77,5 @@ return {
 				max_width = 0.6,
 			},
 		})
-
-		-- Load test keymaps for supported filetypes
-		vim.api.nvim_create_autocmd("FileType", {
-			pattern = { "python", "javascript", "typescript", "javascriptreact", "typescriptreact", "go", "rust" },
-			callback = function(args)
-				-- Only load test keymaps if we're in a buffer that likely contains tests
-				local bufnr = args.buf
-				local filename = vim.fn.expand("%:t")
-
-				-- Check if this looks like a test file
-				local is_test_file = filename:match("test")
-					or filename:match("spec")
-					or filename:match("_test%.")
-					or filename:match("%.test%.")
-
-				-- Or if neotest can discover tests in this file
-				local has_tests = false
-				vim.schedule(function()
-					-- Use neotest to check if there are discoverable tests
-					local ok, tree = pcall(require("neotest").discover, { bufnr })
-					if ok and tree then
-						has_tests = #tree:children() > 0
-					end
-
-					-- Load test keymaps if this is a test file or has discoverable tests
-					if is_test_file or has_tests then
-						require("config.keymaps").load_test_keymaps(bufnr)
-					end
-				end)
-			end,
-			desc = "Load test keymaps for test files",
-		})
 	end,
 }

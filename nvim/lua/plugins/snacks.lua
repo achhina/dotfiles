@@ -220,7 +220,7 @@ return {
 
 		-- Terminal
 		{
-			"<leader>t",
+			"<c-/>",
 			function()
 				Snacks.terminal()
 			end,
