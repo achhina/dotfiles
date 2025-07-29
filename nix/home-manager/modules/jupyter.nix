@@ -2,7 +2,7 @@
 
 let
   # Define common font settings
-  fontFamily = "Monaco, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace";
+  fontFamily = "'FiraCode Nerd Font Mono', 'Fira Code', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace";
   fontSize = 14;
   lineHeight = 1.4;
   tabSize = 4;
