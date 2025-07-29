@@ -6,6 +6,8 @@ return {
 		spec = {
 			{ "<leader>sw", group = "Swap" },
 			{ "<leader>t", group = "Test" },
+			{ "<leader>g", group = "Git" },
+			{ "<leader>gh", group = "Git Hunks" },
 			{ "<leader>gt", group = "Git Toggle" },
 			{ "<leader>o", group = "Options" },
 		},
