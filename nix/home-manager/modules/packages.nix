@@ -138,6 +138,7 @@ let
     tectonic                   # LaTeX engine
     texlivePackages.detex      # LaTeX to plain text (render-markdown)
     mermaid-cli                # Diagram generation
+    vhs                        # Terminal recording tool
   ];
 
   # System services
