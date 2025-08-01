@@ -1,12 +1,21 @@
 return {
 	"saghen/blink.cmp",
-	dependencies = "rafamadriz/friendly-snippets",
+	dependencies = {
+		"rafamadriz/friendly-snippets",
+		{
+			"folke/lazydev.nvim",
+			ft = "lua",
+			opts = {
+				library = {
+					{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+				},
+			},
+		},
+	},
 	version = "*",
 	opts = {
 		keymap = {
-			preset = "default",
-			["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
-			["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
+			preset = "super-tab",
 		},
 		appearance = {
 			use_nvim_cmp_as_default = true,
@@ -14,12 +23,24 @@ return {
 		},
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer" },
+			per_filetype = {
+				lua = { "lsp", "path", "snippets", "buffer", "lazydev" },
+			},
 			providers = {
 				copilot = {
 					name = "copilot",
 					module = "blink-cmp-copilot",
 					score_offset = 100,
 					async = true,
+				},
+				buffer = {
+					min_keyword_length = 4,
+					max_items = 5,
+				},
+				lazydev = {
+					name = "LazyDev",
+					module = "lazydev.integrations.blink",
+					score_offset = 100,
 				},
 			},
 		},
@@ -29,6 +50,7 @@ return {
 				auto_show_delay_ms = 200,
 			},
 			menu = {
+				auto_show = false,
 				border = "rounded",
 				draw = {
 					treesitter = { "lsp" },
@@ -44,11 +66,19 @@ return {
 					enabled = true,
 				},
 			},
+			ghost_text = {
+				enabled = true,
+			},
 		},
 		signature = {
 			enabled = true,
 			window = {
 				border = "rounded",
+			},
+		},
+		fuzzy = {
+			prebuilt_binaries = {
+				download = true,
 			},
 		},
 	},
