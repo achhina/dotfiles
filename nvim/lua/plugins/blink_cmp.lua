@@ -11,6 +11,9 @@ return {
 				},
 			},
 		},
+		{ "Saghen/blink.compat", opts = {} },
+		"hrsh7th/cmp-git",
+		"f3fora/cmp-spell",
 	},
 	version = "*",
 	opts = {
@@ -25,6 +28,13 @@ return {
 			default = { "lsp", "path", "snippets", "buffer" },
 			per_filetype = {
 				lua = { "lsp", "path", "snippets", "buffer", "lazydev" },
+				-- Enable spell for text files
+				markdown = { "lsp", "path", "snippets", "buffer", "spell" },
+				text = { "lsp", "path", "snippets", "buffer", "spell" },
+				gitcommit = { "lsp", "path", "snippets", "buffer", "git" },
+				-- Git-related files
+				gitrebase = { "git" },
+				gitconfig = { "git" },
 			},
 			providers = {
 				copilot = {
@@ -41,6 +51,16 @@ return {
 					name = "LazyDev",
 					module = "lazydev.integrations.blink",
 					score_offset = 100,
+				},
+				git = {
+					name = "git",
+					module = "blink.compat.source",
+					opts = {},
+				},
+				spell = {
+					name = "spell",
+					module = "blink.compat.source",
+					opts = {},
 				},
 			},
 		},
