@@ -110,6 +110,12 @@ bind ,<Space> nohlsearch
 " New reddit is bad
 autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
 
+" Disable tridactyl specifically for JupyterLab interfaces
+blacklistadd localhost.*/lab
+blacklistadd localhost.*/tree
+blacklistadd 127.0.0.1.*/lab
+blacklistadd 127.0.0.1.*/tree
+
 " Remove hinting styles - they remove background images from websites for me
 set hintstyles.bg none
 set hintstyles.fg none
