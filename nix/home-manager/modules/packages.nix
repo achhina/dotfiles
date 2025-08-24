@@ -163,6 +163,7 @@ let
   # Linux-specific packages
   linuxPackages = with pkgs; [
     firefox              # Web browser
+    firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
   ];
 in
