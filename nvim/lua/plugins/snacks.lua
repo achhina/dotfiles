@@ -7,6 +7,23 @@ return {
 	priority = 1000,
 	lazy = false,
 	---@type snacks.Config
+	config = function(_, opts)
+		-- Store original vim.notify before Snacks.setup() replaces it
+		local original_vim_notify = vim.notify
+
+		-- Call Snacks setup
+		require("snacks").setup(opts)
+
+		-- Override the notifier to call both original and Snacks
+		if opts.notifier and opts.notifier.enabled then
+			vim.notify = function(msg, level, o)
+				-- Call original vim.notify (writes to :messages)
+				original_vim_notify(msg, level, o)
+				-- Also call Snacks.notifier (toast popups + history)
+				return require("snacks").notifier.notify(msg, level, o)
+			end
+		end
+	end,
 	opts = {
 		-- Enable most snacks modules for comprehensive functionality
 		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
@@ -268,9 +285,6 @@ return {
 		},
 	},
 	init = function()
-		-- Store original vim.notify BEFORE Snacks can replace it
-		local original_vim_notify = vim.notify
-
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "VeryLazy",
 			callback = function()
@@ -287,16 +301,6 @@ return {
 				vim.api.nvim_create_user_command("Dashboard", function()
 					Snacks.dashboard()
 				end, { desc = "Open Dashboard" })
-
-				-- Override vim.notify to call both original and Snacks
-				if Snacks.config.notifier.enabled then
-					vim.notify = function(msg, level, opts)
-						-- Call original vim.notify (writes to :messages)
-						original_vim_notify(msg, level, opts)
-						-- Also call Snacks.notifier (toast popups + history)
-						return Snacks.notifier.notify(msg, level, opts)
-					end
-				end
 			end,
 		})
 	end,
