@@ -139,6 +139,8 @@ let
     texlivePackages.detex      # LaTeX to plain text (render-markdown)
     mermaid-cli                # Diagram generation
     vhs                        # Terminal recording tool
+    imagemagick                # Image processing (for Snacks.image)
+    ghostscript                # PostScript/PDF interpreter (for PDF rendering)
   ];
 
   # System services
