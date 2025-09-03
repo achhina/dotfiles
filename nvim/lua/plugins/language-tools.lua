@@ -117,7 +117,7 @@ return {
 		config = function()
 			require("venv-selector").setup({
 				options = {
-					notify_user_on_venv_activation = false, -- Disable VenvSelect startup notifications
+					notify_user_on_venv_activation = true,
 				},
 				search = {
 					my_venvs = {
