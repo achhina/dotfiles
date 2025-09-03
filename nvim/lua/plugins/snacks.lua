@@ -175,48 +175,13 @@ return {
 			desc = "Toggle Scratch Buffer",
 		},
 
-		-- Unified notification history
+		-- Snacks notification history
 		{
-			"<leader>nh",
+			"<leader>snh",
 			function()
-				-- Create a unified view showing both Snacks notifications and Noice history
-				local win = Snacks.win({
-					title = " All Notifications & Messages ",
-					width = 0.8,
-					height = 0.8,
-					border = "rounded",
-					keys = { q = "close" },
-				})
-				local buf = win:open_buf()
-
-				-- Add Snacks notification history
-				local snacks_history = Snacks.notifier.get_history({ reverse = true })
-				if #snacks_history > 0 then
-					vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "## Snacks Notifications", "" })
-					for _, notif in ipairs(snacks_history) do
-						local time = os.date("%H:%M:%S", notif.added / 1e9)
-						local level = string.upper(notif.level)
-						vim.api.nvim_buf_set_lines(buf, -1, -1, false, {
-							string.format("[%s] %s: %s", time, level, notif.msg),
-							"",
-						})
-					end
-				end
-
-				-- Add Noice message history
-				vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "## Vim Messages", "" })
-				local messages = vim.fn.execute("messages"):split("\n")
-				for _, msg in ipairs(messages) do
-					if msg ~= "" then
-						vim.api.nvim_buf_set_lines(buf, -1, -1, false, { msg })
-					end
-				end
-
-				vim.bo[buf].filetype = "markdown"
-				vim.bo[buf].modifiable = false
-				win:show()
+				Snacks.notifier.show_history()
 			end,
-			desc = "All Notifications & Messages",
+			desc = "Snacks Notification History",
 		},
 
 		-- Git integration
