@@ -50,7 +50,7 @@ in
     XDG_CACHE_HOME = "${config.home.homeDirectory}/.cache";
     XDG_DATA_HOME = "${config.home.homeDirectory}/.local/share";
     IPYTHONDIR = "${config.home.homeDirectory}/.config/ipython";
-    JUPYTER_CONFIG_DIR = "${config.home.homeDirectory}/.config/jupyter";
+    JUPYTER_CONFIG_PATH = "${config.home.homeDirectory}/.config/jupyter";
   };
 
   # Configure Nix settings
