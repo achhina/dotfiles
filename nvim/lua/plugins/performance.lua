@@ -10,7 +10,7 @@ return {
 
 	-- Better buffer management and memory optimization
 	{
-		"echasnovski/mini.bufremove",
+		"nvim-mini/mini.bufremove",
 		event = "VeryLazy",
 		keys = {
 			{

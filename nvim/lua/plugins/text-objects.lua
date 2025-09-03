@@ -1,7 +1,7 @@
 return {
 	-- Enhanced text objects
 	{
-		"echasnovski/mini.ai",
+		"nvim-mini/mini.ai",
 		event = "VeryLazy",
 		config = function()
 			local ai = require("mini.ai")
@@ -143,7 +143,7 @@ return {
 
 	-- Enhanced surround operations
 	{
-		"echasnovski/mini.surround",
+		"nvim-mini/mini.surround",
 		event = "VeryLazy",
 		config = function()
 			require("mini.surround").setup({

@@ -1,7 +1,7 @@
 return {
 	-- Mini.nvim - only for features that snacks doesn't provide well
 	{
-		"echasnovski/mini.nvim",
+		"nvim-mini/mini.nvim",
 		config = function()
 			-- Better Around/Inside textobjects (snacks doesn't have this)
 			-- Examples: va), viq, daf, etc.
