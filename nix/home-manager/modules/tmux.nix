@@ -2,7 +2,6 @@
 
 let
   cfg = config.programs.tmux;
-  defaultShortcut = "b";
   prefix = if cfg.prefix != null then cfg.prefix else "C-${cfg.shortcut}";
 in
 {
