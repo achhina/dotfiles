@@ -43,6 +43,7 @@ let
   coreTools = with pkgs; [
     git                    # Version control
     git-lfs                # Git Large File Storage
+    lazygit                # Terminal UI for Git (for Snacks.lazygit)
     wget                   # File downloader
     htop                   # System monitor
     ncdu                   # Disk usage analyzer
