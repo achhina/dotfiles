@@ -1,9 +1,9 @@
 return {
 	"MeanderingProgrammer/render-markdown.nvim",
 	opts = {
-		-- Use detex instead of latex2text for LaTeX processing
+		-- Disable LaTeX support to avoid detex dependency
 		latex = {
-			converter = "detex",
+			enabled = false,
 		},
 	},
 	dependencies = {
