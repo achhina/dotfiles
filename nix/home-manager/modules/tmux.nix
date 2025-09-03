@@ -122,7 +122,7 @@
           set-option -t popup status off
           detach-client
       } {
-          display-popup -E "tmux new -A -s popup -t aichat"
+          display-popup -E "tmux new -A -s popup -t popup"
       }
 
       # Status bar position and update interval
