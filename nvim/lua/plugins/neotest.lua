@@ -12,6 +12,16 @@ return {
 		"nvim-neotest/neotest-jest",
 	},
 	config = function()
+		-- Temporarily suppress vim.tbl_flatten deprecation warning from neotest-jest
+		local original_deprecate = vim.deprecate
+		vim.deprecate = function(name, alternative, version, plugin, backtrace)
+			if name == "vim.tbl_flatten" and backtrace and backtrace:find("neotest%-jest") then
+				-- Suppress this specific deprecation warning from neotest-jest
+				return
+			end
+			return original_deprecate(name, alternative, version, plugin, backtrace)
+		end
+
 		require("neotest").setup({
 			adapters = {
 				require("neotest-python")({
@@ -77,5 +87,8 @@ return {
 				max_width = 0.6,
 			},
 		})
+
+		-- Restore original vim.deprecate function
+		vim.deprecate = original_deprecate
 	end,
 }
