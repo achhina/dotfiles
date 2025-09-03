@@ -268,6 +268,9 @@ return {
 		},
 	},
 	init = function()
+		-- Store original vim.notify BEFORE Snacks can replace it
+		local original_vim_notify = vim.notify
+
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "VeryLazy",
 			callback = function()
@@ -285,13 +288,11 @@ return {
 					Snacks.dashboard()
 				end, { desc = "Open Dashboard" })
 
-				-- Override Snacks' vim.notify replacement to also write to :messages
+				-- Override vim.notify to call both original and Snacks
 				if Snacks.config.notifier.enabled then
-					-- Store the original vim.notify before Snacks replaces it
-					local original_notify = vim.notify
 					vim.notify = function(msg, level, opts)
 						-- Call original vim.notify (writes to :messages)
-						original_notify(msg, level, opts)
+						original_vim_notify(msg, level, opts)
 						-- Also call Snacks.notifier (toast popups + history)
 						return Snacks.notifier.notify(msg, level, opts)
 					end
