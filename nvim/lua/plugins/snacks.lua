@@ -14,7 +14,12 @@ return {
 			enabled = true,
 			preset = {
 				keys = {
-					{ icon = " ", key = "f", desc = "Find File", action = ":lua require('fzf-lua').files()" },
+					{
+						icon = " ",
+						key = "f",
+						desc = "Find File",
+						action = ":lua require('fzf-lua').combine({ pickers = 'oldfiles;files' })",
+					},
 					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
 					{ icon = " ", key = "g", desc = "Find Text", action = ":lua require('fzf-lua').live_grep()" },
 					{ icon = " ", key = "r", desc = "Recent Files", action = ":lua require('fzf-lua').oldfiles()" },
