@@ -26,11 +26,6 @@ return {
 			lsp_doc_border = false,
 		},
 		routes = {
-			-- Route all vim.notify messages to Noice (instead of letting Snacks intercept them)
-			{
-				filter = { event = "notify" },
-				view = "notify",
-			},
 			{
 				filter = {
 					event = "msg_show",
@@ -91,11 +86,11 @@ return {
 			desc = "Noice Last Message",
 		},
 		{
-			"<leader>nh",
+			"<leader>nmh",
 			function()
 				require("noice").cmd("history")
 			end,
-			desc = "Noice History",
+			desc = "Noice Message History",
 		},
 		{
 			"<leader>na",
