@@ -5,11 +5,9 @@ return {
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
 			require("dropbar").setup({
-				general = {
-					update_debounce = 100, -- Smooth scrolling, prevents rapid updates
-				},
 				bar = {
 					truncate = true, -- Automatically truncate long paths
+					update_debounce = 100, -- Smooth scrolling, prevents rapid updates (moved from general)
 				},
 				menu = {
 					preview = true, -- Enable hover previews
