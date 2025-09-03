@@ -26,6 +26,15 @@ return {
 			lsp_doc_border = false,
 		},
 		routes = {
+			-- Capture VenvSelect messages for debugging
+			{
+				filter = {
+					event = "notify",
+					find = "venv",
+				},
+				view = "notify",
+				opts = { title = "VenvSelect Debug" },
+			},
 			{
 				filter = {
 					event = "msg_show",
