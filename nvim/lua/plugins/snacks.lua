@@ -175,15 +175,6 @@ return {
 			desc = "Toggle Scratch Buffer",
 		},
 
-		-- Snacks notification history
-		{
-			"<leader>snh",
-			function()
-				Snacks.notifier.show_history()
-			end,
-			desc = "Snacks Notification History",
-		},
-
 		-- Git integration
 		{
 			"<leader>gB",
@@ -293,6 +284,18 @@ return {
 				vim.api.nvim_create_user_command("Dashboard", function()
 					Snacks.dashboard()
 				end, { desc = "Open Dashboard" })
+
+				-- Override Snacks' vim.notify replacement to also write to :messages
+				if Snacks.config.notifier.enabled then
+					-- Store the original vim.notify before Snacks replaces it
+					local original_notify = vim.notify
+					vim.notify = function(msg, level, opts)
+						-- Call original vim.notify (writes to :messages)
+						original_notify(msg, level, opts)
+						-- Also call Snacks.notifier (toast popups + history)
+						return Snacks.notifier.notify(msg, level, opts)
+					end
+				end
 			end,
 		})
 	end,
