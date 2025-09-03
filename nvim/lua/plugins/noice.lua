@@ -26,14 +26,10 @@ return {
 			lsp_doc_border = false,
 		},
 		routes = {
-			-- Capture VenvSelect messages for debugging
+			-- Route all vim.notify messages to Noice (instead of letting Snacks intercept them)
 			{
-				filter = {
-					event = "notify",
-					find = "venv",
-				},
+				filter = { event = "notify" },
 				view = "notify",
-				opts = { title = "VenvSelect Debug" },
 			},
 			{
 				filter = {

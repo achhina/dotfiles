@@ -61,7 +61,7 @@ return {
 			},
 		},
 		picker = { enabled = false }, -- Keep fzf-lua as primary picker
-		notifier = { enabled = true },
+		notifier = { enabled = false }, -- Let Noice handle vim.notify messages
 		quickfile = { enabled = true }, -- Fast file operations
 		scope = { enabled = true }, -- Enhanced scope highlighting
 		scroll = {
@@ -190,22 +190,6 @@ return {
 				Snacks.git.blame_line()
 			end,
 			desc = "Git Blame Line",
-		},
-
-		-- Notifications
-		{
-			"<leader>un",
-			function()
-				Snacks.notifier.hide()
-			end,
-			desc = "Dismiss All Notifications",
-		},
-		{
-			"<leader>snh",
-			function()
-				Snacks.notifier.show_history()
-			end,
-			desc = "Snacks Notification History",
 		},
 
 		-- Terminal
