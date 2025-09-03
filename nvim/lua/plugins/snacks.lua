@@ -201,11 +201,11 @@ return {
 			desc = "Dismiss All Notifications",
 		},
 		{
-			"<leader>nh",
+			"<leader>snh",
 			function()
 				Snacks.notifier.show_history()
 			end,
-			desc = "Notification History",
+			desc = "Snacks Notification History",
 		},
 
 		-- Terminal
