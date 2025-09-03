@@ -1,5 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
+let
+  cfg = config.programs.tmux;
+  defaultShortcut = "b";
+  prefix = if cfg.prefix != null then cfg.prefix else "C-${cfg.shortcut}";
+in
 {
   # Tmuxinator project templates
   xdg.configFile."tmuxinator/dev.yml".text = ''
@@ -92,6 +97,14 @@
     tmuxinator.enable = true;
 
     extraConfig = ''
+      # Override Home Manager's tmux prefix binding to restore standard behavior
+      # Home Manager PR #7549 added the `-n` flag to the send-prefix binding,
+      # which changed the behavior from the tmux default. We want prefix-prefix
+      # to send a literal prefix key to the application (standard tmux double-prefix behavior).
+      # See: https://github.com/nix-community/home-manager/pull/7549
+      unbind -n ${prefix}
+      bind ${prefix} send-prefix
+
       # Automatically renumber windows when one is closed
       set-option -g renumber-windows on
 
