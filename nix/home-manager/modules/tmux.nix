@@ -15,8 +15,8 @@ in
           layout: main-vertical
           panes:
             - nvim
-            - # terminal for commands
           panes:
+            - # terminal for commands
             - # for running servers/builds
       - logs:
           panes:
