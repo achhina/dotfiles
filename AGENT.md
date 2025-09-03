@@ -8,11 +8,9 @@ This repository treats the entire development environment as a unified, version-
 
 - **Total Declarative Control.** The environment is defined as code. **Nix and Home Manager** serve as the single source of truth, ensuring that the system is **bit-for-bit reproducible**. The `flake.nix` is the main entry point, and the goal is to eliminate all manual setup.
 
-- **Structured by Function.** The configuration is organized into **logical tiers** based on their function and stability, not just by tool name. This separates the foundational **Declarative Core** (`nix/`) from the frequently-tweaked **Interactive Environment** (`nvim/`, `aerospace/`) and the stable **Supporting Tools** (Git, etc.). This structure makes the system easier to reason about and safer to modify.
+- **Structured by Function.** The configuration is organized into **logical tiers** based on their function and stability, not just by tool name. This separates the foundational **Declarative Core** (`nix/`) from the frequently-tweaked **Interactive Environment** (`nvim/`). When looking to update a configuration ALWAYS check `nix/` FIRST for any declarative configuration before checking the application configuration directories and files.
 
 - **Engineered for Portability.** The use of Nix, conditional logic (`pkgs.stdenv.isDarwin`), and a focus on cross-platform tools ensures the environment is **portable across macOS and Linux** on different architectures.
-
-- **Optimized for Flow.** The choice of tools and extensive custom configurations (Neovim, Aerospace, Zsh aliases, fzf-tab) are heavily biased towards a **fast, keyboard-driven workflow**. The primary goal is to minimize friction and maximize developer efficiency.
 
 ## 2. Dependency Management: A Tiered Approach
 
@@ -43,24 +41,6 @@ These managers operate within a specific application, handling its internal ecos
   - **Role:** Manages Zsh plugins.
   - **Governing File:** `nix/home-manager/modules/shell.nix` (in the `programs.zsh.oh-my-zsh.plugins` section).
   - **How to Update:** This is managed declaratively by Nix. Updates to the plugins happen when the Nix flake inputs are updated.
-
-### Tier 3: Project-Specific & Tool-Specific Managers
-These are tools installed by Home Manager to manage dependencies *within your development projects* or for specific tools.
-
-- **Python (`uv`/`pip`):**
-  - **Role:** Manages Python packages in project-specific virtual environments.
-  - **Governing Files:** `pyproject.toml` or `requirements.txt` (per-project, not in this repo).
-  - **How to Use:** Managed imperatively on a per-project basis.
-
-- **Node.js (`pnpm`/`yarn`):**
-  - **Role:** Manages JavaScript/TypeScript dependencies.
-  - **Governing File:** `package.json` (per-project).
-  - **How to Use:** Managed imperatively on a per-project basis.
-
-- **Git Hooks (`pre-commit`):**
-  - **Role:** Manages linters and formatters used during Git commits.
-  - **Governing File:** `.pre-commit-config.yaml`.
-  - **How to Update:** Run `pre-commit autoupdate`.
 
 ## 3. The Change Workflow: A Strict Protocol
 
