@@ -101,7 +101,6 @@ return {
 			"nvim-lua/plenary.nvim",
 		},
 		lazy = false,
-		branch = "regexp", -- Use the regexp branch for better performance
 		keys = {
 			{
 				"<leader>vs",
