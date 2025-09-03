@@ -16,7 +16,6 @@ in
           panes:
             - nvim
             - # terminal for commands
-      - server:
           panes:
             - # for running servers/builds
       - logs:
