@@ -125,5 +125,17 @@ in
       builtins.toJSON {
         visible = true;
       };
+
+    # Document registry settings - configure file viewers by default
+    ".config/jupyter/lab/user-settings/@jupyterlab/docregistry-extension/plugin.jupyterlab-settings".text =
+      builtins.toJSON {
+        defaultViewers = {
+          markdown = "Markdown Preview";
+          csv = "CSV Viewer";
+          tsv = "CSV Viewer";
+          html = "HTML Preview";
+          json = "JSON Viewer";
+        };
+      };
   };
 }
