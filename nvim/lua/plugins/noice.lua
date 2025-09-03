@@ -26,11 +26,6 @@ return {
 			lsp_doc_border = false,
 		},
 		routes = {
-			-- Route vim.notify calls to external handler (Snacks.notifier)
-			{
-				filter = { event = "notify" },
-				opts = { skip = true }, -- Don't display in Noice, let vim.notify handler take over
-			},
 			{
 				filter = {
 					event = "msg_show",
