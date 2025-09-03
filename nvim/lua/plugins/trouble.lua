@@ -5,6 +5,7 @@ return {
 	opts = {
 		focus = true, -- Focus the window when opened
 		follow = true, -- Follow the cursor
+		warn_no_results = false, -- Disable Trouble's internal warnings (they don't use vim.notify)
 		preview = {
 			type = "float",
 			relative = "editor",
