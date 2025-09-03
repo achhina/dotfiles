@@ -300,17 +300,6 @@ return {
 				vim.api.nvim_create_user_command("Dashboard", function()
 					Snacks.dashboard()
 				end, { desc = "Open Dashboard" })
-
-				-- Dual notification system: Send to both Snacks.notifier (toast) and :messages
-				if Snacks.config.notifier.enabled then
-					local original_notify = vim.notify
-					vim.notify = function(msg, level, opts)
-						-- Send to original vim.notify (for :messages)
-						original_notify(msg, level, opts)
-						-- Also send to Snacks.notifier (for toast popups)
-						return Snacks.notifier.notify(msg, level, opts)
-					end
-				end
 			end,
 		})
 	end,
