@@ -32,16 +32,18 @@ tmux/plugins/**
 **secret**
 
 # Artifacts
+.ruff_cache/
 zsh/zsh-autocomplete
 
 # Home Manager generated files and symlinks
 direnv/lib/hm-nix-direnv.sh
 github-copilot/apps.json
 starship.toml
-aerospace/aerospace.toml
+aerospace/
 git/
 gh/
 gh-copilot/
+github-copilot/
 gh-dash/
 ghostty/
 jupyter/
