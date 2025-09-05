@@ -52,78 +52,12 @@ autocmd("BufWritePre", {
 -- Language-specific automation
 local lang_group = augroup("LanguageSpecific", { clear = true })
 
--- Go: Auto-format and organize imports on save
+-- Go: Auto-format on save
 autocmd("BufWritePre", {
 	group = lang_group,
 	pattern = "*.go",
 	callback = function()
-		-- Organize imports
-		local params = vim.lsp.util.make_range_params()
-		params.context = { only = { "source.organizeImports" } }
-		local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-		if err then
-			vim.notify("Error organizing imports: " .. tostring(err), vim.log.levels.WARN)
-			return
-		end
-		if result then
-			for _, res in pairs(result) do
-				if res.result then
-					for _, action in pairs(res.result) do
-						if action.edit then
-							vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
-						elseif action.command then
-							vim.lsp.buf.execute_command(action.command)
-						end
-					end
-				end
-			end
-		end
-		-- Format
 		vim.lsp.buf.format({ async = false })
-	end,
-})
-
--- Python: Auto-organize imports on save
-autocmd("BufWritePre", {
-	group = lang_group,
-	pattern = "*.py",
-	callback = function()
-		-- Try to organize imports with LSP
-		local params = vim.lsp.util.make_range_params()
-		params.context = { only = { "source.organizeImports" } }
-		local _, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-		if err then
-			vim.notify("Error organizing Python imports: " .. tostring(err), vim.log.levels.WARN)
-		end
-	end,
-})
-
--- TypeScript/JavaScript: Auto-organize imports and format
-autocmd("BufWritePre", {
-	group = lang_group,
-	pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
-	callback = function()
-		-- Organize imports
-		local params = vim.lsp.util.make_range_params()
-		params.context = { only = { "source.organizeImports", "source.fixAll" } }
-		local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-		if err then
-			vim.notify("Error organizing TS/JS imports: " .. tostring(err), vim.log.levels.WARN)
-			return
-		end
-		if result then
-			for _, res in pairs(result) do
-				if res.result then
-					for _, action in pairs(res.result) do
-						if action.edit then
-							vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
-						elseif action.command then
-							vim.lsp.buf.execute_command(action.command)
-						end
-					end
-				end
-			end
-		end
 	end,
 })
 

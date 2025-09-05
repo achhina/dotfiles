@@ -298,37 +298,6 @@ return {
 		-- 	return vim.fs.dirname(vim.fs.find(patterns, { upward = true })[1])
 		-- end
 
-		-- Auto-organize imports and fix issues on save
-		local format_augroup = vim.api.nvim_create_augroup("LSPFormatting", { clear = true })
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			group = format_augroup,
-			pattern = "*.ts,*.tsx,*.js,*.jsx,*.py,*.go,*.rs",
-			callback = function()
-				-- Try to organize imports and fix issues
-				local params = vim.lsp.util.make_range_params()
-				params.context = { only = { "source.organizeImports", "source.fixAll" } }
-
-				local result, err = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-				if err then
-					vim.notify("Error organizing imports: " .. tostring(err), vim.log.levels.WARN)
-					return
-				end
-				if result then
-					for _, res in pairs(result) do
-						if res.result then
-							for _, action in pairs(res.result) do
-								if action.edit then
-									vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
-								elseif action.command then
-									vim.lsp.buf.execute_command(action.command)
-								end
-							end
-						end
-					end
-				end
-			end,
-		})
-
 		--  This function gets run when an LSP connects to a particular buffer.
 		local on_attach = function(client, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
