@@ -448,6 +448,9 @@
       zstyle ':fzf-tab:*' switch-group '<' '>'
       # use tmux floating pane
       zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+      # configure popup size to prevent small menus
+      zstyle ':fzf-tab:*' popup-min-size 65 12
+      zstyle ':fzf-tab:*' popup-pad 8 3
 
       # Completions
       eval "$(starship init zsh)"
