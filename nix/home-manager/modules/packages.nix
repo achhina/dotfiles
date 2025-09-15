@@ -93,7 +93,7 @@ let
     nil                              # Nix LSP
     marksman                         # Markdown LSP
     yaml-language-server             # YAML LSP
-    dockerfile-language-server-nodejs # Docker LSP
+    dockerfile-language-server       # Docker LSP
     taplo                            # TOML LSP
     vscode-langservers-extracted     # HTML/CSS/JSON LSP
   ];

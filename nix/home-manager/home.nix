@@ -84,6 +84,12 @@ in
     );
   };
 
+  # Allow broken and unfree packages
+  nixpkgs.config = {
+    allowBroken = true;
+    allowUnfree = true;
+  };
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
