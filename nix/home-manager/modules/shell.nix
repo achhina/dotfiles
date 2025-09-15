@@ -419,6 +419,10 @@
       zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
       # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
       zstyle ':completion:*' menu no
+      # include hidden files in completion
+      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
+      # enable glob_dots to include hidden files in glob patterns
+      setopt glob_dots
       # preview directory's content with eza when completing cd (include hidden files)
       zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
       # custom fzf flags - use tab for cycling, ctrl-space for accept
