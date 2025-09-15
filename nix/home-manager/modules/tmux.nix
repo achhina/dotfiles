@@ -296,6 +296,12 @@ in
           set -g @continuum-restore 'on'
         '';
       }
+      {
+        plugin = fzf-tmux-url;
+        extraConfig = ''
+          set -g @fzf-url-bind 'u'
+        '';
+      }
     ];
   };
 }
