@@ -421,6 +421,8 @@
       zstyle ':completion:*' menu no
       # include hidden files in completion
       zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
+      # configure cd completion to show directory stack when using cd -
+      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
       # enable glob_dots to include hidden files in glob patterns
       setopt glob_dots
       # navigation improvements
