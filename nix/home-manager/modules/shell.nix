@@ -465,9 +465,9 @@
       gcd = "$(git rev-parse --show-toplevel)";
       hm = "home-manager switch --flake ~/.config/nix";
       home-manager = "home-manager switch --flake ~/.config/nix";
-      l = "eza";
-      ll = "eza --header --all --long --git --color=always --icons=auto";
-      lt = "eza --tree --all --level 3";
+      l = "eza --hyperlink";
+      ll = "eza --header --all --long --git --color=always --icons=auto --hyperlink";
+      lt = "eza --tree --all --level 3 --hyperlink";
       t = "tmux";
       ta = "tmux attach || tmux new-session";
 
