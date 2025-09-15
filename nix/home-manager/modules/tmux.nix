@@ -183,6 +183,8 @@ in
 
       # Enable OSC8 hyperlink support
       set-option -as terminal-features ",*:hyperlinks"
+      # Enable OSC7 working directory reporting for Ghostty
+      set-option -as terminal-features ",*:osc7"
 
       # Bell notifications for Ghostty
       set -g allow-passthrough on
