@@ -423,6 +423,14 @@
       zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
       # enable glob_dots to include hidden files in glob patterns
       setopt glob_dots
+      # navigation improvements
+      setopt auto_cd              # cd by typing directory name if it's not a command
+      setopt auto_pushd           # automatically push directories to stack
+      # history improvements
+      setopt hist_ignore_dups     # don't record consecutive duplicate commands
+      # advanced features
+      setopt extended_glob        # enable advanced globbing: ^, ~, #, ##, (...)
+      setopt complete_in_word     # complete from cursor position, not just end
       # preview directory's content with eza when completing cd (include hidden files)
       zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
       # custom fzf flags - use tab for cycling, ctrl-space for accept
