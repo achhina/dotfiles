@@ -181,6 +181,9 @@ in
       set-option -g focus-events on
       set-option -as terminal-overrides ",xterm-256color:RGB"
 
+      # Enable OSC8 hyperlink support
+      set-option -as terminal-features ",*:hyperlinks"
+
       # Bell notifications for Ghostty
       set -g allow-passthrough on
       set -g bell-action any
