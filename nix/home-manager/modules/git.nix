@@ -39,6 +39,7 @@
         side-by-side = true;
         syntax-theme = "gruvbox-dark";
         features = "decorations";
+        hyperlinks = true; # Enable clickable hyperlinks
         decorations = {
           commit-decoration-style = "bold yellow box ul";
           file-style = "bold yellow ul";

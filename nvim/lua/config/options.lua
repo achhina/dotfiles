@@ -41,6 +41,9 @@ function M.load_options()
 	-- NOTE: You should make sure your terminal supports this
 	vim.o.termguicolors = true
 
+	-- Enable hyperlink support (OSC8) for clickable links in terminal
+	-- Neovim 0.10+ supports OSC8 hyperlinks automatically when termguicolors is enabled
+
 	-- Set default tab to 4 instead of 8
 	vim.opt.tabstop = 4
 	vim.opt.shiftwidth = 4

@@ -468,6 +468,11 @@
       l = "eza --hyperlink";
       ll = "eza --header --all --long --git --color=always --icons=auto --hyperlink";
       lt = "eza --tree --all --level 3 --hyperlink";
+
+      # fd aliases with hyperlink support
+      fd = "fd --hyperlink";
+      fdf = "fd --type f --hyperlink";
+      fdd = "fd --type d --hyperlink";
       t = "tmux";
       ta = "tmux attach || tmux new-session";
 
