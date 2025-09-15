@@ -302,6 +302,13 @@ in
           set -g @fzf-url-bind 'u'
         '';
       }
+      {
+        plugin = fingers;
+        extraConfig = ''
+          # tmux-fingers configuration
+          set -g @fingers-key f
+        '';
+      }
     ];
   };
 }
