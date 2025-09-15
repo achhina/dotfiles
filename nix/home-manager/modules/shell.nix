@@ -423,6 +423,8 @@
       zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
       # configure cd completion to show directory stack when using cd -
       zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
+      # case insensitive completion
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
       # enable glob_dots to include hidden files in glob patterns
       setopt glob_dots
       # navigation improvements
@@ -430,6 +432,7 @@
       setopt auto_pushd           # automatically push directories to stack
       # history improvements
       setopt hist_ignore_dups     # don't record consecutive duplicate commands
+      setopt hist_ignore_space    # don't record commands starting with space
       # advanced features
       setopt extended_glob        # enable advanced globbing: ^, ~, #, ##, (...)
       setopt complete_in_word     # complete from cursor position, not just end
