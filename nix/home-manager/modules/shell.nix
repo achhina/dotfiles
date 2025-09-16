@@ -31,6 +31,18 @@
       };
   };
 
+  # JankyBorders service for window borders
+  services.jankyborders = {
+    enable = true;
+    settings = {
+      style = "round";
+      width = 6.0;
+      hidpi = "off";
+      active_color = "0xff0099cc";
+      inactive_color = "0xff414550";
+    };
+  };
+
   # Docker CLI configuration with credential helper
   programs.docker-cli = {
     enable = true;

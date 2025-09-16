@@ -11,9 +11,7 @@
     launchd.enable = true;
     userSettings = {
       after-login-command = [];
-      after-startup-command = [
-        "exec-and-forget ${config.home.homeDirectory}/.nix-profile/bin/borders"
-      ];
+      after-startup-command = [];
 
       on-focused-monitor-changed = ["move-mouse monitor-lazy-center"];
 
