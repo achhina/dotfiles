@@ -181,10 +181,24 @@ in
       set-option -g focus-events on
       set-option -as terminal-overrides ",xterm-256color:RGB"
 
-      # Enable OSC8 hyperlink support
-      set-option -as terminal-features ",*:hyperlinks"
-      # Enable OSC7 working directory reporting for Ghostty
-      set-option -as terminal-features ",*:osc7"
+      # Enable comprehensive terminal features for Ghostty
+      set-option -as terminal-features ",*:hyperlinks"      # OSC 8 clickable links
+      set-option -as terminal-features ",*:osc7"            # working directory reporting
+      set-option -as terminal-features ",*:sync"            # synchronized updates
+      set-option -as terminal-features ",*:extkeys"         # extended keyboard protocol
+      set-option -as terminal-features ",*:RGB"             # 24-bit truecolor
+      set-option -as terminal-features ",*:strikethrough"   # strikethrough text
+      set-option -as terminal-features ",*:overline"        # overline text
+      set-option -as terminal-features ",*:usstyle"         # underscore styling
+      set-option -as terminal-features ",*:256"             # 256 color support
+      set-option -as terminal-features ",*:clipboard"       # system clipboard
+      set-option -as terminal-features ",*:ccolour"         # cursor color setting
+      set-option -as terminal-features ",*:cstyle"          # cursor style setting
+      set-option -as terminal-features ",*:focus"           # focus reporting
+      set-option -as terminal-features ",*:mouse"           # mouse support
+      set-option -as terminal-features ",*:title"           # window title setting
+      set-option -as terminal-features ",*:margins"         # DECSLRM margin support
+      set-option -as terminal-features ",*:rectfill"        # DECFRA rectangle fill
 
       # Bell notifications for Ghostty
       set -g allow-passthrough on
