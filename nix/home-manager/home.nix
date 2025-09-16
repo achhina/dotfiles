@@ -13,6 +13,7 @@ in
     ./modules/packages.nix
     ./modules/git.nix
     ./modules/shell.nix
+    ./modules/fzf.nix
     ./modules/aerospace.nix
     ./modules/tmux.nix
     ./modules/tridactyl.nix
