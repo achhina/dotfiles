@@ -15,10 +15,11 @@
       "--header"
       "--group"
       "--time-style=relative"
+      "--hyperlink"
     ];
 
-    # Shell integrations
-    enableBashIntegration = true;
-    enableZshIntegration = true;
+    # Disable shell integrations to avoid conflicting aliases
+    enableBashIntegration = false;
+    enableZshIntegration = false;
   };
 }

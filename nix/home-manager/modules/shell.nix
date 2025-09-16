@@ -517,9 +517,9 @@
       gcd = "$(git rev-parse --show-toplevel)";
       hm = "home-manager switch --flake ~/.config/nix";
       home-manager = "home-manager switch --flake ~/.config/nix";
-      l = "eza --hyperlink";
-      ll = "eza --header --all --long --git --color=always --icons=auto --hyperlink";
-      lt = "eza --tree --all --level 3 --hyperlink";
+      l = "eza";
+      ll = "eza --all --long";
+      lt = "eza --tree --all --level 3";
 
       # fd aliases with hyperlink support
       fd = "fd --hyperlink";
