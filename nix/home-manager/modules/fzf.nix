@@ -13,7 +13,7 @@
       "--layout=reverse"
       "--border"
       "--inline-info"
-      "--preview-window=:hidden"
+      "--preview-window=right:50%:hidden"
       "--bind=ctrl-/:toggle-preview"
     ];
 
@@ -21,12 +21,14 @@
     fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
     fileWidgetOptions = [
       "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+      "--preview-window=right:50%"
     ];
 
     # Directory widget (ALT-C) with tree preview
     changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
     changeDirWidgetOptions = [
       "--preview 'eza --tree --level=2 --color=always {}'"
+      "--preview-window=right:50%"
     ];
 
     # History widget (CTRL-R) improvements
@@ -35,20 +37,20 @@
       "--exact"
     ];
 
-    # Gruvbox-inspired colors matching your theme
+    # Tokyo Night/Catppuccin colors matching your theme
     colors = {
-      fg = "#ebdbb2";
-      bg = "#282828";
-      hl = "#fabd2f";
-      "fg+" = "#ebdbb2";
-      "bg+" = "#3c3836";
-      "hl+" = "#fabd2f";
-      info = "#83a598";
-      prompt = "#bdae93";
-      spinner = "#fabd2f";
-      pointer = "#83a598";
-      marker = "#fe8019";
-      header = "#665c54";
+      fg = "#c0caf5";
+      bg = "#1a1b26";
+      hl = "#bb9af7";
+      "fg+" = "#c0caf5";
+      "bg+" = "#292e42";
+      "hl+" = "#bb9af7";
+      info = "#7aa2f7";
+      prompt = "#7dcfff";
+      spinner = "#f7768e";
+      pointer = "#f7768e";
+      marker = "#9ece6a";
+      header = "#565f89";
     };
 
     # Shell integrations
