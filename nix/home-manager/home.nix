@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -56,9 +57,9 @@ in
     IPYTHONDIR = "${config.home.homeDirectory}/.config/ipython";
     JUPYTER_CONFIG_PATH = "${config.home.homeDirectory}/.config/jupyter";
 
-    # Set locale if not already defined by system
-    LANG = "en_CA.UTF-8";
-    LC_CTYPE = "en_CA.UTF-8";
+    # Set locale fallback if not already defined by system
+    LANG = lib.mkDefault "en_US.UTF-8";
+    LC_CTYPE = lib.mkDefault "en_US.UTF-8";
   };
 
   # Configure Nix settings
