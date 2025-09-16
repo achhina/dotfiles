@@ -243,6 +243,169 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
+    # Custom autoloadable functions
+    siteFunctions = {
+      man = ''
+        local MAN="/usr/bin/man"
+        local MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$XDG_HOME/.nix-profile/share/man")
+
+        if [ -n "$1" ]; then
+            command "$MAN" "$@"
+            return $?
+        else
+            if ! command -v fd >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
+                echo "Error: fd and fzf are required for interactive man browsing" >&2
+                return 1
+            fi
+
+            local selected
+            selected=$(fd -tf -tl . "''${MANPATHS[@]}" 2>/dev/null | sed "s|.*/||" | sed "s|\..*||" | sort -u | fzf --reverse --preview="$MAN {} 2>/dev/null || echo 'Preview not available'")
+
+            if [ -n "$selected" ]; then
+                command "$MAN" "$selected"
+            fi
+        fi
+      '';
+
+      "$" = ''
+        "$@"
+      '';
+
+      tmux-clean = ''
+        if ! command -v tmux >/dev/null 2>&1; then
+            echo "Error: tmux is not installed or not in PATH" >&2
+            return 1
+        fi
+
+        if ! tmux info &>/dev/null; then
+            echo "No tmux server running"
+            return 0
+        fi
+
+        local current_session
+        current_session=$(tmux display-message -p '#S' 2>/dev/null)
+
+        if [ -z "$current_session" ]; then
+            echo "Not inside a tmux session"
+            return 1
+        fi
+
+        local sessions_to_kill
+        sessions_to_kill=$(tmux list-sessions -F '#S' 2>/dev/null | grep -v "^$current_session$" || true)
+
+        if [ -z "$sessions_to_kill" ]; then
+            echo "No sessions to clean (only current session '$current_session' exists)"
+            return 0
+        fi
+
+        echo "Killing tmux sessions except current ('$current_session'):"
+        local count=0
+        echo "$sessions_to_kill" | while read -r session; do
+            if [ -n "$session" ]; then
+                echo "  ✗ Killing session: $session"
+                tmux kill-session -t "$session" 2>/dev/null || echo "    Failed to kill session: $session" >&2
+                count=$((count + 1))
+            fi
+        done
+        echo "Done! Cleaned $(echo "$sessions_to_kill" | wc -l | tr -d ' ') sessions"
+      '';
+
+      tmux-here = ''
+        if ! command -v tmux >/dev/null 2>&1; then
+            echo "Error: tmux is not installed or not in PATH" >&2
+            return 1
+        fi
+
+        local session_name
+        session_name=$(basename "$PWD" | tr '.' '_' | tr ' ' '_')
+
+        if tmux has-session -t "$session_name" 2>/dev/null; then
+            if [ -n "$TMUX" ]; then
+                tmux switch-client -t "$session_name"
+            else
+                tmux attach-session -t "$session_name"
+            fi
+        else
+            tmux new-session -d -s "$session_name" -c "$PWD"
+            if [ -n "$TMUX" ]; then
+                tmux switch-client -t "$session_name"
+            else
+                tmux attach-session -t "$session_name"
+            fi
+        fi
+      '';
+
+      mux-here = ''
+        if ! command -v tmuxinator >/dev/null 2>&1; then
+            echo "Error: tmuxinator is not installed" >&2
+            echo "Falling back to tmux-here..."
+            tmux-here
+            return $?
+        fi
+
+        if [ -f ".tmuxinator.yml" ]; then
+            tmuxinator start . || {
+                echo "Failed to start tmuxinator project, falling back to tmux-here..." >&2
+                tmux-here
+            }
+        else
+            tmuxinator start dev || {
+                echo "Failed to start default tmuxinator project, falling back to tmux-here..." >&2
+                tmux-here
+            }
+        fi
+      '';
+
+      ts = ''
+        if ! command -v tmux >/dev/null 2>&1; then
+            echo "Error: tmux is not installed or not in PATH" >&2
+            return 1
+        fi
+
+        if ! tmux info &>/dev/null; then
+            echo "No tmux server running"
+            return 1
+        fi
+
+        if [ $# -eq 0 ]; then
+            if ! command -v fzf >/dev/null 2>&1; then
+                echo "Available sessions:"
+                tmux list-sessions -F '#S'
+                echo "Use 'ts <session_name>' to switch"
+                return 0
+            fi
+
+            local session
+            session=$(tmux list-sessions -F '#S' 2>/dev/null | fzf --reverse --preview='tmux capture-pane -p -t {} 2>/dev/null || echo "No preview available"')
+
+            if [ -n "$session" ]; then
+                if [ -n "$TMUX" ]; then
+                    tmux switch-client -t "$session"
+                else
+                    tmux attach-session -t "$session"
+                fi
+            fi
+        else
+            if tmux has-session -t "$1" 2>/dev/null; then
+                if [ -n "$TMUX" ]; then
+                    tmux switch-client -t "$1"
+                else
+                    tmux attach-session -t "$1"
+                fi
+            else
+                echo "Session '$1' does not exist" >&2
+                return 1
+            fi
+        fi
+      '';
+
+      refresh-env = ''
+        unset __HM_SESS_VARS_SOURCED
+        source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+        echo "Environment refreshed from Home Manager"
+      '';
+    };
+
     initContent = ''
       [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 
@@ -250,164 +413,6 @@
       bindkey -e
 
       source $XDG_CONFIG_HOME/bash/secrets
-
-      function man(){
-          local MAN="/usr/bin/man"
-          local MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$XDG_HOME/.nix-profile/share/man")
-
-          if [ -n "$1" ]; then
-              command "$MAN" "$@"
-              return $?
-          else
-              if ! command -v fd >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
-                  echo "Error: fd and fzf are required for interactive man browsing" >&2
-                  return 1
-              fi
-
-              local selected
-              selected=$(fd -tf -tl . "''${MANPATHS[@]}" 2>/dev/null | sed "s|.*/||" | sed "s|\..*||" | sort -u | fzf --reverse --preview="$MAN {} 2>/dev/null || echo 'Preview not available'")
-
-              if [ -n "$selected" ]; then
-                  command "$MAN" "$selected"
-              fi
-          fi
-      }
-
-
-      # Function to map `$ <command>` to just `command`. Useful for copying single
-      # line commands prefixed with '$'.
-      # https://github.com/orgs/community/discussions/35615#discussioncomment-10491333
-      function \$ { "$@"; }
-
-      # Enhanced tmux session management utilities
-      function tmux-clean() {
-          if ! command -v tmux >/dev/null 2>&1; then
-              echo "Error: tmux is not installed or not in PATH" >&2
-              return 1
-          fi
-
-          if ! tmux info &>/dev/null; then
-              echo "No tmux server running"
-              return 0
-          fi
-
-          local current_session
-          current_session=$(tmux display-message -p '#S' 2>/dev/null)
-
-          if [ -z "$current_session" ]; then
-              echo "Not inside a tmux session"
-              return 1
-          fi
-
-          local sessions_to_kill
-          sessions_to_kill=$(tmux list-sessions -F '#S' 2>/dev/null | grep -v "^$current_session$" || true)
-
-          if [ -z "$sessions_to_kill" ]; then
-              echo "No sessions to clean (only current session '$current_session' exists)"
-              return 0
-          fi
-
-          echo "Killing tmux sessions except current ('$current_session'):"
-          local count=0
-          echo "$sessions_to_kill" | while read -r session; do
-              if [ -n "$session" ]; then
-                  echo "  ✗ Killing session: $session"
-                  tmux kill-session -t "$session" 2>/dev/null || echo "    Failed to kill session: $session" >&2
-                  count=$((count + 1))
-              fi
-          done
-          echo "Done! Cleaned $(echo "$sessions_to_kill" | wc -l | tr -d ' ') sessions"
-      }
-
-      function tmux-here() {
-          if ! command -v tmux >/dev/null 2>&1; then
-              echo "Error: tmux is not installed or not in PATH" >&2
-              return 1
-          fi
-
-          local session_name
-          session_name=$(basename "$PWD" | tr '.' '_' | tr ' ' '_')
-
-          if tmux has-session -t "$session_name" 2>/dev/null; then
-              if [ -n "$TMUX" ]; then
-                  tmux switch-client -t "$session_name"
-              else
-                  tmux attach-session -t "$session_name"
-              fi
-          else
-              tmux new-session -d -s "$session_name" -c "$PWD"
-              if [ -n "$TMUX" ]; then
-                  tmux switch-client -t "$session_name"
-              else
-                  tmux attach-session -t "$session_name"
-              fi
-          fi
-      }
-
-      function mux-here() {
-          if ! command -v tmuxinator >/dev/null 2>&1; then
-              echo "Error: tmuxinator is not installed" >&2
-              echo "Falling back to tmux-here..."
-              tmux-here
-              return $?
-          fi
-
-          if [ -f ".tmuxinator.yml" ]; then
-              tmuxinator start . || {
-                  echo "Failed to start tmuxinator project, falling back to tmux-here..." >&2
-                  tmux-here
-              }
-          else
-              tmuxinator start dev || {
-                  echo "Failed to start default tmuxinator project, falling back to tmux-here..." >&2
-                  tmux-here
-              }
-          fi
-      }
-
-      function ts() {
-          if ! command -v tmux >/dev/null 2>&1; then
-              echo "Error: tmux is not installed or not in PATH" >&2
-              return 1
-          fi
-
-          if ! tmux info &>/dev/null; then
-              echo "No tmux server running"
-              return 1
-          fi
-
-          if [ $# -eq 0 ]; then
-              if ! command -v fzf >/dev/null 2>&1; then
-                  echo "Available sessions:"
-                  tmux list-sessions -F '#S'
-                  echo "Use 'ts <session_name>' to switch"
-                  return 0
-              fi
-
-              local session
-              session=$(tmux list-sessions -F '#S' 2>/dev/null | fzf --reverse --preview='tmux capture-pane -p -t {} 2>/dev/null || echo "No preview available"')
-
-              if [ -n "$session" ]; then
-                  if [ -n "$TMUX" ]; then
-                      tmux switch-client -t "$session"
-                  else
-                      tmux attach-session -t "$session"
-                  fi
-              fi
-          else
-              if tmux has-session -t "$1" 2>/dev/null; then
-                  if [ -n "$TMUX" ]; then
-                      tmux switch-client -t "$1"
-                  else
-                      tmux attach-session -t "$1"
-                  fi
-              else
-                  echo "Session '$1' does not exist" >&2
-                  return 1
-              fi
-          fi
-      }
-
 
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
@@ -459,13 +464,6 @@
       FPATH="$HOME/.docker/completions:$FPATH"
       autoload -Uz compinit
       compinit
-
-      # Environment refresh function for tmux sessions
-      refresh-env() {
-        unset __HM_SESS_VARS_SOURCED
-        source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-        echo "Environment refreshed from Home Manager"
-      }
     '';
 
     oh-my-zsh = {
