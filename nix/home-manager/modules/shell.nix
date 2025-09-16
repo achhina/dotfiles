@@ -242,6 +242,54 @@
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    defaultKeymap = "emacs";
+
+    setOptions = [
+      "GLOB_DOTS"           # include hidden files in glob patterns
+      "AUTO_PUSHD"          # automatically push directories to stack
+      "HIST_IGNORE_DUPS"    # don't record consecutive duplicate commands
+      "HIST_IGNORE_SPACE"   # don't record commands starting with space
+      "EXTENDED_GLOB"       # enable advanced globbing: ^, ~, #, ##, (...)
+      "COMPLETE_IN_WORD"    # complete from cursor position, not just end
+    ];
+
+    completionInit = ''
+      # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
+      # disable sort when completing `git checkout`
+      zstyle ':completion:*:git-checkout:*' sort false
+      # set descriptions format to enable group support
+      # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
+      zstyle ':completion:*:descriptions' format '[%d]'
+      # set list-colors to enable filename colorizing
+      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+      # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+      zstyle ':completion:*' menu no
+      # include hidden files in completion
+      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
+      # configure cd completion to show directory stack when using cd -
+      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
+      # case insensitive completion
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+      # preview directory's content with eza when completing cd (include hidden files)
+      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
+      # custom fzf flags - use tab for cycling, ctrl-space for accept
+      # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
+      zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
+      # To make fzf-tab follow FZF_DEFAULT_OPTS.
+      # NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
+      zstyle ':fzf-tab:*' use-fzf-default-opts yes
+      # switch group using `<` and `>`
+      zstyle ':fzf-tab:*' switch-group '<' '>'
+      # use tmux floating pane
+      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+      # configure popup size to prevent small menus
+      zstyle ':fzf-tab:*' popup-min-size 65 12
+      zstyle ':fzf-tab:*' popup-pad 8 3
+
+      FPATH="$HOME/.docker/completions:$FPATH"
+      autoload -Uz compinit
+      compinit
+    '';
 
     # Custom autoloadable functions
     siteFunctions = {
@@ -409,61 +457,9 @@
     initContent = ''
       [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 
-      # set emacs keybindings, otherwise zsh uses $EDITOR keybindings
-      bindkey -e
-
       source $XDG_CONFIG_HOME/bash/secrets
 
-      # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
-      # disable sort when completing `git checkout`
-      zstyle ':completion:*:git-checkout:*' sort false
-      # set descriptions format to enable group support
-      # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
-      zstyle ':completion:*:descriptions' format '[%d]'
-      # set list-colors to enable filename colorizing
-      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-      zstyle ':completion:*' menu no
-      # include hidden files in completion
-      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
-      # configure cd completion to show directory stack when using cd -
-      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
-      # case insensitive completion
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
-      # enable glob_dots to include hidden files in glob patterns
-      setopt glob_dots
-      # navigation improvements
-      setopt auto_cd              # cd by typing directory name if it's not a command
-      setopt auto_pushd           # automatically push directories to stack
-      # history improvements
-      setopt hist_ignore_dups     # don't record consecutive duplicate commands
-      setopt hist_ignore_space    # don't record commands starting with space
-      # advanced features
-      setopt extended_glob        # enable advanced globbing: ^, ~, #, ##, (...)
-      setopt complete_in_word     # complete from cursor position, not just end
-      # preview directory's content with eza when completing cd (include hidden files)
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
-      # custom fzf flags - use tab for cycling, ctrl-space for accept
-      # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
-      zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
-      # To make fzf-tab follow FZF_DEFAULT_OPTS.
-      # NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
-      zstyle ':fzf-tab:*' use-fzf-default-opts yes
-      # switch group using `<` and `>`
-      zstyle ':fzf-tab:*' switch-group '<' '>'
-      # use tmux floating pane
-      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-      # configure popup size to prevent small menus
-      zstyle ':fzf-tab:*' popup-min-size 65 12
-      zstyle ':fzf-tab:*' popup-pad 8 3
-
-      # Completions
-      eval "$(starship init zsh)"
       source <(fzf --zsh)
-
-      FPATH="$HOME/.docker/completions:$FPATH"
-      autoload -Uz compinit
-      compinit
     '';
 
     oh-my-zsh = {
