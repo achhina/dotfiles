@@ -31,6 +31,29 @@
       };
   };
 
+  # Docker CLI configuration with credential helper
+  programs.docker-cli = {
+    enable = true;
+    settings = {
+      # Use macOS Keychain for secure credential storage
+      credsStore = "osxkeychain";
+      # Preserve other existing settings
+      currentContext = "desktop-linux";
+      plugins = {
+        debug = {
+          hooks = "exec";
+        };
+        scout = {
+          hooks = "pull,buildx build";
+        };
+      };
+      features = {
+        hooks = "true";
+      };
+      experimental = "disabled";
+    };
+  };
+
   # Starship prompt configuration
   programs.starship = {
     enable = true;
@@ -467,7 +490,6 @@
         "zsh-syntax-highlighting"
         "zsh-autosuggestions"
         "fzf-tab"
-        "docker"
       ];
       theme = "";
       custom = config.home.homeDirectory + "/.oh-my-zsh/custom";

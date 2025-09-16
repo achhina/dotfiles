@@ -95,6 +95,7 @@ let
     yaml-language-server             # YAML LSP
     dockerfile-language-server       # Docker LSP
     taplo                            # TOML LSP
+    docker-credential-helpers        # Docker credential helpers
     vscode-langservers-extracted     # HTML/CSS/JSON LSP
   ];
 
