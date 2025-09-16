@@ -31,6 +31,13 @@
       };
   };
 
+  # Docker CLI configuration
+  programs.docker-cli = {
+    enable = true;
+    # Let Docker handle config file management to preserve auth data
+    enableCompletions = true;
+  };
+
   # Starship prompt configuration
   programs.starship = {
     enable = true;
@@ -286,7 +293,6 @@
       zstyle ':fzf-tab:*' popup-min-size 65 12
       zstyle ':fzf-tab:*' popup-pad 8 3
 
-      FPATH="$HOME/.docker/completions:$FPATH"
       autoload -Uz compinit
       compinit
     '';
