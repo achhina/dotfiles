@@ -34,24 +34,7 @@
   # Docker CLI configuration with credential helper
   programs.docker-cli = {
     enable = true;
-    settings = {
-      # Use macOS Keychain for secure credential storage
-      credsStore = "osxkeychain";
-      # Preserve other existing settings
-      currentContext = "desktop-linux";
-      plugins = {
-        debug = {
-          hooks = "exec";
-        };
-        scout = {
-          hooks = "pull,buildx build";
-        };
-      };
-      features = {
-        hooks = "true";
-      };
-      experimental = "disabled";
-    };
+    # Only provide completions, let Docker manage its own config
   };
 
   # Starship prompt configuration
