@@ -31,13 +31,6 @@
       };
   };
 
-  # Docker CLI configuration
-  programs.docker-cli = {
-    enable = true;
-    # Let Docker handle config file management to preserve auth data
-    enableCompletions = true;
-  };
-
   # Starship prompt configuration
   programs.starship = {
     enable = true;
@@ -474,6 +467,7 @@
         "zsh-syntax-highlighting"
         "zsh-autosuggestions"
         "fzf-tab"
+        "docker"
       ];
       theme = "";
       custom = config.home.homeDirectory + "/.oh-my-zsh/custom";
