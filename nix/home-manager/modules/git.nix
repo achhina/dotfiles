@@ -37,7 +37,7 @@
         navigate = true; # use n and N to move between diff sections
         line-numbers = true;
         side-by-side = true;
-        syntax-theme = "gruvbox-dark";
+        syntax-theme = "TwoDark";
         features = "decorations";
         hyperlinks = true; # Enable clickable hyperlinks
         decorations = {

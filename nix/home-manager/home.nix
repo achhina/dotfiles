@@ -14,6 +14,8 @@ in
     ./modules/git.nix
     ./modules/shell.nix
     ./modules/fzf.nix
+    ./modules/bat.nix
+    ./modules/eza.nix
     ./modules/aerospace.nix
     ./modules/tmux.nix
     ./modules/tridactyl.nix

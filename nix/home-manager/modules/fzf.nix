@@ -13,7 +13,7 @@
       "--layout=reverse"
       "--border"
       "--inline-info"
-      "--preview-window=right:50%:hidden"
+      "--preview-window=right:50%"
       "--bind=ctrl-/:toggle-preview"
     ];
 
@@ -21,14 +21,12 @@
     fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
     fileWidgetOptions = [
       "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-      "--preview-window=right:50%"
     ];
 
     # Directory widget (ALT-C) with tree preview
     changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
     changeDirWidgetOptions = [
       "--preview 'eza --tree --level=2 --color=always {}'"
-      "--preview-window=right:50%"
     ];
 
     # History widget (CTRL-R) improvements
