@@ -32,6 +32,7 @@ tmux/plugins/**
 **secret**
 
 # Artifacts
+.DS_Store
 .ruff_cache/
 zsh/zsh-autocomplete
 
@@ -40,6 +41,8 @@ direnv/lib/hm-nix-direnv.sh
 github-copilot/apps.json
 starship.toml
 aerospace/
+bat/
+borders/
 git/
 gh/
 gh-copilot/
@@ -47,6 +50,7 @@ github-copilot/
 gh-dash/
 ghostty/
 jupyter/
+ripgrep/
 tmux/
 tmuxinator/
 tridactyl/
