@@ -144,7 +144,7 @@ in
       set-option -g renumber-windows on
 
       # Update environment variables when attaching to sessions
-      set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH"
+      set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH LANG LC_ALL LC_CTYPE"
 
       # Override ~/.tmux/plugins
       setenv -g TMUX_PLUGIN_MANAGER_PATH "$XDG_CONFIG_HOME/tmux/plugins/"

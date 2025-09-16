@@ -55,6 +55,10 @@ in
     XDG_DATA_HOME = "${config.home.homeDirectory}/.local/share";
     IPYTHONDIR = "${config.home.homeDirectory}/.config/ipython";
     JUPYTER_CONFIG_PATH = "${config.home.homeDirectory}/.config/jupyter";
+
+    # Set locale if not already defined by system
+    LANG = "en_CA.UTF-8";
+    LC_CTYPE = "en_CA.UTF-8";
   };
 
   # Configure Nix settings
