@@ -43,34 +43,9 @@
     };
   };
 
-  # Docker CLI configuration with credential helper
-  programs.docker-cli = {
-    enable = true;
-    settings = {
-      # Use macOS Keychain for secure credential storage
-      credsStore = "osxkeychain";
-      # Use default context for macOS
-      currentContext = "default";
-      plugins = {
-        debug = {
-          hooks = "exec";
-        };
-        scout = {
-          hooks = "pull,buildx build";
-        };
-      };
-      features = {
-        hooks = "true";
-      };
-      experimental = "disabled";
-      # Docker will manage auth entries dynamically
-      auths = {
-        "https://index.docker.io/v1/" = {};
-        "https://index.docker.io/v1/access-token" = {};
-        "https://index.docker.io/v1/refresh-token" = {};
-      };
-    };
-  };
+  # Docker CLI - let Docker Desktop manage config.json
+  # programs.docker-cli disabled to prevent cross-device link errors
+  # Docker Desktop will manage ~/.docker/config.json directly
 
   # Starship prompt configuration
   programs.starship = {
