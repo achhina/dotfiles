@@ -122,6 +122,60 @@ in
     executable = true;
   };
 
+  xdg.configFile."tmux/scripts/battery.sh" = {
+    text = ''
+      #!/bin/bash
+      # Cross-platform battery status using upower with macOS fallback
+
+      get_battery_info() {
+          if command -v upower >/dev/null 2>&1; then
+              # Use upower if available (Linux and some other systems)
+              battery_path=$(upower -e | grep -i 'BAT\|battery' | head -1)
+              if [[ -n "$battery_path" ]]; then
+                  battery_info=$(upower -i "$battery_path" 2>/dev/null)
+                  percentage=$(echo "$battery_info" | grep percentage | awk '{print $2}')
+                  state=$(echo "$battery_info" | grep state | awk '{print $2}')
+
+                  if [[ -n "$percentage" ]]; then
+                      if [[ "$state" == "charging" ]]; then
+                          echo "⚡ $percentage"
+                      elif [[ "$state" == "fully-charged" ]]; then
+                          echo "🔋 $percentage"
+                      else
+                          echo "🔋 $percentage"
+                      fi
+                      return 0
+                  fi
+              fi
+          fi
+
+          # macOS fallback using pmset
+          if [[ "$OSTYPE" == "darwin"* ]] && command -v pmset >/dev/null 2>&1; then
+              battery_info=$(pmset -g batt 2>/dev/null)
+              if [[ $? -eq 0 ]] && echo "$battery_info" | grep -q "InternalBattery"; then
+                  percentage=$(echo "$battery_info" | grep -o '[0-9]*%' | head -1)
+                  if echo "$battery_info" | grep -q "AC Power\|charging"; then
+                      echo "⚡ $percentage"
+                  else
+                      echo "🔋 $percentage"
+                  fi
+                  return 0
+              fi
+          fi
+
+          # Fallback for systems without battery
+          if [[ -n "$SSH_CONNECTION" ]]; then
+              echo "🖥️ $(hostname -s)"
+          else
+              echo "🖥️ Desktop"
+          fi
+      }
+
+      get_battery_info
+    '';
+    executable = true;
+  };
+
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
@@ -240,7 +294,7 @@ in
 
       # Build statusline
       set -g status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#{E:@catppuccin_status_date_time}"
+      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]🔋 #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/battery.sh) #[fg=#{@thm_surface_0}]"
 
       # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
