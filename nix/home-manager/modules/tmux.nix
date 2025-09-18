@@ -334,6 +334,9 @@ in
           set -g @batt_icon_status_discharging '󰁹'
           set -g @batt_icon_status_attached '󰚥'
           set -g @batt_icon_status_unknown '󰂑'
+
+          # Initialize the battery plugin
+          run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
         '';
       }
     ];
