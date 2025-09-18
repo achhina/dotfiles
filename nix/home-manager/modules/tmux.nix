@@ -150,6 +150,9 @@ in
       # Override ~/.tmux/plugins
       setenv -g TMUX_PLUGIN_MANAGER_PATH "$XDG_CONFIG_HOME/tmux/plugins/"
 
+      # Initialize battery plugin early (before statusline setup)
+      run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
+
       # visual mode with v
       bind-key -T copy-mode-vi v send-keys -X begin-selection
 
@@ -334,9 +337,6 @@ in
           set -g @batt_icon_status_discharging '󰁹'
           set -g @batt_icon_status_attached '󰚥'
           set -g @batt_icon_status_unknown '󰂑'
-
-          # Initialize the battery plugin
-          run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
         '';
       }
     ];
