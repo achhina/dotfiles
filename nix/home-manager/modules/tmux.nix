@@ -241,7 +241,7 @@ in
 
       # Build statusline
       set -g status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]#{battery_icon} #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#{battery_percentage} #[fg=#{@thm_surface_0}]"
+      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]#{battery_icon_status} #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#{battery_percentage} #[fg=#{@thm_surface_0}]"
 
       # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
