@@ -55,10 +55,6 @@ let
     pre-commit             # Git pre-commit hooks
   ];
 
-  # Linux-specific power management tools
-  linuxPowerTools = with pkgs; [
-    upower                 # Power management info (battery status)
-  ];
 
   # Modern CLI alternatives to traditional Unix tools
   modernCLI = with pkgs; [
@@ -175,8 +171,7 @@ let
     firefox              # Web browser
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
-  ]
-  ++ linuxPowerTools;
+  ];
 in
 {
   home.packages =
