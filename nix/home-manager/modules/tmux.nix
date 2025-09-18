@@ -137,13 +137,7 @@ in
                   state=$(echo "$battery_info" | grep state | awk '{print $2}')
 
                   if [[ -n "$percentage" ]]; then
-                      if [[ "$state" == "charging" ]]; then
-                          echo "󰂄 $percentage"
-                      elif [[ "$state" == "fully-charged" ]]; then
-                          echo "󰁹 $percentage"
-                      else
-                          echo "󰁹 $percentage"
-                      fi
+                      echo "$percentage"
                       return 0
                   fi
               fi
@@ -154,20 +148,16 @@ in
               battery_info=$(pmset -g batt 2>/dev/null)
               if [[ $? -eq 0 ]] && echo "$battery_info" | grep -q "InternalBattery"; then
                   percentage=$(echo "$battery_info" | grep -o '[0-9]*%' | head -1)
-                  if echo "$battery_info" | grep -q "AC Power\|charging"; then
-                      echo "󰂄 $percentage"
-                  else
-                      echo "󰁹 $percentage"
-                  fi
+                  echo "$percentage"
                   return 0
               fi
           fi
 
           # Fallback for systems without battery
           if [[ -n "$SSH_CONNECTION" ]]; then
-              echo "󰒋 $(hostname -s)"
+              echo "$(hostname -s)"
           else
-              echo "󰒋 Desktop"
+              echo "Desktop"
           fi
       }
 
@@ -294,7 +284,7 @@ in
 
       # Build statusline
       set -g status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}] #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/battery.sh) #[fg=#{@thm_surface_0}]"
+      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]󰁹 #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/battery.sh) #[fg=#{@thm_surface_0}]"
 
       # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
