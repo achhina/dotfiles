@@ -150,6 +150,12 @@ in
       # Override ~/.tmux/plugins
       setenv -g TMUX_PLUGIN_MANAGER_PATH "$XDG_CONFIG_HOME/tmux/plugins/"
 
+      # Improve plugin reliability and performance
+      set -g status-interval 2
+      set -g status-right-length 150
+
+
+
 
       # visual mode with v
       bind-key -T copy-mode-vi v send-keys -X begin-selection
@@ -229,7 +235,6 @@ in
       bind s choose-tree -Zs -O time -f '#{?pane_format,#{pane_current_command},#{?window_format,#{window_name},#{session_name}}}'
 
       # Configure statusline after catppuccin is loaded
-      set -g status-right-length 150
       set -g status-left-length 150
 
       # Configure statusline using proper catppuccin modules
@@ -240,14 +245,12 @@ in
       set -ag status-left "#[fg=#{@thm_teal}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_teal}]󰖩 #[fg=#{@thm_teal},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/network.sh) #[fg=#{@thm_surface_0}]"
 
 
-      # Build statusline
-      set -g status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]#{battery_icon_status} #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#{battery_percentage} #[fg=#{@thm_surface_0}]"
 
       # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
       set -g window-status-format "#[fg=#11111b,bg=#{@thm_overlay_2}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
       set -g window-status-current-format "#[fg=#11111b,bg=#{@thm_mauve}]#[fg=#181825,reverse]#[none] #I:#W #[fg=#181825,reverse]#[none]"
+
     '';
 
     plugins = with pkgs.tmuxPlugins; [
@@ -301,17 +304,19 @@ in
           set -g @cpu_high_fg_color "#{@thm_red}"
         '';
       }
+      # Functional plugins (after theme, before session management)
       {
-        plugin = resurrect;
+        plugin = pkgs.tmuxPlugins.battery;
         extraConfig = ''
-          set -g @resurrect-processes '"~nvim->nvim" "~claude->claude -c"'
-          set -g @resurrect-capture-pane-contents 'on'
-        '';
-      }
-      {
-        plugin = continuum;
-        extraConfig = ''
-          set -g @continuum-restore 'on'
+          # tmux-battery configuration with nerd font icons
+          set -g @batt_icon_status_charging '󰂄'
+          set -g @batt_icon_status_discharging '󰁹'
+          set -g @batt_icon_status_attached '󰚥'
+          set -g @batt_icon_status_unknown '󰂑'
+
+          # Set status-right with battery variables BEFORE plugin runs so it can interpolate them
+          set -g status-right "#{E:@catppuccin_status_cpu}"
+          set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]#{battery_icon_status} #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#{battery_percentage} #[fg=#{@thm_surface_0}]"
         '';
       }
       {
@@ -327,14 +332,18 @@ in
           set -g @fingers-key f
         '';
       }
+      # Session management plugins (last)
       {
-        plugin = pkgs.tmuxPlugins.battery;
+        plugin = resurrect;
         extraConfig = ''
-          # tmux-battery configuration with nerd font icons
-          set -g @batt_icon_status_charging '󰂄'
-          set -g @batt_icon_status_discharging '󰁹'
-          set -g @batt_icon_status_attached '󰚥'
-          set -g @batt_icon_status_unknown '󰂑'
+          set -g @resurrect-processes '"~nvim->nvim" "~claude->claude -c"'
+          set -g @resurrect-capture-pane-contents 'on'
+        '';
+      }
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
         '';
       }
     ];
