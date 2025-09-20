@@ -13,6 +13,7 @@ NC='\033[0m' # No Color
 STASH_NAME="update-script-$(date +%s)"
 STASHED=false
 PREVIEW_MODE=false
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -60,7 +61,7 @@ cleanup_on_error() {
 
   if [ "$STASHED" = true ]; then
     log_info "Restoring stashed changes..."
-    git stash pop "stash@{0}" 2>/dev/null || log_warning "Could not restore stash automatically. Check 'git stash list'"
+    git -C "$CONFIG_HOME" stash pop "stash@{0}" 2>/dev/null || log_warning "Could not restore stash automatically. Check 'git stash list'"
   fi
 
   log_info "If you need to rollback, use: home-manager generations"
@@ -71,19 +72,17 @@ cleanup_on_error() {
 trap cleanup_on_error ERR
 
 check_git_repo() {
-  cd "$HOME/.config"
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if ! git -C "$CONFIG_HOME" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     log_error "Config directory is not a git repository"
     exit 1
   fi
 }
 
 stash_changes() {
-  cd "$HOME/.config"
   # Check if there are any changes to stash
-  if ! git diff-index --quiet HEAD -- 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+  if ! git -C "$CONFIG_HOME" diff-index --quiet HEAD -- 2>/dev/null || [ -n "$(git -C "$CONFIG_HOME" ls-files --others --exclude-standard)" ]; then
     log_info "Stashing current changes..."
-    git stash push -u -m "$STASH_NAME" >/dev/null
+    git -C "$CONFIG_HOME" stash push -u -m "$STASH_NAME" >/dev/null
     STASHED=true
     log_success "Changes stashed successfully"
   else
@@ -93,9 +92,8 @@ stash_changes() {
 
 restore_stash() {
   if [ "$STASHED" = true ]; then
-    cd "$HOME/.config"
     log_info "Restoring stashed changes..."
-    if git stash pop "stash@{0}" >/dev/null 2>&1; then
+    if git -C "$CONFIG_HOME" stash pop "stash@{0}" >/dev/null 2>&1; then
       log_success "Stashed changes restored successfully"
     else
       log_warning "Could not restore stash automatically - there may be conflicts"
@@ -105,10 +103,8 @@ restore_stash() {
 }
 
 commit_flake_lock() {
-  cd "$HOME/.config/nix"
-
   # Check if flake.lock actually changed
-  if git diff-index --quiet HEAD -- flake.lock 2>/dev/null; then
+  if git -C "$CONFIG_HOME" diff-index --quiet HEAD -- nix/flake.lock 2>/dev/null; then
     log_info "No changes to flake.lock - skipping commit"
     return 0
   fi
@@ -120,9 +116,9 @@ commit_flake_lock() {
   update_summary=$(generate_update_summary)
 
   log_info "Committing flake.lock updates..."
-  git add flake.lock
+  git -C "$CONFIG_HOME" add nix/flake.lock
 
-  git commit -m "Update flake inputs
+  git -C "$CONFIG_HOME" commit -m "Update flake inputs
 
 $update_summary
 
@@ -168,9 +164,8 @@ get_package_version_changes() {
 }
 
 get_flake_input_summary() {
-  cd "$HOME/.config/nix"
   local lock_diff
-  lock_diff=$(git diff HEAD~1 flake.lock 2>/dev/null || echo "")
+  lock_diff=$(git -C "$CONFIG_HOME" diff HEAD~1 nix/flake.lock 2>/dev/null || echo "")
 
   if [ -z "$lock_diff" ]; then
     return
@@ -195,15 +190,15 @@ preview_updates() {
 
   # Show what would be updated in flake inputs
   echo -e "${CYAN}📋 Checking for flake input updates:${NC}"
-  nix flake update --dry-run ~/.config/nix 2>/dev/null || {
+  nix flake update --dry-run "$CONFIG_HOME/nix" 2>/dev/null || {
     log_info "Running flake update check..."
     # Create a temporary copy to check what would change
     temp_dir=$(mktemp -d)
-    cp -r ~/.config/nix "$temp_dir/"
+    cp -r "$CONFIG_HOME/nix" "$temp_dir/"
     cd "$temp_dir/nix"
     nix flake update 2>/dev/null || true
 
-    if ! diff -q ~/.config/nix/flake.lock "$temp_dir/nix/flake.lock" >/dev/null 2>&1; then
+    if ! diff -q "$CONFIG_HOME/nix/flake.lock" "$temp_dir/nix/flake.lock" >/dev/null 2>&1; then
       echo -e "${YELLOW}📦 Updates available for flake inputs${NC}"
 
       # Show detailed diff
@@ -221,14 +216,14 @@ preview_updates() {
 
   echo -e "${CYAN}📋 Current system status:${NC}"
   echo "  • Current generation: $(home-manager generations | head -1 | awk '{print $1}' | sed 's/id-//')"
-  echo "  • Configuration path: ~/.config/nix"
+  echo "  • Configuration path: $CONFIG_HOME/nix"
 
   log_info "Preview completed. Use 'update' without --preview to apply changes."
 }
 
 get_flake_input_preview() {
   local new_lock_file="$1"
-  local old_lock_file="$HOME/.config/nix/flake.lock"
+  local old_lock_file="$CONFIG_HOME/nix/flake.lock"
 
   if [ ! -f "$new_lock_file" ] || [ ! -f "$old_lock_file" ]; then
     return
@@ -263,11 +258,10 @@ main() {
 
   # Update flake inputs
   log_info "Updating flake inputs..."
-  run_cmd nix flake update --flake ~/.config/nix
+  run_cmd nix flake update --flake "$CONFIG_HOME/nix"
 
   # Commit flake.lock changes if any
-  cd "$HOME/.config"
-  if ! git diff-index --quiet HEAD -- nix/flake.lock 2>/dev/null; then
+  if ! git -C "$CONFIG_HOME" diff-index --quiet HEAD -- nix/flake.lock 2>/dev/null; then
     commit_flake_lock
   else
     log_info "No flake.lock changes - inputs are already up to date"
@@ -275,7 +269,20 @@ main() {
 
   # Always apply home-manager configuration to ensure system is up to date
   log_info "Applying home-manager configuration..."
-  run_cmd home-manager switch --flake ~/.config/nix
+  run_cmd home-manager switch --flake "$CONFIG_HOME/nix"
+
+  # Source tmux configuration if tmux is running
+  if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+    log_info "Sourcing tmux configuration..."
+    if [ -f "$CONFIG_HOME/tmux/tmux.conf" ]; then
+      run_cmd tmux source-file "$CONFIG_HOME/tmux/tmux.conf"
+      log_success "Tmux configuration sourced successfully"
+    else
+      log_warning "Tmux configuration file not found at $CONFIG_HOME/tmux/tmux.conf"
+    fi
+  else
+    log_info "Tmux is not running or not available - skipping tmux config sourcing"
+  fi
 
   # Restore any stashed changes
   restore_stash
