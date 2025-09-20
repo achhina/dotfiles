@@ -195,8 +195,7 @@ preview_updates() {
     # Create a temporary copy to check what would change
     temp_dir=$(mktemp -d)
     cp -r "$CONFIG_HOME/nix" "$temp_dir/"
-    cd "$temp_dir/nix"
-    nix flake update 2>/dev/null || true
+    nix flake update --flake "$temp_dir/nix" 2>/dev/null || true
 
     if ! diff -q "$CONFIG_HOME/nix/flake.lock" "$temp_dir/nix/flake.lock" >/dev/null 2>&1; then
       echo -e "${YELLOW}📦 Updates available for flake inputs${NC}"
