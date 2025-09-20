@@ -150,7 +150,13 @@ in
       # Override ~/.tmux/plugins
       setenv -g TMUX_PLUGIN_MANAGER_PATH "$XDG_CONFIG_HOME/tmux/plugins/"
 
-      # Initialize battery plugin early (before statusline setup)
+      # Configure battery plugin options BEFORE initialization
+      set -g @batt_icon_status_charging '󰂄'
+      set -g @batt_icon_status_discharging '󰁹'
+      set -g @batt_icon_status_attached '󰚥'
+      set -g @batt_icon_status_unknown '󰂑'
+
+      # Initialize battery plugin (after options are set)
       run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
 
       # visual mode with v
@@ -327,16 +333,6 @@ in
         extraConfig = ''
           # tmux-fingers configuration
           set -g @fingers-key f
-        '';
-      }
-      {
-        plugin = pkgs.tmuxPlugins.battery;
-        extraConfig = ''
-          # tmux-battery configuration with nerd font icons
-          set -g @batt_icon_status_charging '󰂄'
-          set -g @batt_icon_status_discharging '󰁹'
-          set -g @batt_icon_status_attached '󰚥'
-          set -g @batt_icon_status_unknown '󰂑'
         '';
       }
     ];
