@@ -500,6 +500,10 @@
       fd = "fd --hyperlink";
       fdf = "fd --type f --hyperlink";
       fdd = "fd --type d --hyperlink";
+
+      # Mermaid CLI with dynamic Chrome path
+      mmdc = "PUPPETEER_EXECUTABLE_PATH=\"$(find $HOME/.cache/puppeteer/chrome-headless-shell -name 'chrome-headless-shell' -type f 2>/dev/null | head -1)\" command mmdc";
+
       t = "tmux";
       ta = "tmux attach || tmux new-session";
 

@@ -6,7 +6,6 @@ return {
 	},
 	priority = 1000,
 	lazy = false,
-	---@type snacks.Config
 	config = function(_, opts)
 		-- Store original vim.notify before Snacks.setup() replaces it
 		local original_vim_notify = vim.notify
@@ -16,6 +15,7 @@ return {
 
 		-- Override the notifier to call both original and Snacks
 		if opts.notifier and opts.notifier.enabled then
+			---@diagnostic disable-next-line: duplicate-set-field
 			vim.notify = function(msg, level, o)
 				-- Call original vim.notify (writes to :messages)
 				original_vim_notify(msg, level, o)
@@ -24,6 +24,7 @@ return {
 			end
 		end
 	end,
+	---@type snacks.Config
 	opts = {
 		-- Enable most snacks modules for comprehensive functionality
 		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
@@ -241,21 +242,21 @@ return {
 			mode = "t",
 		},
 
-		-- Window management
-		{
-			"<leader>wm",
-			function()
-				Snacks.win.maximize()
-			end,
-			desc = "Maximize Window",
-		},
-		{
-			"<leader>wr",
-			function()
-				Snacks.win.restore()
-			end,
-			desc = "Restore Window",
-		},
+		-- Window management (commented out - methods not available in current Snacks version)
+		-- {
+		-- 	"<leader>wm",
+		-- 	function()
+		-- 		Snacks.win.maximize()
+		-- 	end,
+		-- 	desc = "Maximize Window",
+		-- },
+		-- {
+		-- 	"<leader>wr",
+		-- 	function()
+		-- 		Snacks.win.restore()
+		-- 	end,
+		-- 	desc = "Restore Window",
+		-- },
 
 		-- Word highlighting
 		{
