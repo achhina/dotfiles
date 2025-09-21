@@ -13,6 +13,7 @@ NC='\033[0m' # No Color
 STASH_NAME="update-script-$(date +%s)"
 STASHED=false
 PREVIEW_MODE=false
+CLEANUP_MODE=false
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 # Parse command line arguments
@@ -22,10 +23,15 @@ for arg in "$@"; do
       PREVIEW_MODE=true
       shift
       ;;
+    --cleanup|-c)
+      CLEANUP_MODE=true
+      shift
+      ;;
     --help|-h)
       echo "Usage: $0 [options]"
       echo "Options:"
       echo "  --preview, -p    Show what would be updated without applying changes"
+      echo "  --cleanup, -c    Also expire old generations and run garbage collection"
       echo "  --help, -h       Show this help message"
       exit 0
       ;;
@@ -285,6 +291,21 @@ main() {
 
   # Restore any stashed changes
   restore_stash
+
+  # Run cleanup if requested
+  if [ "$CLEANUP_MODE" = true ]; then
+    log_info "Running cleanup: expiring old generations and collecting garbage..."
+
+    # Expire old home-manager generations (older than 1 minute)
+    log_info "Expiring old home-manager generations..."
+    run_cmd home-manager expire-generations '-1 minute'
+
+    # Run Nix garbage collection
+    log_info "Running Nix garbage collection..."
+    run_cmd nix-collect-garbage
+
+    log_success "Cleanup completed successfully!"
+  fi
 
   log_success "System update completed successfully!"
 }
