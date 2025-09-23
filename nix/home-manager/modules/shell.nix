@@ -13,22 +13,21 @@
     enable = true;
     package = null; # Don't install ghostty, just manage config
 
-    settings =
-      {
-        # Theme and font settings
-        theme = "catppuccin-mocha";
-        font-family = "FiraCode Nerd Font Mono";
+    settings = {
+      # Theme and font settings
+      theme = "Catppuccin Mocha";
+      font-family = "FiraCode Nerd Font Mono";
 
-        # Compromise, because when left on it's harder to autoupdate OS.
-        confirm-close-surface = false;
-      }
-      // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
-        # MacOS settings
-        macos-option-as-alt = true;
-        macos-titlebar-style = "hidden";
-        macos-icon = "chalkboard";
-        macos-auto-secure-input = true;
-      };
+      # Compromise, because when left on it's harder to autoupdate OS.
+      confirm-close-surface = false;
+    }
+    // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+      # MacOS settings
+      macos-option-as-alt = true;
+      macos-titlebar-style = "hidden";
+      macos-icon = "chalkboard";
+      macos-auto-secure-input = true;
+    };
   };
 
   # JankyBorders service for window borders (macOS only)
@@ -261,12 +260,12 @@
     defaultKeymap = "emacs";
 
     setOptions = [
-      "GLOB_DOTS"           # include hidden files in glob patterns
-      "AUTO_PUSHD"          # automatically push directories to stack
-      "HIST_IGNORE_DUPS"    # don't record consecutive duplicate commands
-      "HIST_IGNORE_SPACE"   # don't record commands starting with space
-      "EXTENDED_GLOB"       # enable advanced globbing: ^, ~, #, ##, (...)
-      "COMPLETE_IN_WORD"    # complete from cursor position, not just end
+      "GLOB_DOTS" # include hidden files in glob patterns
+      "AUTO_PUSHD" # automatically push directories to stack
+      "HIST_IGNORE_DUPS" # don't record consecutive duplicate commands
+      "HIST_IGNORE_SPACE" # don't record commands starting with space
+      "EXTENDED_GLOB" # enable advanced globbing: ^, ~, #, ##, (...)
+      "COMPLETE_IN_WORD" # complete from cursor position, not just end
     ];
 
     completionInit = ''
