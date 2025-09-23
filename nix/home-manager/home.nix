@@ -16,6 +16,7 @@ in
     ./modules/shell.nix
     ./modules/fzf.nix
     ./modules/bat.nix
+    ./modules/btop.nix
     ./modules/eza.nix
     ./modules/ripgrep.nix
     ./modules/aerospace.nix

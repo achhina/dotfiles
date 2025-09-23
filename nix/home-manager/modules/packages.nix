@@ -46,7 +46,6 @@ let
     lazygit                # Terminal UI for Git (for Snacks.lazygit)
     wget                   # File downloader
     htop                   # System monitor
-    btop                   # Modern system monitor
     ncdu                   # Disk usage analyzer
     ifstat-legacy          # Network interface statistics
     bandwhich              # Network utilization by process
