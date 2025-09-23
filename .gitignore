@@ -9,10 +9,10 @@ aichat/sessions/**
 aichat/messages.md
 
 # npm config
-configstore/**
+configstore/
 
 # ipython
-ipython/**
+ipython/
 !ipython/profile_default/ipython_config.py
 
 # iterm2
@@ -20,10 +20,10 @@ iterm2/AppSupport
 iterm2/sockets/**
 
 # htop - meh not married to any settings
-htop/**
+htop/
 
 # tmux
-tmux/plugins/**
+tmux/plugins/
 
 # Backups
 /backup
