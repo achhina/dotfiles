@@ -37,7 +37,6 @@ tmux/plugins/**
 zsh/zsh-autocomplete
 
 # Home Manager generated files and symlinks
-direnv/lib/hm-nix-direnv.sh
 direnv/
 github-copilot/apps.json
 starship.toml
