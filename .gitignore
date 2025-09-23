@@ -43,6 +43,7 @@ starship.toml
 aerospace/
 bat/
 borders/
+btop/
 git/
 gh/
 gh-copilot/
