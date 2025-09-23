@@ -472,7 +472,7 @@
     initContent = ''
       [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 
-      source $XDG_CONFIG_HOME/bash/secrets
+      source $XDG_CONFIG_HOME/secrets/.secrets
     '';
 
     oh-my-zsh = {
