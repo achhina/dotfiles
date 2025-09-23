@@ -16,8 +16,7 @@ ipython/
 !ipython/profile_default/ipython_config.py
 
 # iterm2
-iterm2/AppSupport
-iterm2/sockets/**
+iterm2/
 
 # htop - meh not married to any settings
 htop/
