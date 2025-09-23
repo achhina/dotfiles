@@ -18,6 +18,10 @@
       theme = "Catppuccin Mocha";
       font-family = "FiraCode Nerd Font Mono";
 
+      # SSH improvements
+      ssh-env = true;
+      ssh-terminfo = true;
+
       # Compromise, because when left on it's harder to autoupdate OS.
       confirm-close-surface = false;
     }
