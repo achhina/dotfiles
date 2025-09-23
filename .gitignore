@@ -56,7 +56,7 @@ tmux/
 tmuxinator/
 tridactyl/
 nix/nix.conf
-result/
+result
 /home-manager/
 
 # qBittorrent
