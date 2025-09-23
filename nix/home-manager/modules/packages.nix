@@ -171,6 +171,7 @@ let
     firefox              # Web browser
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
+    isd                  # TUI to interactively work with systemd units
   ];
 in
 {

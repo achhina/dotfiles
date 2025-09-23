@@ -31,8 +31,8 @@
       };
   };
 
-  # JankyBorders service for window borders
-  services.jankyborders = {
+  # JankyBorders service for window borders (macOS only)
+  services.jankyborders = pkgs.lib.mkIf pkgs.stdenv.isDarwin {
     enable = true;
     settings = {
       style = "round";
