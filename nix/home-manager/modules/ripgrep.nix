@@ -11,17 +11,16 @@
       # Follow symbolic links
       "--follow"
 
-      # Show line numbers
-      "--line-number"
 
-      # Show column numbers
-      "--column"
 
       # Compact output with no heading and filename on each line
       "--no-heading"
 
       # Show colors in output
       "--color=always"
+
+      # Enable clickable hyperlinks
+      "--hyperlink-format=default"
 
       # Custom colors matching terminal theme
       "--colors=line:fg:yellow"
