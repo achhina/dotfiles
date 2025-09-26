@@ -133,6 +133,9 @@
       pom = "push origin main";
       puma = "pull upstream main";
       fetch-all = "fetch --all --prune";
+
+      # PR workflow
+      pr = "!f() { base=\${1:-origin/main}; git diff $base...HEAD; }; f";
     };
 
     # Global ignore patterns
