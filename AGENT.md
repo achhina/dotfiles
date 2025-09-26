@@ -8,7 +8,9 @@ This repository treats the entire development environment as a unified, version-
 
 - **Total Declarative Control.** The environment is defined as code. **Nix and Home Manager** serve as the single source of truth, ensuring that the system is **bit-for-bit reproducible**. The `flake.nix` is the main entry point, and the goal is to eliminate all manual setup.
 
-- **Structured by Function.** The configuration is organized into **logical tiers** based on their function and stability, not just by tool name. This separates the foundational **Declarative Core** (`nix/`) from the frequently-tweaked **Interactive Environment** (`nvim/`). When looking to update a configuration ALWAYS check `nix/` FIRST for any declarative configuration before checking the application configuration directories and files.
+- **Structured by Function.** The configuration is organized into **logical tiers** based on their function and stability, not just by tool name. This separates the foundational **Declarative Core** (`${XDG_CONFIG_HOME:-$HOME/.config}/nix/`) from the frequently-tweaked **Interactive Environment** (`${XDG_CONFIG_HOME:-$HOME/.config}/nvim/`). When looking to update a configuration ALWAYS check `${XDG_CONFIG_HOME:-$HOME/.config}/nix/` FIRST for any declarative configuration before checking the application configuration directories and files.
+
+- **Declarative First.** Most configurations are declaratively managed through Home Manager modules in `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/`. **NEVER modify generated config files directly** (they often appear as symlinks to `/nix/store/`). Instead, look for the corresponding Home Manager module first. If no module exists, ask if one should be created rather than editing application config files directly.
 
 - **Engineered for Portability.** The use of Nix, conditional logic (`pkgs.stdenv.isDarwin`), and a focus on cross-platform tools ensures the environment is **portable across macOS and Linux** on different architectures.
 
@@ -21,25 +23,25 @@ This is the primary, system-level package manager and the single source of truth
 
 - **Role:** To declaratively manage and install system-level packages, applications, and even other package managers.
 - **Governing Files:**
-  - `nix/flake.nix`: The entry point that defines all inputs.
-  - `nix/home-manager/modules/packages.nix`: **The master list** of all software managed by Nix.
+  - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.nix`: The entry point that defines all inputs.
+  - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix`: **The master list** of all software managed by Nix.
 - **How to Update:**
     - Run the `update` alias. This will update the Nix flake inputs and apply the new generation.
     - Run the `hm switch` OR `home-manager switch` after EVERY change to a nix module.
-- **How to Debug:** If a package is missing or the wrong version, check `nix/home-manager/modules/packages.nix` and the `nix/flake.lock` file.
+- **How to Debug:** If a package is missing or the wrong version, check `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix` and the `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.lock` file.
 
 ### Tier 2: Application-Specific Managers
 These managers operate within a specific application, handling its internal ecosystem of plugins and extensions. They are installed by Home Manager.
 
 - **Neovim Plugins (`lazy.nvim`):**
   - **Role:** Manages all Neovim plugins.
-  - **Governing Files:** `nvim/lua/plugins/` (for definitions) and `nvim/lazy-lock.json` (for version locking).
+  - **Governing Files:** `${XDG_CONFIG_HOME:-$HOME/.config}/nvim/lua/plugins/` (for definitions) and `${XDG_CONFIG_HOME:-$HOME/.config}/nvim/lazy-lock.json` (for version locking).
   - **How to Update:** Run `:Lazy update` from within Neovim.
   - **How to Debug:** Use `:Lazy` commands within Neovim. Check for errors during startup.
 
 - **Zsh Plugins (`oh-my-zsh`):**
   - **Role:** Manages Zsh plugins.
-  - **Governing File:** `nix/home-manager/modules/shell.nix` (in the `programs.zsh.oh-my-zsh.plugins` section).
+  - **Governing File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/shell.nix` (in the `programs.zsh.oh-my-zsh.plugins` section).
   - **How to Update:** This is managed declaratively by Nix. Updates to the plugins happen when the Nix flake inputs are updated.
 
 ## 3. The Change Workflow: A Strict Protocol
@@ -52,7 +54,7 @@ All modifications to this repository must follow this protocol to ensure changes
 
 **2. Establish a Verifiable Baseline**
 - **Capture the "before" state.** Before making any edits, run commands to prove the current state.
-- *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail). For Neovim, follow the testing standards in `nvim/AGENT.md`.
+- *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail). For Neovim, follow the testing standards in `${XDG_CONFIG_HOME:-$HOME/.config}/nvim/AGENT.md`.
 
 **3. Execute the Idempotent Change**
 - **Modify only the necessary files** for the single planned change.
