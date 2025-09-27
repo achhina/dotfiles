@@ -53,7 +53,6 @@ jupyter/
 ripgrep/
 tmux/
 tmuxinator/
-tridactyl/
 nix/nix.conf
 result
 /home-manager/
