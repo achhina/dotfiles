@@ -112,3 +112,20 @@ man home-configuration.nix | grep -C 10 "modulename"
 
 ### Best Practice:
 Start with `man home-configuration.nix` and search. Only resort to GitHub source when you need to understand implementation details or see complex examples.
+
+## 6. Configuration Management Exceptions
+
+While this repository follows the "Declarative First" principle, some configurations are intentionally tracked in git for specific use cases:
+
+### Tridactyl Configuration Exception
+- **Source File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/files/tridactylrc` (declaratively managed)
+- **Symlink:** `${XDG_CONFIG_HOME:-$HOME/.config}/tridactyl/tridactylrc` (tracked in git)
+- **Rationale:** Tridactyl supports loading configuration from URLs using `:source --url`. By tracking the generated symlink in git, the configuration can be loaded remotely from GitHub:
+  ```
+  :source --url https://raw.githubusercontent.com/user/repo/main/.config/tridactyl/tridactylrc
+  ```
+- **Benefits:**
+  - Remote configuration loading across machines
+  - Easy sharing of tridactyl setups
+  - Version-controlled browser extension configuration
+- **Workflow:** Always edit the source file (`nix/home-manager/files/tridactylrc`), then run `hm switch` to update the symlink that gets committed to git.
