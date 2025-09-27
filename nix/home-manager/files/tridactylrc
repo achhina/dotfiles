@@ -50,8 +50,8 @@ unbind --mode=ex <C-a>
 " Allow Ctrl-c to copy in the commandline
 unbind --mode=ex <C-c>
 
-" Binds for new reader mode
-bind gr reader
+" Binds for new reader mode (changed from gr to gre to avoid conflict with Reddit search)
+bind gre reader
 bind gR reader --tab
 
 " Bind site specific hints
@@ -83,7 +83,10 @@ set scrollduration 300
 " Set search engine keywords
 set searchurls.gh https://www.github.com/%s
 set searchurls.ghi https://www.github.com/%s/issues
-set searchurls.gr https://www.google.com/search?q=site:reddit.com+%s
+
+" Smart Reddit search using jsurl - prepends site:reddit.com to current search query if no args, or searches new term if args provided
+" Works with Google, DuckDuckGo, and Bing - maintains the same search engine host
+set jsurls.gr (query) => { const hostname = window.location.hostname; const searchParams = new URLSearchParams(window.location.search); let baseUrl, currentQuery = ''; if (hostname.includes('google.com')) { baseUrl = 'https://www.google.com/search?q='; currentQuery = searchParams.get('q') || ''; } else if (hostname.includes('duckduckgo.com')) { baseUrl = 'https://duckduckgo.com/?q='; currentQuery = searchParams.get('q') || ''; } else if (hostname.includes('bing.com')) { baseUrl = 'https://www.bing.com/search?q='; currentQuery = searchParams.get('q') || ''; } else { baseUrl = 'https://www.google.com/search?q='; } if (!query || query.trim() === '') { if (currentQuery) { return baseUrl + encodeURIComponent('site:reddit.com ' + currentQuery); } return baseUrl + encodeURIComponent('site:reddit.com'); } else { return baseUrl + encodeURIComponent('site:reddit.com ' + query); } }
 
 " Set sourcegraph queries
 set searchurls.repo https://sourcegraph.com/search?q=%s1:%5E.*blah.*%24+%s2&patternType=regexp&sm=0
