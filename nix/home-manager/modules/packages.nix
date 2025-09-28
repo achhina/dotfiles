@@ -157,6 +157,7 @@ let
     gh-copilot               # AI-powered command suggestions
   ];
 
+
   # macOS-specific packages
   darwinPackages = with pkgs; [
     aerospace            # Tiling window manager for macOS
@@ -171,6 +172,7 @@ let
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
     isd                  # TUI to interactively work with systemd units
+    signal-desktop       # Private messaging app
   ];
 in
 {
