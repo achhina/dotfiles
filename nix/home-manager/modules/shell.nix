@@ -24,6 +24,10 @@
 
       # Compromise, because when left on it's harder to autoupdate OS.
       confirm-close-surface = false;
+
+      # Claude Code shift+enter keybind support
+      # See: https://github.com/anthropics/claude-code/issues/1282
+      keybind = "shift+enter=text:\\x1b\\r";
     }
     // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
       # MacOS settings
