@@ -18,9 +18,8 @@
       theme = "Catppuccin Mocha";
       font-family = "FiraCode Nerd Font Mono";
 
-      # SSH improvements
-      ssh-env = true;
-      ssh-terminfo = true;
+      # SSH improvements (Ghostty 1.2.0+)
+      shell-integration-features = "ssh-env,ssh-terminfo";
 
       # Compromise, because when left on it's harder to autoupdate OS.
       confirm-close-surface = false;
