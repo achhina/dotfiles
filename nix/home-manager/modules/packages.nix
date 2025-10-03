@@ -62,6 +62,7 @@ let
     fd                     # Modern find replacement
     ripgrep                # Fast grep replacement
     fzf                    # Fuzzy finder
+    zoxide                 # Smarter cd command
     tldr                   # Simplified man pages
     jq                     # JSON processor
     delta                  # Enhanced diff viewer
