@@ -8,6 +8,12 @@
     nix-direnv.enable = true;
   };
 
+  # Enable zoxide for smarter directory navigation
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   # Terminal emulator
   programs.ghostty = {
     enable = true;
@@ -316,7 +322,7 @@
     siteFunctions = {
       man = ''
         local MAN="/usr/bin/man"
-        local MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$XDG_HOME/.nix-profile/share/man")
+        local MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$HOME/.nix-profile/share/man")
 
         if [ -n "$1" ]; then
             command "$MAN" "$@"
