@@ -105,7 +105,6 @@ let
 
     # JavaScript/TypeScript
     nodejs                   # Node.js runtime
-    typescript               # TypeScript compiler
     pnpm                     # Fast package manager
     yarn                     # Package manager
 
@@ -122,7 +121,6 @@ let
 
   # Document processing and generation tools
   documentTools = with pkgs; [
-    tectonic                   # LaTeX engine
     mermaid-cli                # Diagram generation
     vhs                        # Terminal recording tool
   ];
