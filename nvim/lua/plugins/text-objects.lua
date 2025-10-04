@@ -1,5 +1,8 @@
 return {
 	-- Enhanced text objects
+	-- Note: which-key will show overlap warnings for 'a' and 'i' in visual/operator modes
+	-- (a/ai/al/an and i/ii/il/in). These are expected - 'a'/'i' wait for textobject char,
+	-- while ai/ii/al/il/an/in are specific treesitter textobjects
 	{
 		"nvim-mini/mini.ai",
 		event = "VeryLazy",
@@ -142,6 +145,8 @@ return {
 	},
 
 	-- Enhanced surround operations
+	-- Note: which-key will show overlap warnings for gs* mappings (gsd/gsdl/gsdn, etc.)
+	-- These are expected - base mapping waits for input, l/n suffixes are for prev/next
 	{
 		"nvim-mini/mini.surround",
 		event = "VeryLazy",

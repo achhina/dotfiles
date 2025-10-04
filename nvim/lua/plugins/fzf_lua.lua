@@ -143,7 +143,7 @@ return {
 		vim.keymap.set("n", "<leader>gc", fzf.git_commits, { desc = "Git Commits" })
 		vim.keymap.set("n", "<leader>gb", fzf.git_branches, { desc = "Git Branches" })
 		vim.keymap.set("n", "<leader>gs", fzf.git_status, { desc = "Git Status" })
-		vim.keymap.set("n", "<leader>gt", fzf.git_stash, { desc = "Git stash" })
+		vim.keymap.set("n", "<leader>gS", fzf.git_stash, { desc = "Git stash" })
 
 		-- LSP pickers
 		vim.keymap.set("n", "<leader>lr", fzf.lsp_references, { desc = "LSP References" })

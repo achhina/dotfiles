@@ -50,7 +50,7 @@ return {
 				desc = "Extract block",
 			},
 			{
-				"<leader>rbf",
+				"<leader>rB",
 				":Refactor extract_block_to_file",
 				mode = "n",
 				desc = "Extract block to file",
