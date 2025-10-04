@@ -172,7 +172,7 @@ function M.setup()
 	-- Terminal window navigation handled by vim-tmux-navigator plugin
 
 	-- Quick commands
-	safe_keymap("n", "<leader>x", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
+	safe_keymap("n", "<leader>X", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
 	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
 
 	-- Options toggle (moved from <leader>t to avoid test conflicts)
