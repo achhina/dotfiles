@@ -10,6 +10,7 @@ return {
 			{ "<leader>gh", group = "Git Hunks" },
 			{ "<leader>gt", group = "Git Toggle" },
 			{ "<leader>o", group = "Options" },
+			{ "m", group = "Marks" },
 		},
 	},
 	keys = {
