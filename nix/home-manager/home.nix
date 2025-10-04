@@ -12,6 +12,7 @@ in
 {
   imports = [
     ./modules/packages.nix
+    ./modules/neovim.nix
     ./modules/git.nix
     ./modules/shell.nix
     ./modules/fzf.nix

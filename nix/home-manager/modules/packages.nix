@@ -76,30 +76,18 @@ let
 
   # Editor and terminal environment
   editorTools = with pkgs; [
-    (neovim.override {
-      extraPython3Packages = ps: [ ps.debugpy ];
-    })                     # Text editor with debugpy for DAP
     tmux                   # Terminal multiplexer
     tmux-mem-cpu-load      # Tmux system info plugin
     starship               # Cross-shell prompt
     chafa                  # Image viewer for terminal (fzf-lua preview)
   ];
 
-  # Language servers for editor integration
+  # Language servers for general use (also used outside editor)
   languageServers = with pkgs; [
-    oldPkgs.bash-language-server      # Bash LSP (pinned to working version)
-    lua-language-server               # Lua LSP
-    pyright                          # Python LSP
-    gopls                            # Go LSP
-    rust-analyzer                    # Rust LSP
-    typescript-language-server       # TypeScript LSP
-    nil                              # Nix LSP
-    marksman                         # Markdown LSP
-    yaml-language-server             # YAML LSP
-    dockerfile-language-server       # Docker LSP
-    taplo                            # TOML LSP
+    gopls                            # Go LSP (used with go tools)
+    rust-analyzer                    # Rust LSP (used with cargo)
+    nil                              # Nix LSP (used for nix evaluation)
     docker-credential-helpers        # Docker credential helpers
-    vscode-langservers-extracted     # HTML/CSS/JSON LSP
   ];
 
   # Code linters and formatters
