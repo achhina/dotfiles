@@ -364,18 +364,11 @@ return {
 			},
 		},
 		config = function()
-			-- Try to find Python with debugpy installed
-			local python_path = vim.fn.exepath("python3") or vim.fn.exepath("python")
+			-- Use Neovim's bundled Python3 (includes debugpy via Nix)
+			-- Falls back to system/venv python3 if available
+			local python_path = vim.g.python3_host_prog or vim.fn.exepath("python3")
 
-			-- Setup with fallback paths
-			local debugpy_python = python_path
-			if vim.fn.isdirectory(vim.fn.expand("~/venv/debugpy")) == 1 then
-				debugpy_python = "~/venv/debugpy/bin/python"
-			elseif vim.fn.isdirectory(vim.fn.expand("~/.virtualenvs/debugpy")) == 1 then
-				debugpy_python = "~/.virtualenvs/debugpy/bin/python"
-			end
-
-			require("dap-python").setup(debugpy_python)
+			require("dap-python").setup(python_path)
 
 			-- Enhanced Python configurations
 			local dap = require("dap")

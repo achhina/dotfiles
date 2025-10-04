@@ -76,7 +76,9 @@ let
 
   # Editor and terminal environment
   editorTools = with pkgs; [
-    neovim                 # Text editor
+    (neovim.override {
+      extraPython3Packages = ps: [ ps.debugpy ];
+    })                     # Text editor with debugpy for DAP
     tmux                   # Terminal multiplexer
     tmux-mem-cpu-load      # Tmux system info plugin
     starship               # Cross-shell prompt
