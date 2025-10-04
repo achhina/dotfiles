@@ -4,8 +4,7 @@ return {
 		"hedyhli/outline.nvim",
 		cmd = { "Outline", "OutlineOpen" },
 		keys = {
-			{ "<leader>o", "<cmd>Outline<CR>", desc = "Toggle code outline" },
-			{ "<leader>O", "<cmd>OutlineOpen<CR>", desc = "Open code outline" },
+			{ "<leader>O", "<cmd>Outline<CR>", desc = "Toggle code outline" },
 		},
 		config = function()
 			require("outline").setup({
