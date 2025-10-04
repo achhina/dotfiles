@@ -79,7 +79,6 @@ let
     tmux                   # Terminal multiplexer
     tmux-mem-cpu-load      # Tmux system info plugin
     starship               # Cross-shell prompt
-    chafa                  # Image viewer for terminal (fzf-lua preview)
   ];
 
   # Language servers for general use (also used outside editor)
@@ -102,9 +101,6 @@ let
 
   # Programming language runtimes and tools
   languageRuntimes = with pkgs; [
-    # C/C++
-    clang-tools              # Provides clangd LSP
-
     # Go
     go                       # Go compiler and tools
 
@@ -118,7 +114,6 @@ let
     lua                      # Lua interpreter
     luaPackages.luacheck     # Lua static analyzer
     luaPackages.luarocks     # Lua package manager
-    tree-sitter              # Syntax highlighting parser
 
     # Python
     python312Packages.black    # Code formatter for IPython
@@ -132,8 +127,6 @@ let
     texlivePackages.detex      # LaTeX to plain text (render-markdown)
     mermaid-cli                # Diagram generation
     vhs                        # Terminal recording tool
-    imagemagick                # Image processing (for Snacks.image)
-    ghostscript                # PostScript/PDF interpreter (for PDF rendering)
   ];
 
   # System services

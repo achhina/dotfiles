@@ -18,7 +18,7 @@ in
 
     # LSP servers and tools available only within Neovim
     extraPackages = with pkgs; [
-      # Editor-only LSPs (not used outside Neovim)
+      # Editor-only LSPs
       oldPkgs.bash-language-server
       lua-language-server
       pyright
@@ -28,6 +28,13 @@ in
       marksman
       taplo
       vscode-langservers-extracted
+      clang-tools              # Provides clangd LSP for C/C++
+
+      # Neovim-specific tools
+      tree-sitter              # Syntax highlighting parser
+      chafa                    # Image viewer for fzf-lua preview
+      imagemagick              # Image processing for Snacks.image
+      ghostscript              # PostScript/PDF interpreter for PDF rendering
     ];
   };
 }
