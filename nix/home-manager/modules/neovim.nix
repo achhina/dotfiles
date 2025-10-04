@@ -35,6 +35,7 @@ in
       chafa                    # Image viewer for fzf-lua preview
       imagemagick              # Image processing for Snacks.image
       ghostscript              # PostScript/PDF interpreter for PDF rendering
+      pkgs.texlivePackages.detex  # LaTeX to plain text for render-markdown plugin
     ];
   };
 }

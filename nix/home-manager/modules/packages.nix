@@ -43,7 +43,6 @@ let
   coreTools = with pkgs; [
     git                    # Version control
     git-lfs                # Git Large File Storage
-    lazygit                # Terminal UI for Git (for Snacks.lazygit)
     wget                   # File downloader
     htop                   # System monitor
     ncdu                   # Disk usage analyzer
@@ -124,7 +123,6 @@ let
   # Document processing and generation tools
   documentTools = with pkgs; [
     tectonic                   # LaTeX engine
-    texlivePackages.detex      # LaTeX to plain text (render-markdown)
     mermaid-cli                # Diagram generation
     vhs                        # Terminal recording tool
   ];
