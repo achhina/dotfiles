@@ -37,6 +37,9 @@ return {
 			})
 
 			-- Enhanced commenting with treesitter support (snacks doesn't have commenting)
+			-- Note: which-key will show overlap warning for 'gc' with 'gcc'
+			-- This is expected behavior - 'gc' is an operator (gc{motion}),
+			-- while 'gcc' is a direct line comment mapping
 			require("mini.comment").setup({
 				options = {
 					custom_commentstring = function()
