@@ -121,19 +121,15 @@ man home-configuration.nix | grep -C 10 "modulename"
 ### Best Practice:
 Start with `man home-configuration.nix` and search interactively. For programmatic searching or listing all options for a module, use `col -b` to get clean text output. Only resort to GitHub source when you need to understand implementation details or see complex examples.
 
-## 6. Configuration Management Exceptions
+## 6. Remote Configuration Loading
 
-While this repository follows the "Declarative First" principle, some configurations are intentionally tracked in git for specific use cases:
+Some tools support loading configuration from URLs, allowing you to bootstrap settings on new machines without cloning the entire repository.
 
-### Tridactyl Configuration Exception
+### Tridactyl Browser Extension
 - **Source File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/files/tridactylrc` (declaratively managed)
-- **Symlink:** `${XDG_CONFIG_HOME:-$HOME/.config}/tridactyl/tridactylrc` (tracked in git)
-- **Rationale:** Tridactyl supports loading configuration from URLs using `:source --url`. By tracking the generated symlink in git, the configuration can be loaded remotely from GitHub:
+- **Deployed File:** `${XDG_CONFIG_HOME:-$HOME/.config}/tridactyl/tridactylrc` (symlink, ignored in git)
+- **Remote Loading:** Tridactyl can load configuration directly from GitHub:
   ```
-  :source --url https://raw.githubusercontent.com/user/repo/main/.config/tridactyl/tridactylrc
+  :source --url https://raw.githubusercontent.com/user/repo/main/nix/home-manager/files/tridactylrc
   ```
-- **Benefits:**
-  - Remote configuration loading across machines
-  - Easy sharing of tridactyl setups
-  - Version-controlled browser extension configuration
-- **Workflow:** Always edit the source file (`nix/home-manager/files/tridactylrc`), then run `hm switch` to update the symlink that gets committed to git.
+- **Workflow:** Edit the source file (`nix/home-manager/files/tridactylrc`), then run `hm switch` to deploy the symlink locally.
