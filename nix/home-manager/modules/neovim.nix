@@ -10,6 +10,7 @@ in
 {
   programs.neovim = {
     enable = true;
+    defaultEditor = true;
 
     # Python packages for Neovim
     extraPython3Packages = ps: with ps; [

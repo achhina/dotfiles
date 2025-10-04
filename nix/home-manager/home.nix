@@ -50,7 +50,6 @@ in
   home.sessionVariables = {
     EZA_COLORS = "gm=33:ga=31";
     VISUAL = "nvim";
-    EDITOR = "nvim";
     XDG_CONFIG_HOME = "${config.home.homeDirectory}/.config";
     XDG_STATE_HOME = "${config.home.homeDirectory}/.local/state";
     XDG_CACHE_HOME = "${config.home.homeDirectory}/.cache";
