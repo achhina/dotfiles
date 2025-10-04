@@ -101,9 +101,17 @@ For complex modules or when you need implementation details:
 ```
 
 ### Method 3: grep Search (Quick Reference)
+Man pages use special formatting that can interfere with grep. Use `col -b` to strip formatting codes for clean searching:
+
 ```bash
+# Search for specific module options (strips formatting for clean output)
+man home-configuration.nix | col -b | grep 'programs\.modulename'
+
+# Search with context (works without col -b)
 man home-configuration.nix | grep -C 10 "modulename"
 ```
+
+**Why `col -b`?** Man pages use backspace sequences to create bold/underlined text (e.g., `pprrooggrraammss..bbttoopp` for `programs.btop`). The `col -b` command strips these formatting codes, making the output grep-friendly.
 
 ### What Doesn't Work with Flakes:
 - `home-manager option` commands (flake configurations not supported)
@@ -111,7 +119,7 @@ man home-configuration.nix | grep -C 10 "modulename"
 - Auto-generated documentation builds (not exposed by default in flakes)
 
 ### Best Practice:
-Start with `man home-configuration.nix` and search. Only resort to GitHub source when you need to understand implementation details or see complex examples.
+Start with `man home-configuration.nix` and search interactively. For programmatic searching or listing all options for a module, use `col -b` to get clean text output. Only resort to GitHub source when you need to understand implementation details or see complex examples.
 
 ## 6. Configuration Management Exceptions
 
