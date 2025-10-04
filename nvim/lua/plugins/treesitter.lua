@@ -224,7 +224,6 @@ return {
 					"dashboard",
 					"neo-tree",
 					"lazy",
-					"mason",
 					"notify",
 					"toggleterm",
 					"lazyterm",
