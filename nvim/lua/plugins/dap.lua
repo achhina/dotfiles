@@ -335,6 +335,7 @@ return {
 			"mfussenegger/nvim-dap",
 			"rcarriga/nvim-dap-ui",
 		},
+		build = false, -- Disable luarocks build, we use system debugpy
 		keys = {
 			{
 				"<leader>dpt",
