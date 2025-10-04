@@ -68,7 +68,6 @@ let
 
   # AI interfaces and productivity tools
   aiTools = with pkgs; [
-    aichat                 # AI chat interface
     claude-code            # Claude Code CLI
     gemini-cli             # Google Gemini CLI
   ];
