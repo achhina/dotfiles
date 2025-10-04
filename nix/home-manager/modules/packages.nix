@@ -105,7 +105,6 @@ let
 
     # JavaScript/TypeScript
     nodejs                   # Node.js runtime
-    pnpm                     # Fast package manager
     yarn                     # Package manager
 
     # Lua
