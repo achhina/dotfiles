@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Enable direnv for automatic environment loading
@@ -489,11 +489,14 @@
     ];
 
     envExtra = ''
-      [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
-    '';
+      ${lib.optionalString pkgs.stdenv.isDarwin ''
+        # Fallback for macOS: ensure Nix daemon is sourced
+        # macOS updates wipe /etc/zshrc, breaking system-wide Nix initialization
+        # See: https://github.com/NixOS/nix/issues/6117
+        [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      ''}
 
-    initContent = ''
-      [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
     '';
 
     shellAliases = {
