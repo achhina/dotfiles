@@ -481,22 +481,18 @@
       '';
     };
 
+    plugins = [
+      {
+        name = "fzf-tab";
+        src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
+      }
+    ];
+
     initContent = ''
       [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 
       source $XDG_CONFIG_HOME/secrets/.secrets
     '';
-
-    oh-my-zsh = {
-      enable = true;
-      plugins = [
-        "zsh-syntax-highlighting"
-        "zsh-autosuggestions"
-        "fzf-tab"
-      ];
-      theme = "";
-      custom = config.home.homeDirectory + "/.oh-my-zsh/custom";
-    };
 
     shellAliases = {
       config = "$XDG_CONFIG_HOME";
