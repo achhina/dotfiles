@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+if ! command -v tmux >/dev/null 2>&1; then
+    echo "Error: tmux is not installed or not in PATH" >&2
+    exit 1
+fi
+
+session_name=$(basename "$PWD" | tr '.' '_' | tr ' ' '_')
+
+if tmux has-session -t "$session_name" 2>/dev/null; then
+    if [ -n "$TMUX" ]; then
+        exec tmux switch-client -t "$session_name"
+    else
+        exec tmux attach-session -t "$session_name"
+    fi
+else
+    tmux new-session -d -s "$session_name" -c "$PWD"
+    if [ -n "$TMUX" ]; then
+        exec tmux switch-client -t "$session_name"
+    else
+        exec tmux attach-session -t "$session_name"
+    fi
+fi

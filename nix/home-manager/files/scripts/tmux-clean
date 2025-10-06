@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+
+if ! command -v tmux >/dev/null 2>&1; then
+    echo "Error: tmux is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! tmux info &>/dev/null; then
+    echo "No tmux server running"
+    exit 0
+fi
+
+current_session=$(tmux display-message -p '#S' 2>/dev/null)
+
+if [ -z "$current_session" ]; then
+    echo "Not inside a tmux session"
+    exit 1
+fi
+
+sessions_to_kill=$(tmux list-sessions -F '#S' 2>/dev/null | grep -v "^$current_session$" || true)
+
+if [ -z "$sessions_to_kill" ]; then
+    echo "No sessions to clean (only current session '$current_session' exists)"
+    exit 0
+fi
+
+echo "Killing tmux sessions except current ('$current_session'):"
+count=0
+echo "$sessions_to_kill" | while read -r session; do
+    if [ -n "$session" ]; then
+        echo "  ✗ Killing session: $session"
+        tmux kill-session -t "$session" 2>/dev/null || echo "    Failed to kill session: $session" >&2
+        count=$((count + 1))
+    fi
+done
+echo "Done! Cleaned $(echo "$sessions_to_kill" | wc -l | tr -d ' ') sessions"

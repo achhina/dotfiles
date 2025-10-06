@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+if ! command -v tmuxinator >/dev/null 2>&1; then
+    echo "Error: tmuxinator is not installed" >&2
+    echo "Falling back to tmux-here..."
+    exec tmux-here
+fi
+
+if [ -f ".tmuxinator.yml" ]; then
+    tmuxinator start . || {
+        echo "Failed to start tmuxinator project, falling back to tmux-here..." >&2
+        exec tmux-here
+    }
+else
+    tmuxinator start dev || {
+        echo "Failed to start default tmuxinator project, falling back to tmux-here..." >&2
+        exec tmux-here
+    }
+fi

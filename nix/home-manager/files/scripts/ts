@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+
+if ! command -v tmux >/dev/null 2>&1; then
+    echo "Error: tmux is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! tmux info &>/dev/null; then
+    echo "No tmux server running"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Available sessions:"
+        tmux list-sessions -F '#S'
+        echo "Use 'ts <session_name>' to switch"
+        exit 0
+    fi
+
+    session=$(tmux list-sessions -F '#S' 2>/dev/null | fzf --reverse --preview='tmux capture-pane -p -t {} 2>/dev/null || echo "No preview available"')
+
+    if [ -n "$session" ]; then
+        if [ -n "$TMUX" ]; then
+            exec tmux switch-client -t "$session"
+        else
+            exec tmux attach-session -t "$session"
+        fi
+    fi
+else
+    if tmux has-session -t "$1" 2>/dev/null; then
+        if [ -n "$TMUX" ]; then
+            exec tmux switch-client -t "$1"
+        else
+            exec tmux attach-session -t "$1"
+        fi
+    else
+        echo "Session '$1' does not exist" >&2
+        exit 1
+    fi
+fi

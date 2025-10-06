@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+MAN="/usr/bin/man"
+MANPATHS=("/usr/share/man" "/usr/local/share/man" "/nix/var/nix/profiles/default/share/man" "$HOME/.nix-profile/share/man")
+
+if [ -n "$1" ]; then
+    exec "$MAN" "$@"
+else
+    if ! command -v fd >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fd and fzf are required for interactive man browsing" >&2
+        exit 1
+    fi
+
+    selected=$(fd -tf -tl . "${MANPATHS[@]}" 2>/dev/null | sed "s|.*/||" | sed "s|\..*||" | sort -u | fzf --reverse --preview="$MAN {} 2>/dev/null || echo 'Preview not available'")
+
+    if [ -n "$selected" ]; then
+        exec "$MAN" "$selected"
+    fi
+fi
