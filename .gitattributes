@@ -2,3 +2,13 @@
 # After merging, regenerate locks by running update commands
 nix/flake.lock merge=ours
 nvim/lazy-lock.json merge=ours
+
+# Collapse lock file diffs (hide noisy changes in git diff/log)
+nix/flake.lock -diff
+nvim/lazy-lock.json -diff
+
+# Normalize line endings for cross-platform compatibility
+*.sh text eol=lf
+*.nix text eol=lf
+*.lua text eol=lf
+*.md text eol=lf
