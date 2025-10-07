@@ -258,7 +258,7 @@
 
   # Home Manager managed scripts
   home.file."bin/update" = {
-    source = ../files/update;
+    source = ../files/scripts/update;
     executable = true;
   };
 
