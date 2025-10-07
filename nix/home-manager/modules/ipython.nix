@@ -229,26 +229,26 @@
     import importlib
     from collections import namedtuple
 
-    Import = namedtuple('Import', ['module', 'alias', 'display_name', 'post_import'])
+    Import = namedtuple('Import', ['module', 'alias', 'post_import'])
 
     IMPORTS = [
         # Core
-        Import('sys', None, None, None),
-        Import('os', None, None, None),
-        Import('pathlib', 'Path', None, None),
+        Import('sys', None, None),
+        Import('os', None, None),
+        Import('pathlib', 'Path', None),
         # Scientific computing
-        Import('numpy', 'np', 'numpy', None),
-        Import('pandas', 'pd', 'pandas', None),
-        Import('matplotlib.pyplot', 'plt', 'matplotlib', None),
-        Import('seaborn', 'sns', 'seaborn', lambda: __import__('seaborn').set_theme()),
+        Import('numpy', 'np', None),
+        Import('pandas', 'pd', None),
+        Import('matplotlib.pyplot', 'plt', None),
+        Import('seaborn', 'sns', lambda: __import__('seaborn').set_theme()),
         # ML frameworks
-        Import('sklearn', None, 'scikit-learn', None),
-        Import('torch', None, 'pytorch', None),
-        Import('tensorflow', 'tf', 'tensorflow', None),
+        Import('sklearn', None, None),
+        Import('torch', None, None),
+        Import('tensorflow', 'tf', None),
         # Utilities
-        Import('scipy', None, 'scipy', None),
-        Import('tqdm', 'tqdm', 'tqdm', None),
-        Import('IPython.display', ['display', 'HTML', 'Markdown'], 'IPython.display', None),
+        Import('scipy', None, None),
+        Import('tqdm', 'tqdm', None),
+        Import('IPython.display', ['display', 'HTML', 'Markdown'], None),
     ]
 
     for imp in IMPORTS:
@@ -270,11 +270,9 @@
             if imp.post_import:
                 imp.post_import()
 
-            if imp.display_name:
-                print(f'✓ {imp.display_name}')
+            print(f'✓ {imp.module}')
         except ImportError:
-            if imp.display_name:
-                print(f'✗ {imp.display_name} not installed')
+            print(f'✗ {imp.module}')
 
     print('\nResearch environment ready!')
   '';
