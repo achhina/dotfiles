@@ -288,6 +288,16 @@ main() {
   log_info "Applying home-manager configuration..."
   run_cmd home-manager switch --flake "$CONFIG_HOME/nix"
 
+  # Show package changes between previous and current generation
+  log_info "Package changes in this update:"
+  local package_diff
+  package_diff=$(get_package_version_changes)
+  if [ -n "$package_diff" ]; then
+    echo "$package_diff"
+  else
+    echo "  No package version changes detected"
+  fi
+
   # Commit tridactyl config updates if they changed (Home Manager generates the symlink)
   if ! git -C "$CONFIG_HOME" diff-index --quiet HEAD -- tridactyl/tridactylrc 2>/dev/null; then
     log_info "Committing tridactyl configuration updates..."
