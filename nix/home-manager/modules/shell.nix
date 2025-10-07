@@ -302,7 +302,6 @@
       "AUTO_PUSHD" # automatically push directories to stack
       "HIST_IGNORE_DUPS" # don't record consecutive duplicate commands
       "HIST_IGNORE_SPACE" # don't record commands starting with space
-      "EXTENDED_GLOB" # enable advanced globbing: ^, ~, #, ##, (...)
       "COMPLETE_IN_WORD" # complete from cursor position, not just end
     ];
 
