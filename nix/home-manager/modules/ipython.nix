@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  # IPython configuration managed by Home Manager
+  # IPython default profile configuration
   home.file.".config/ipython/profile_default/ipython_config.py".text = ''
     c: traitlets.config.Config
 
@@ -167,5 +167,130 @@
 
     # Enhanced object introspection
     c.InteractiveShell.object_info_string_level = 2
+  '';
+
+  # IPython ML profile configuration
+  # Launch with: ipython --profile=ml
+  home.file.".config/ipython/profile_ml/ipython_config.py".text = ''
+    c: traitlets.config.Config
+
+    # =============================================================================
+    # IPython ML Profile Configuration
+    # =============================================================================
+
+    # Import base settings from default profile
+    c.TerminalIPythonApp.display_banner = False
+    c.TerminalInteractiveShell.extra_open_editor_shortcuts = True
+    c.TerminalInteractiveShell.confirm_exit = False
+    c.InteractiveShell.automagic = True
+    c.InteractiveShell.xmode = "Context"
+    c.InteractiveShell.colors = "LightBG"
+    c.InteractiveShell.cache_size = 1000
+    c.IPCompleter.greedy = True
+    c.IPCompleter.use_jedi = True
+
+    # ML-specific settings
+    c.InteractiveShell.ast_node_interactivity = "last_expr_or_assign"  # Show assignments too
+
+    # =============================================================================
+    # ML Library Auto-imports with Error Handling
+    # =============================================================================
+
+    c.InteractiveShellApp.exec_lines = [
+        "# Auto-importing ML libraries...",
+        "import sys",
+        "import os",
+        "from pathlib import Path",
+        "",
+        "# Core scientific computing",
+        "try:",
+        "    import numpy as np",
+        "    print('✓ numpy')",
+        "except ImportError:",
+        "    print('✗ numpy not installed')",
+        "",
+        "try:",
+        "    import pandas as pd",
+        "    print('✓ pandas')",
+        "except ImportError:",
+        "    print('✗ pandas not installed')",
+        "",
+        "try:",
+        "    import matplotlib.pyplot as plt",
+        "    print('✓ matplotlib')",
+        "except ImportError:",
+        "    print('✗ matplotlib not installed')",
+        "",
+        "try:",
+        "    import seaborn as sns",
+        "    sns.set_theme()",
+        "    print('✓ seaborn')",
+        "except ImportError:",
+        "    print('✗ seaborn not installed')",
+        "",
+        "# Machine learning frameworks",
+        "try:",
+        "    import sklearn",
+        "    print('✓ scikit-learn')",
+        "except ImportError:",
+        "    print('✗ scikit-learn not installed')",
+        "",
+        "try:",
+        "    import torch",
+        "    print('✓ pytorch')",
+        "except ImportError:",
+        "    print('✗ pytorch not installed')",
+        "",
+        "try:",
+        "    import tensorflow as tf",
+        "    print('✓ tensorflow')",
+        "except ImportError:",
+        "    print('✗ tensorflow not installed')",
+        "",
+        "# Jupyter/IPython enhancements",
+        "try:",
+        "    from IPython.display import display, HTML, Markdown",
+        "    print('✓ IPython.display')",
+        "except ImportError:",
+        "    pass",
+        "",
+        "# Additional utilities",
+        "try:",
+        "    import scipy",
+        "    print('✓ scipy')",
+        "except ImportError:",
+        "    print('✗ scipy not installed')",
+        "",
+        "try:",
+        "    from tqdm import tqdm",
+        "    print('✓ tqdm')",
+        "except ImportError:",
+        "    print('✗ tqdm not installed')",
+        "",
+        "print('\\nML environment ready!')",
+    ]
+
+    # =============================================================================
+    # Magic Commands for ML Workflow
+    # =============================================================================
+
+    c.InteractiveShellApp.exec_lines += [
+        "%load_ext autoreload",
+        "%autoreload 2",
+        "# Uncomment if using Jupyter:",
+        "# %matplotlib inline",
+        "# %config InlineBackend.figure_format = 'retina'",
+    ]
+
+    # =============================================================================
+    # Custom Aliases for ML
+    # =============================================================================
+
+    c.AliasManager.user_aliases = [
+        ("la", "ls -la"),
+        ("ll", "ls -l"),
+        ("cls", "clear"),
+        ("h", "history"),
+    ]
   '';
 }
