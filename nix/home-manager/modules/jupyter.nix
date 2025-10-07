@@ -25,26 +25,21 @@ let
   };
 in
 {
-  # JupyterLab configuration files managed by Home Manager
-  home.file = {
-    # Theme settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings".text =
-      builtins.toJSON
-        {
-          "adaptive-theme" = true;
-          theme = "JupyterLab Dark High Contrast";
-          "theme-scrollbars" = true;
-        };
+  # JupyterLab configuration managed via overrides
+  # This allows users to modify settings in the UI while maintaining declarative defaults
+  home.file.".config/jupyter/lab/settings/overrides.json".text =
+    builtins.toJSON {
+      "@jupyterlab/apputils-extension:themes" = {
+        "adaptive-theme" = true;
+        theme = "JupyterLab Dark High Contrast";
+        "theme-scrollbars" = true;
+      };
 
-    # Notification settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/apputils-extension:notification" = {
         fetchNews = "false";
       };
 
-    # Notebook settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/notebook-extension/tracker.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/notebook-extension:tracker" = {
         autoStartDefaultKernel = true;
         maxNumberOutputs = 50;
         recordTiming = true;
@@ -58,17 +53,13 @@ in
         codeCellConfig = commonEditorSettings;
       };
 
-    # File editor settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/fileeditor-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/fileeditor-extension:plugin" = {
         editorConfig = commonEditorSettings // {
           lineWrap = "on";
         };
       };
 
-    # Console settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/console-extension/tracker.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/console-extension:tracker" = {
         promptCellConfig = {
           showHiddenCellsButton = true;
           defaultCollapsed = false;
@@ -79,19 +70,15 @@ in
         };
       };
 
-    # Document manager settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/docmanager-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/docmanager-extension:plugin" = {
         autosave = true;
-        autosaveInterval = 120;
+        autosaveInterval = 5;
         lastModifiedCheckMargin = 500;
         renameUntitledFileOnSave = true;
         confirmClosingDocument = true;
       };
 
-    # File browser settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/filebrowser-extension/browser.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/filebrowser-extension:browser" = {
         showLastModifiedColumn = true;
         showFileSizeColumn = true;
         showHiddenFiles = false;
@@ -99,36 +86,27 @@ in
         showFileCheckboxes = true;
       };
 
-    # Terminal settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON
-        {
-          fontFamily = fontFamily;
-          fontSize = fontSize;
-          lineHeight = 1.3;
-          theme = "dark";
-          cursorBlink = true;
-          scrollback = 1000;
-          screenReaderMode = false;
-        };
+      "@jupyterlab/terminal-extension:plugin" = {
+        fontFamily = fontFamily;
+        fontSize = fontSize;
+        lineHeight = 1.3;
+        theme = "dark";
+        cursorBlink = true;
+        scrollback = 1000;
+        screenReaderMode = false;
+      };
 
-    # Code completer settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/completer-extension/manager.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/completer-extension:manager" = {
         autoCompletion = true;
         showDocumentationPanel = true;
         providerTimeout = 1000;
       };
 
-    # Status bar settings
-    ".config/jupyter/lab/user-settings/@jupyterlab/statusbar-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/statusbar-extension:plugin" = {
         visible = true;
       };
 
-    # Document registry settings - configure file viewers by default
-    ".config/jupyter/lab/user-settings/@jupyterlab/docregistry-extension/plugin.jupyterlab-settings".text =
-      builtins.toJSON {
+      "@jupyterlab/docregistry-extension:plugin" = {
         defaultViewers = {
           markdown = "Markdown Preview";
           csv = "CSV Viewer";
@@ -137,5 +115,5 @@ in
           json = "JSON Viewer";
         };
       };
-  };
+    };
 }
