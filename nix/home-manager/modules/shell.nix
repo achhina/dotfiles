@@ -363,6 +363,11 @@
       }
     ];
 
+    initContent = ''
+      # Zsh-autosuggestions: bind right arrow to accept suggestion
+      bindkey '^[[C' autosuggest-accept
+    '';
+
     envExtra = ''
       ${lib.optionalString pkgs.stdenv.isDarwin ''
         # Fallback for macOS: ensure Nix daemon is sourced
