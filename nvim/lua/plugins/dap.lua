@@ -294,15 +294,15 @@ return {
 		"mxsdev/nvim-dap-vscode-js",
 		dependencies = {
 			"mfussenegger/nvim-dap",
-			{
-				"microsoft/vscode-js-debug",
-				build = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out"
-					.. " && git update-index --assume-unchanged package-lock.json",
-			},
 		},
 		config = function()
+			-- Use vscode-js-debug from Nix
+			-- Path is: bin/js-debug -> ../../lib/node_modules/js-debug/dist
+			local bin = vim.fn.exepath("js-debug")
+			local debugger_path = vim.fn.fnamemodify(bin, ":h:h") .. "/lib/node_modules/js-debug/dist"
+
 			require("dap-vscode-js").setup({
-				debugger_path = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug",
+				debugger_path = debugger_path,
 				adapters = { "pwa-node", "pwa-chrome", "node-terminal" },
 			})
 

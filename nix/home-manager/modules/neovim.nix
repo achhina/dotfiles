@@ -39,6 +39,7 @@ in
       pkgs.texlivePackages.detex  # LaTeX to plain text for render-markdown plugin
       pkgs.tectonic            # LaTeX engine for document compilation
       pkgs.lazygit             # Terminal UI for Git (for Snacks.lazygit)
+      vscode-js-debug          # JavaScript debugger for nvim-dap
     ];
   };
 }
