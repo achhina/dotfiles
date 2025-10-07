@@ -158,15 +158,27 @@ generate_update_summary() {
 }
 
 get_package_version_changes() {
-  # Use nix profile diff-closures to get actual package version changes
-  local profile_path="$HOME/.local/state/nix/profiles/home-manager"
+  # Get the two most recent home-manager generations and compare them
+  local generations
+  generations=$(home-manager generations 2>/dev/null | head -2)
 
-  if [ ! -e "$profile_path" ]; then
+  if [ -z "$generations" ]; then
     return
   fi
 
-  # Get the diff between the current and previous generation
-  nix profile diff-closures --profile "$profile_path" 2>/dev/null
+  # Extract store paths for current and previous generations
+  local current_path
+  local previous_path
+  current_path=$(echo "$generations" | sed -n '1p' | sed 's|.* -> \(/nix/store/[^ ]*\).*|\1|')
+  previous_path=$(echo "$generations" | sed -n '2p' | sed 's|.* -> \(/nix/store/[^ ]*\).*|\1|')
+
+  # If we don't have both paths, we can't compare
+  if [ -z "$current_path" ] || [ -z "$previous_path" ]; then
+    return
+  fi
+
+  # Use nix store diff-closures to compare the two generations
+  nix store diff-closures "$previous_path" "$current_path" 2>/dev/null
 }
 
 get_flake_input_summary() {
