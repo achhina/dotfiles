@@ -169,16 +169,16 @@
     c.InteractiveShell.object_info_string_level = 2
   '';
 
-  # IPython ML profile configuration
-  # Launch with: ipython --profile=ml
-  home.file.".config/ipython/profile_ml/ipython_config.py".text = ''
+  # IPython research profile configuration
+  # Launch with: ipython --profile=research
+  home.file.".config/ipython/profile_research/ipython_config.py".text = ''
     c: traitlets.config.Config
 
     # =============================================================================
-    # IPython ML Profile Configuration
+    # IPython Research Profile Configuration
     # =============================================================================
 
-    # Import base settings from default profile
+    # Core interface settings
     c.TerminalIPythonApp.display_banner = False
     c.TerminalInteractiveShell.extra_open_editor_shortcuts = True
     c.TerminalInteractiveShell.confirm_exit = False
@@ -188,109 +188,94 @@
     c.InteractiveShell.cache_size = 1000
     c.IPCompleter.greedy = True
     c.IPCompleter.use_jedi = True
+    c.IPCompleter.merge_completions = True
 
-    # ML-specific settings
-    c.InteractiveShell.ast_node_interactivity = "last_expr_or_assign"  # Show assignments too
+    # Research-specific settings
+    c.InteractiveShell.ast_node_interactivity = "last_expr_or_assign"  # Show assignments
 
-    # =============================================================================
-    # ML Library Auto-imports with Error Handling
-    # =============================================================================
+    # History configuration
+    c.HistoryManager.connection_options = {"timeout": 20}
+    c.HistoryManager.db_log_output = False
 
+    # Code formatting
+    c.TerminalInteractiveShell.autoformatter = "black"
+
+    # Magic commands for research workflow
     c.InteractiveShellApp.exec_lines = [
-        "# Auto-importing ML libraries...",
-        "import sys",
-        "import os",
-        "from pathlib import Path",
-        "",
-        "# Core scientific computing",
-        "try:",
-        "    import numpy as np",
-        "    print('✓ numpy')",
-        "except ImportError:",
-        "    print('✗ numpy not installed')",
-        "",
-        "try:",
-        "    import pandas as pd",
-        "    print('✓ pandas')",
-        "except ImportError:",
-        "    print('✗ pandas not installed')",
-        "",
-        "try:",
-        "    import matplotlib.pyplot as plt",
-        "    print('✓ matplotlib')",
-        "except ImportError:",
-        "    print('✗ matplotlib not installed')",
-        "",
-        "try:",
-        "    import seaborn as sns",
-        "    sns.set_theme()",
-        "    print('✓ seaborn')",
-        "except ImportError:",
-        "    print('✗ seaborn not installed')",
-        "",
-        "# Machine learning frameworks",
-        "try:",
-        "    import sklearn",
-        "    print('✓ scikit-learn')",
-        "except ImportError:",
-        "    print('✗ scikit-learn not installed')",
-        "",
-        "try:",
-        "    import torch",
-        "    print('✓ pytorch')",
-        "except ImportError:",
-        "    print('✗ pytorch not installed')",
-        "",
-        "try:",
-        "    import tensorflow as tf",
-        "    print('✓ tensorflow')",
-        "except ImportError:",
-        "    print('✗ tensorflow not installed')",
-        "",
-        "# Jupyter/IPython enhancements",
-        "try:",
-        "    from IPython.display import display, HTML, Markdown",
-        "    print('✓ IPython.display')",
-        "except ImportError:",
-        "    pass",
-        "",
-        "# Additional utilities",
-        "try:",
-        "    import scipy",
-        "    print('✓ scipy')",
-        "except ImportError:",
-        "    print('✗ scipy not installed')",
-        "",
-        "try:",
-        "    from tqdm import tqdm",
-        "    print('✓ tqdm')",
-        "except ImportError:",
-        "    print('✗ tqdm not installed')",
-        "",
-        "print('\\nML environment ready!')",
-    ]
-
-    # =============================================================================
-    # Magic Commands for ML Workflow
-    # =============================================================================
-
-    c.InteractiveShellApp.exec_lines += [
         "%load_ext autoreload",
         "%autoreload 2",
-        "# Uncomment if using Jupyter:",
-        "# %matplotlib inline",
-        "# %config InlineBackend.figure_format = 'retina'",
     ]
 
-    # =============================================================================
-    # Custom Aliases for ML
-    # =============================================================================
-
+    # Custom aliases
     c.AliasManager.user_aliases = [
         ("la", "ls -la"),
         ("ll", "ls -l"),
         ("cls", "clear"),
         ("h", "history"),
     ]
+
+    # Development workflow enhancements
+    c.InteractiveShell.separate_in = "\n"
+    c.InteractiveShell.separate_out = ""
+    c.InteractiveShell.separate_out2 = ""
+
+    # Enhanced object introspection
+    c.InteractiveShell.object_info_string_level = 2
+  '';
+
+  # Research profile startup files
+  home.file.".config/ipython/profile_research/startup/00-imports.py".text = ''
+    """Auto-import research libraries"""
+    import importlib
+    from collections import namedtuple
+
+    Import = namedtuple('Import', ['module', 'alias', 'display_name', 'post_import'])
+
+    IMPORTS = [
+        # Core
+        Import('sys', None, None, None),
+        Import('os', None, None, None),
+        Import('pathlib', 'Path', None, None),
+        # Scientific computing
+        Import('numpy', 'np', 'numpy', None),
+        Import('pandas', 'pd', 'pandas', None),
+        Import('matplotlib.pyplot', 'plt', 'matplotlib', None),
+        Import('seaborn', 'sns', 'seaborn', lambda: __import__('seaborn').set_theme()),
+        # ML frameworks
+        Import('sklearn', None, 'scikit-learn', None),
+        Import('torch', None, 'pytorch', None),
+        Import('tensorflow', 'tf', 'tensorflow', None),
+        # Utilities
+        Import('scipy', None, 'scipy', None),
+        Import('tqdm', 'tqdm', 'tqdm', None),
+        Import('IPython.display', ['display', 'HTML', 'Markdown'], 'IPython.display', None),
+    ]
+
+    for imp in IMPORTS:
+        try:
+            mod = importlib.import_module(imp.module)
+
+            # Handle different import patterns
+            if isinstance(imp.alias, list):
+                # from X import a, b, c
+                for attr in imp.alias:
+                    globals()[attr] = getattr(mod, attr)
+            elif imp.alias:
+                # import X as Y
+                globals()[imp.alias] = mod
+            else:
+                # import X
+                globals()[imp.module.split('.')[0]] = mod
+
+            if imp.post_import:
+                imp.post_import()
+
+            if imp.display_name:
+                print(f'✓ {imp.display_name}')
+        except ImportError:
+            if imp.display_name:
+                print(f'✗ {imp.display_name} not installed')
+
+    print('\nResearch environment ready!')
   '';
 }
