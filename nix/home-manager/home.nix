@@ -24,6 +24,7 @@ in
     ./modules/tmux.nix
     ./modules/tridactyl.nix
     ./modules/jupyter.nix
+    ./modules/ipython.nix
   ];
 
   # Home Manager configuration
