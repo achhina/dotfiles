@@ -34,8 +34,8 @@ in
   home.homeDirectory =
     if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
 
-  # Add ~/bin to PATH
-  home.sessionPath = [ "${config.home.homeDirectory}/bin" ];
+  # NOTE: ~/bin is added to PATH in shell.nix via profileExtra instead
+  # of sessionPath, to ensure it runs after macOS's path_helper. See shell.nix.
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release

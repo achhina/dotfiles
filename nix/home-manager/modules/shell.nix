@@ -374,6 +374,28 @@
       [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
     '';
 
+    # Ensure ~/bin takes precedence over system and Nix paths
+    #
+    # We prepend ~/bin in ~/.zprofile instead of ~/.zshenv because of macOS's
+    # path_helper utility (in /etc/zprofile) which reorganizes PATH and would
+    # move ~/bin to the end.
+    # See: https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
+    #
+    # Shell loading order (login shells):
+    #   1. /etc/zshenv
+    #   2. ~/.zshenv
+    #   3. /etc/zprofile      <- macOS: path_helper runs here, reorganizes PATH
+    #   4. ~/.zprofile        <- We prepend ~/bin here (after path_helper)
+    #   5. /etc/zshrc
+    #   6. ~/.zshrc
+    #
+    # This works on all platforms:
+    #   - macOS: Runs after path_helper, ensuring ~/bin stays first
+    #   - Linux: No path_helper exists, simple prepend in .zprofile works fine
+    profileExtra = ''
+      export PATH="$HOME/bin:$PATH"
+    '';
+
     shellAliases = {
       config = "$XDG_CONFIG_HOME";
       g = "git";
