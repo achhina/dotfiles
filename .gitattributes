@@ -1,0 +1,4 @@
+# Lock files - prefer our version during merges
+# After merging, regenerate locks by running update commands
+nix/flake.lock merge=ours
+nvim/lazy-lock.json merge=ours
