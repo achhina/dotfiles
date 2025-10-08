@@ -367,6 +367,10 @@
     initExtra = ''
       # Zsh-autosuggestions: bind right arrow to accept suggestion
       bindkey '^[[C' autosuggest-accept
+
+      # History substring search: disable highlighting
+      HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
+      HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
     '';
 
     envExtra = ''
