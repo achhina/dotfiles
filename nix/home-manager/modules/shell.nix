@@ -441,6 +441,9 @@
       v = "nvim";
     };
 
-    history.size = 100000;
+    history = {
+      size = 100000;
+      save = 100000;
+    };
   };
 }
