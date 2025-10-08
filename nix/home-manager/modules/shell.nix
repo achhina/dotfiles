@@ -365,14 +365,6 @@
     historySubstringSearch.enable = true;
 
     initExtra = ''
-      # Configure autosuggestions to accept one char at a time with right arrow
-      # Remove forward-char from accept widgets (which would accept whole suggestion)
-      ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=("''${(@)ZSH_AUTOSUGGEST_ACCEPT_WIDGETS:#forward-char}")
-      ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=("''${(@)ZSH_AUTOSUGGEST_ACCEPT_WIDGETS:#vi-forward-char}")
-      # Add forward-char to partial accept widgets (accept one char at a time)
-      ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(forward-char)
-      ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(vi-forward-char)
-
       # History substring search: disable highlighting
       HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
       HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
