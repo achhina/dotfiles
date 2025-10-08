@@ -12,6 +12,7 @@
     # Core configuration
     extraConfig = {
       pull.rebase = true;
+      rebase.autoStash = true;
 
       core = {
         # Better interop between Mac & other OSs
