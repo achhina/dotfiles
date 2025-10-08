@@ -365,8 +365,10 @@
     historySubstringSearch.enable = true;
 
     initExtra = ''
-      # Zsh-autosuggestions: bind right arrow to accept suggestion
-      bindkey '^[[C' autosuggest-accept
+      # Zsh-autosuggestions: bind ctrl+f or end key to accept suggestion
+      # Don't override right arrow - let it move cursor normally
+      bindkey '^F' autosuggest-accept
+      bindkey '^[[F' autosuggest-accept  # End key
 
       # History substring search: disable highlighting
       HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
