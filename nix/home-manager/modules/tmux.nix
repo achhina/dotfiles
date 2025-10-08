@@ -129,6 +129,8 @@ in
     prefix = "C-a";
     mouse = true;
     escapeTime = 10;
+    historyLimit = 100000;
+    disableConfirmationPrompt = true;
     keyMode = "vi";
     tmuxinator.enable = true;
 
