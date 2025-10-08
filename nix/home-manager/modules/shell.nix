@@ -366,7 +366,7 @@
       }
     ];
 
-    initContent = ''
+    initExtra = ''
       # Zsh-autosuggestions: bind right arrow to accept suggestion
       bindkey '^[[C' autosuggest-accept
 
