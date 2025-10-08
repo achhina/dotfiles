@@ -365,10 +365,13 @@
     historySubstringSearch.enable = true;
 
     initExtra = ''
-      # Zsh-autosuggestions: bind ctrl+f or end key to accept suggestion
-      # Don't override right arrow - let it move cursor normally
-      bindkey '^F' autosuggest-accept
-      bindkey '^[[F' autosuggest-accept  # End key
+      # Configure autosuggestions to accept one char at a time with right arrow
+      # Remove forward-char from accept widgets (which would accept whole suggestion)
+      ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=("''${(@)ZSH_AUTOSUGGEST_ACCEPT_WIDGETS:#forward-char}")
+      ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=("''${(@)ZSH_AUTOSUGGEST_ACCEPT_WIDGETS:#vi-forward-char}")
+      # Add forward-char to partial accept widgets (accept one char at a time)
+      ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(forward-char)
+      ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(vi-forward-char)
 
       # History substring search: disable highlighting
       HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
