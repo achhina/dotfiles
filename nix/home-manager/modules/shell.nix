@@ -360,19 +360,13 @@
         name = "fzf-tab";
         src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
       }
-      {
-        name = "zsh-history-substring-search";
-        src = "${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search";
-      }
     ];
+
+    historySubstringSearch.enable = true;
 
     initExtra = ''
       # Zsh-autosuggestions: bind right arrow to accept suggestion
       bindkey '^[[C' autosuggest-accept
-
-      # History substring search: bind up/down arrows
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
     '';
 
     envExtra = ''
