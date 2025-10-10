@@ -355,20 +355,15 @@
       '';
     };
 
-    plugins = [
-      {
-        name = "fzf-tab";
-        src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
-      }
-    ];
+    oh-my-zsh = {
+      enable = true;
+      custom = "$HOME/.oh-my-zsh/custom";
+      plugins = [
+        "fzf-tab"
+      ];
+    };
 
     historySubstringSearch.enable = true;
-
-    initExtra = ''
-      # History substring search: disable highlighting
-      HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
-      HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
-    '';
 
     envExtra = ''
       ${lib.optionalString pkgs.stdenv.isDarwin ''
@@ -379,6 +374,10 @@
       ''}
 
       [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
+
+      # History substring search: disable highlighting
+      export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
+      export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
     '';
 
     # Ensure ~/bin takes precedence over system and Nix paths
