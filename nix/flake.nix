@@ -7,6 +7,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Don't follow our nixpkgs - uses its own pinned version to avoid SBCL 2.5.7 build failures on macOS
     mac-app-util.url = "github:hraban/mac-app-util";
   };
 

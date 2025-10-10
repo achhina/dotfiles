@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # Pin bash-language-server to working version
@@ -39,7 +39,9 @@ in
       pkgs.texlivePackages.detex  # LaTeX to plain text for render-markdown plugin
       pkgs.tectonic            # LaTeX engine for document compilation
       pkgs.lazygit             # Terminal UI for Git (for Snacks.lazygit)
-      vscode-js-debug          # JavaScript debugger for nvim-dap
+    ] ++ lib.optionals pkgs.stdenv.isDarwin [
+      # Pin vscode-js-debug to older nixpkgs on macOS to avoid node-gyp build failures
+      oldPkgs.vscode-js-debug  # JavaScript debugger for nvim-dap
     ];
   };
 }
