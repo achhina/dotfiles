@@ -69,6 +69,7 @@ let
   # AI interfaces and productivity tools
   aiTools = with pkgs; [
     claude-code            # Claude Code CLI
+    claude-monitor         # Real-time Claude Code usage monitor
     gemini-cli             # Google Gemini CLI
   ];
 
