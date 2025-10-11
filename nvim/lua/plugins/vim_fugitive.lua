@@ -85,9 +85,10 @@ return {
 		map("n", "<leader>do", "<cmd>diffoff<cr>", { desc = "Diff off" })
 		map("n", "<leader>du", "<cmd>diffupdate<cr>", { desc = "Diff update" })
 
-		-- Fugitive-specific mappings (only in fugitive buffers)
-		vim.api.nvim_create_autocmd("FileType", {
-			pattern = "fugitive",
+		-- Fugitive-specific mappings (only in fugitive status buffers)
+		-- Use User FugitiveIndex event instead of FileType to properly detect status buffer
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "FugitiveIndex",
 			callback = function()
 				local opts = { buffer = true, nowait = true }
 				map("n", "<tab>", "=", opts) -- Toggle staging
