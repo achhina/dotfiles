@@ -89,7 +89,7 @@ return {
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "fugitive",
 			callback = function()
-				local opts = { buffer = true }
+				local opts = { buffer = true, nowait = true }
 				map("n", "<tab>", "=", opts) -- Toggle staging
 				map("n", "s", "=", opts) -- Stage/unstage
 				map("n", "u", "-", opts) -- Unstage
