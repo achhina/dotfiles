@@ -1,7 +1,11 @@
 return {
 	"coder/claudecode.nvim",
 	dependencies = { "folke/snacks.nvim" },
-	config = true,
+	config = function()
+		require("claudecode").setup({
+			split_width_percentage = 0.40, -- 40% of screen width
+		})
+	end,
 	keys = {
 		{ "<leader>a", nil, desc = "AI/Claude Code" },
 		{ "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
