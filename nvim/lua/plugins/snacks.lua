@@ -127,7 +127,10 @@ return {
 				tabline = false,
 			},
 			win = {
-				backdrop = 0.95,
+				backdrop = {
+					transparent = false,
+					blend = 95,
+				},
 				width = 0.8,
 				height = 0.8,
 				options = {
@@ -153,7 +156,11 @@ return {
 					tabline = true,
 				},
 				win = {
-					backdrop = false,
+					backdrop = {
+						transparent = true,
+					},
+					width = 1, -- Use full width instead of inheriting 0.8 from zen
+					height = 1, -- Use full height instead of inheriting 0.8 from zen
 				},
 			},
 		},
