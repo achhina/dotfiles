@@ -60,8 +60,6 @@ return {
 				},
 			})
 
-			-- 2-character jumping handled by flash.nvim plugin
-
 			-- Session management handled by auto-session plugin
 		end,
 	},
