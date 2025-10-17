@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs }:
 
 {
   programs.bat = {
@@ -28,10 +28,10 @@
 
     # Additional bat utilities
     extraPackages = with pkgs.bat-extras; [
-      batdiff    # Enhanced diff with syntax highlighting
-      batman     # Manual pages with syntax highlighting
-      batgrep    # Search with context and highlighting
-      batwatch   # Watch files with syntax highlighting
+      batdiff # Enhanced diff with syntax highlighting
+      batman # Manual pages with syntax highlighting
+      batgrep # Search with context and highlighting
+      batwatch # Watch files with syntax highlighting
     ];
   };
 }

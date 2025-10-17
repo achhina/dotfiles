@@ -1,5 +1,3 @@
-{ config, pkgs, lib, ... }:
-
 {
   # Claude Code settings configuration
   # Managed declaratively through Home Manager

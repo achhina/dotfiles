@@ -1,5 +1,3 @@
-{ config, pkgs, ... }:
-
 {
   programs.ripgrep = {
     enable = true;
@@ -10,8 +8,6 @@
 
       # Follow symbolic links
       "--follow"
-
-
 
       # Compact output with no heading and filename on each line
       "--no-heading"

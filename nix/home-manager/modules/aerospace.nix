@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   ...
@@ -10,10 +9,10 @@
     enable = true;
     launchd.enable = true;
     userSettings = {
-      after-login-command = [];
-      after-startup-command = [];
+      after-login-command = [ ];
+      after-startup-command = [ ];
 
-      on-focused-monitor-changed = ["move-mouse monitor-lazy-center"];
+      on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
 
       default-root-container-layout = "accordion";
       default-root-container-orientation = "horizontal";
@@ -37,10 +36,22 @@
         alt-k = "focus --boundaries-action wrap-around-the-workspace up";
         alt-l = "focus --boundaries-action wrap-around-the-workspace right";
 
-        alt-shift-h = ["move left" "mode main"];
-        alt-shift-j = ["move down" "mode main"];
-        alt-shift-k = ["move up" "mode main"];
-        alt-shift-l = ["move right" "mode main"];
+        alt-shift-h = [
+          "move left"
+          "mode main"
+        ];
+        alt-shift-j = [
+          "move down"
+          "mode main"
+        ];
+        alt-shift-k = [
+          "move up"
+          "mode main"
+        ];
+        alt-shift-l = [
+          "move right"
+          "mode main"
+        ];
 
         alt-minus = "resize smart -50";
         alt-equal = "resize smart +50";
@@ -55,8 +66,8 @@
 
         alt-shift-space = "layout floating accordion";
 
-        cmd-h = [];
-        cmd-alt-h = [];
+        cmd-h = [ ];
+        cmd-alt-h = [ ];
 
         alt-1 = "workspace 1";
         alt-2 = "workspace 2";
@@ -90,15 +101,33 @@
         j = "resize height +50";
         k = "resize height -50";
         l = "resize width +50";
-        r = ["flatten-workspace-tree" "mode main"];
-        f = ["layout floating tiling" "mode main"];
+        r = [
+          "flatten-workspace-tree"
+          "mode main"
+        ];
+        f = [
+          "layout floating tiling"
+          "mode main"
+        ];
         enter = "mode main";
         esc = "mode main";
 
-        alt-shift-h = ["join-with left" "mode resize"];
-        alt-shift-j = ["join-with down" "mode resize"];
-        alt-shift-k = ["join-with up" "mode resize"];
-        alt-shift-l = ["join-with right" "mode resize"];
+        alt-shift-h = [
+          "join-with left"
+          "mode resize"
+        ];
+        alt-shift-j = [
+          "join-with down"
+          "mode resize"
+        ];
+        alt-shift-k = [
+          "join-with up"
+          "mode resize"
+        ];
+        alt-shift-l = [
+          "join-with right"
+          "mode resize"
+        ];
       };
 
       workspace-to-monitor-force-assignment = {
@@ -110,62 +139,62 @@
         {
           "if".app-id = "org.mozilla.firefox";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 1"];
+          run = [ "move-node-to-workspace 1" ];
         }
         {
           "if".app-id = "com.googlecode.iterm2";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 2"];
+          run = [ "move-node-to-workspace 2" ];
         }
         {
           "if".app-id = "com.mitchellh.ghostty";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 2"];
+          run = [ "move-node-to-workspace 2" ];
         }
         {
           "if".app-id = "com.apple.iCal";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 3"];
+          run = [ "move-node-to-workspace 3" ];
         }
         {
           "if".app-id = "com.apple.mail";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 3"];
+          run = [ "move-node-to-workspace 3" ];
         }
         {
           "if".app-id = "com.spotify.client";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 4"];
+          run = [ "move-node-to-workspace 4" ];
         }
         {
           "if".app-id = "si.filips.firefoxpwa.runtime";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 4"];
+          run = [ "move-node-to-workspace 4" ];
         }
         {
           "if".app-id = "md.obsidian";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 9"];
+          run = [ "move-node-to-workspace 9" ];
         }
         {
           "if".app-id = "com.hnc.Discord";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 10"];
+          run = [ "move-node-to-workspace 10" ];
         }
         {
           "if".app-id = "com.apple.MobileSMS";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 10"];
+          run = [ "move-node-to-workspace 10" ];
         }
         {
           "if".app-id = "net.whatsapp.WhatsApp";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 10"];
+          run = [ "move-node-to-workspace 10" ];
         }
         {
           "if".app-id = "com.automattic.beeper.desktop";
           check-further-callbacks = true;
-          run = ["move-node-to-workspace 10"];
+          run = [ "move-node-to-workspace 10" ];
         }
       ];
     };
