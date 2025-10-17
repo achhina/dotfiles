@@ -169,6 +169,7 @@ function M.setup()
 
 	-- Terminal
 	safe_keymap("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+	safe_keymap("t", "<leader><Esc>", "<C-\\><C-n>a<Esc>", { desc = "Send literal ESC to terminal" })
 	-- Terminal window navigation handled by vim-tmux-navigator plugin
 
 	-- Quick commands
