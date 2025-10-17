@@ -179,6 +179,20 @@
       alwaysThinkingEnabled = true;
 
       theme = "dark";
+
+      # Plugin configuration
+      extraKnownMarketplaces = {
+        superpowers-marketplace = {
+          source = {
+            source = "github";
+            repo = "obra/superpowers-marketplace";
+          };
+        };
+      };
+
+      enabledPlugins = {
+        "superpowers@superpowers-marketplace" = true;
+      };
     };
   };
 }
