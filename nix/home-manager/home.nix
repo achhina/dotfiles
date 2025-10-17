@@ -25,6 +25,7 @@ in
     ./modules/tridactyl.nix
     ./modules/jupyter.nix
     ./modules/ipython.nix
+    ./modules/claude.nix
   ];
 
   # Home Manager configuration
