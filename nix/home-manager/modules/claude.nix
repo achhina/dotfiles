@@ -71,6 +71,8 @@
       };
 
       alwaysThinkingEnabled = true;
+
+      theme = "dark";
     };
   };
 }
