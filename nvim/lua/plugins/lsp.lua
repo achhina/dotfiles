@@ -495,13 +495,13 @@ return {
 
 		-- Setup Nix-managed servers with error handling
 		local function safe_setup_server(name, config)
-			local lspconfig = require("lspconfig")
 			local server_setup_ok, server_setup_err = pcall(function()
-				lspconfig[name].setup({
+				vim.lsp.config[name] = {
 					capabilities = capabilities,
 					on_attach = on_attach,
 					settings = config,
-				})
+				}
+				vim.lsp.enable(name)
 			end)
 
 			if not server_setup_ok then
