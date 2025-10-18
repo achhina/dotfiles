@@ -26,7 +26,7 @@ This is the primary, system-level package manager and the single source of truth
   - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.nix`: The entry point that defines all inputs.
   - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix`: **The master list** of all software managed by Nix.
 - **How to Update:**
-    - Run the `update` alias. This will update the Nix flake inputs and apply the new generation.
+    - Run the `update` command. This will update the Nix flake inputs and apply the new generation.
     - Run the `hm switch` OR `home-manager switch` after EVERY change to a nix module.
 - **How to Debug:** If a package is missing or the wrong version, check `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix` and the `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.lock` file.
 
@@ -44,6 +44,22 @@ These managers operate within a specific application, handling its internal ecos
   - **Governing File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/shell.nix` (in the `programs.zsh.oh-my-zsh.plugins` section).
   - **How to Update:** This is managed declaratively by Nix. Updates to the plugins happen when the Nix flake inputs are updated.
 
+### Other Declaratively Managed Components
+
+Many application configurations are managed through Home Manager modules in `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/`. Key examples:
+
+- **Claude Code Configuration:**
+  - **Governing File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/claude.nix`
+  - **What's Managed:** Settings, permissions, custom slash commands, theme, plugins, MCP servers
+  - **How to Update:** Edit `claude.nix`, then run `hm switch` to apply changes
+  - **Important:** NEVER edit Claude Code settings files directly. All configuration must go through the Home Manager module.
+
+- **Development Shells:**
+  - **Governing File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/modules/devshells.nix`
+  - **Available Shells:** default, python, node, go, rust, datascience
+  - **How to Use:** `nix develop .#python` (or other shell name)
+  - **Role:** Provide isolated development environments with language-specific tooling
+
 ## 3. The Change Workflow: A Strict Protocol
 
 All modifications to this repository must follow this protocol to ensure changes are small, verifiable, and atomic.
@@ -54,7 +70,7 @@ All modifications to this repository must follow this protocol to ensure changes
 
 **2. Establish a Verifiable Baseline**
 - **Capture the "before" state.** Before making any edits, run commands to prove the current state.
-- *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail). For Neovim, follow the testing standards in `${XDG_CONFIG_HOME:-$HOME/.config}/nvim/AGENT.md`.
+- *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail).
 
 **3. Execute the Idempotent Change**
 - **Modify only the necessary files** for the single planned change.
