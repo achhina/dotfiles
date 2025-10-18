@@ -172,6 +172,9 @@ function M.setup()
 	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
 	safe_keymap("n", "<leader>Q", "<cmd>qa<CR>", { desc = "Quit all" })
 
+	-- Terminal mode
+	safe_keymap("t", "<leader><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+
 	-- Options toggle (moved from <leader>t to avoid test conflicts)
 	safe_keymap("n", "<leader>ow", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
 	safe_keymap("n", "<leader>on", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
