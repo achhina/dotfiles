@@ -174,10 +174,7 @@ function M.setup()
 
 	-- Terminal mode
 	safe_keymap("t", "<leader><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
-	safe_keymap("t", "<C-h>", "<cmd>wincmd h<CR>", { desc = "Move to left window" })
-	safe_keymap("t", "<C-j>", "<cmd>wincmd j<CR>", { desc = "Move to lower window" })
-	safe_keymap("t", "<C-k>", "<cmd>wincmd k<CR>", { desc = "Move to upper window" })
-	safe_keymap("t", "<C-l>", "<cmd>wincmd l<CR>", { desc = "Move to right window" })
+	-- Terminal navigation handled by vim-tmux-navigator plugin
 
 	-- Options toggle (moved from <leader>t to avoid test conflicts)
 	safe_keymap("n", "<leader>ow", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
