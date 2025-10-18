@@ -30,7 +30,7 @@ autocmd("BufWritePre", {
 		if event.match:match("^%w%w+://") then
 			return
 		end
-		local file = vim.loop.fs_realpath(event.match) or event.match
+		local file = vim.uv.fs_realpath(event.match) or event.match
 		vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
 	end,
 })
@@ -96,7 +96,7 @@ autocmd("BufEnter", {
 		local current_time = os.time()
 
 		for _, buf in ipairs(buffers) do
-			if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "buflisted") then
+			if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted then
 				table.insert(loaded_buffers, buf)
 			end
 		end
@@ -105,7 +105,7 @@ autocmd("BufEnter", {
 		if #loaded_buffers > 25 then
 			for i = 1, #loaded_buffers - 20 do
 				local buf = loaded_buffers[i]
-				if vim.api.nvim_buf_get_option(buf, "modified") == false then
+				if vim.bo[buf].modified == false then
 					-- Check if buffer hasn't been accessed recently
 					local last_used = vim.api.nvim_buf_get_var(buf, "last_used") or 0
 					if current_time - last_used > 300 then -- 5 minutes
@@ -225,12 +225,12 @@ autocmd("BufEnter", {
 	callback = function()
 		-- Close help windows when entering normal buffers
 		local current_buf = vim.api.nvim_get_current_buf()
-		local current_ft = vim.api.nvim_buf_get_option(current_buf, "filetype")
+		local current_ft = vim.bo[current_buf].filetype
 
 		if current_ft ~= "help" and current_ft ~= "man" then
 			for _, win in ipairs(vim.api.nvim_list_wins()) do
 				local buf = vim.api.nvim_win_get_buf(win)
-				local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+				local ft = vim.bo[buf].filetype
 				if ft == "help" or ft == "man" then
 					pcall(vim.api.nvim_win_close, win, false)
 				end
@@ -259,7 +259,6 @@ autocmd("TermOpen", {
 	group = term_group,
 	pattern = "*",
 	callback = function()
-		vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { buffer = 0, silent = true })
 		vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<cr>", { buffer = 0, silent = true })
 		vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<cr>", { buffer = 0, silent = true })
 		vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { buffer = 0, silent = true })
