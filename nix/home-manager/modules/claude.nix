@@ -129,6 +129,7 @@
         allow = [
           "Bash(awk:*)"
           "Bash(cat:*)"
+          "Bash(command:*)"
           "Bash(col:*)"
           "Bash(diff:*)"
           "Bash(echo:*)"
