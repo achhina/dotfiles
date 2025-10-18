@@ -101,22 +101,6 @@ This setup uses **Nix flakes exclusively** - no channels. Key inspection command
 When working with Home Manager modules, discovering available configuration options can be challenging with flakes. Here are the proven methods, ranked by effectiveness:
 
 ### Method 1: Local Manual (Most Reliable)
-```bash
-man home-configuration.nix
-# Press '/' and search for module name (e.g., "jankyborders")
-# Shows all options with types, defaults, and examples
-```
-
-This is the most practical approach - the manual is always up-to-date with your Home Manager version and contains every option with documentation.
-
-### Method 2: GitHub Source Code (Most Detailed)
-For complex modules or when you need implementation details:
-```bash
-# Navigate to: https://github.com/nix-community/home-manager/tree/master/modules/
-# Find the module file (e.g., services/jankyborders.nix)
-```
-
-### Method 3: grep Search (Quick Reference)
 Man pages use special formatting that can interfere with grep. Use `col -b` to strip formatting codes for clean searching:
 
 ```bash
@@ -129,13 +113,20 @@ man home-configuration.nix | grep -C 10 "modulename"
 
 **Why `col -b`?** Man pages use backspace sequences to create bold/underlined text (e.g., `pprrooggrraammss..bbttoopp` for `programs.btop`). The `col -b` command strips these formatting codes, making the output grep-friendly.
 
+### Method 2: GitHub Source Code (Most Detailed)
+For complex modules or when you need implementation details:
+```bash
+# Navigate to: https://github.com/nix-community/home-manager/tree/master/modules/
+# Find the module file (e.g., services/jankyborders.nix)
+```
+
 ### What Doesn't Work with Flakes:
 - `home-manager option` commands (flake configurations not supported)
 - `apropos` (searches system man pages, not Home Manager options)
 - Auto-generated documentation builds (not exposed by default in flakes)
 
 ### Best Practice:
-Start with `man home-configuration.nix` and search interactively. For programmatic searching or listing all options for a module, use `col -b` to get clean text output. Only resort to GitHub source when you need to understand implementation details or see complex examples.
+Start with `man home-configuration.nix` and search interactively. For programmatic searching or listing all options for a module, use `col -b` to get clean text output. Only resort to GitHub source (Method 2) when you need to understand implementation details or see complex examples.
 
 ## 6. Remote Configuration Loading
 
