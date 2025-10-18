@@ -5,24 +5,6 @@ local augroup = vim.api.nvim_create_augroup
 -- General workflow automation
 local workflow_group = augroup("WorkflowAutomation", { clear = true })
 
--- Auto-save when focus is lost
-autocmd("FocusLost", {
-	group = workflow_group,
-	pattern = "*",
-	command = "silent! wa",
-})
-
--- Auto-save when switching buffers
-autocmd({ "BufLeave", "WinLeave" }, {
-	group = workflow_group,
-	pattern = "*",
-	callback = function()
-		if vim.bo.modified and vim.bo.buftype == "" and vim.fn.expand("%") ~= "" then
-			vim.cmd("silent! write")
-		end
-	end,
-})
-
 -- Auto-create parent directories when saving
 autocmd("BufWritePre", {
 	group = workflow_group,
@@ -32,54 +14,6 @@ autocmd("BufWritePre", {
 		end
 		local file = vim.uv.fs_realpath(event.match) or event.match
 		vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
-	end,
-})
-
--- Remove trailing whitespace on save
-autocmd("BufWritePre", {
-	group = workflow_group,
-	pattern = "*",
-	callback = function()
-		-- Save cursor position
-		local save_cursor = vim.fn.getpos(".")
-		-- Remove trailing whitespace
-		vim.cmd([[%s/\s\+$//e]])
-		-- Restore cursor position
-		vim.fn.setpos(".", save_cursor)
-	end,
-})
-
--- Language-specific automation
-local lang_group = augroup("LanguageSpecific", { clear = true })
-
--- Go: Auto-format on save
-autocmd("BufWritePre", {
-	group = lang_group,
-	pattern = "*.go",
-	callback = function()
-		vim.lsp.buf.format({ async = false })
-	end,
-})
-
--- Rust: Auto-format on save
-autocmd("BufWritePre", {
-	group = lang_group,
-	pattern = "*.rs",
-	callback = function()
-		vim.lsp.buf.format({ async = false })
-	end,
-})
-
--- JSON: Auto-format on save
-autocmd("BufWritePre", {
-	group = lang_group,
-	pattern = "*.json",
-	callback = function()
-		-- Try to format with LSP first, then fall back to jq if available
-		local success = pcall(vim.lsp.buf.format, { async = false })
-		if not success and vim.fn.executable("jq") == 1 then
-			vim.cmd("silent %!jq .")
-		end
 	end,
 })
 
