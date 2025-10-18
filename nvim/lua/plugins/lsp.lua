@@ -303,12 +303,12 @@ return {
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 
 			-- Enable inlay hints if supported
-			if client.supports_method("textDocument/inlayHint") then
+			if client:supports_method("textDocument/inlayHint") then
 				vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
 			end
 
 			-- Document highlighting
-			if client.supports_method("textDocument/documentHighlight") then
+			if client:supports_method("textDocument/documentHighlight") then
 				local group = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = false })
 				vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
 				vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
@@ -324,7 +324,7 @@ return {
 			end
 
 			-- Code lens support
-			if client.supports_method("textDocument/codeLens") then
+			if client:supports_method("textDocument/codeLens") then
 				vim.lsp.codelens.refresh()
 				vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
 					buffer = bufnr,
