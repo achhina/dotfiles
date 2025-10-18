@@ -23,4 +23,4 @@ end
 -- Load core configuration with error handling
 safe_require("config.options", "load_options")
 safe_require("config.keymaps", "setup")
-safe_require("config.autocmd", "load_autocmd")
+safe_require("config.autocmds", "load_autocmds")
