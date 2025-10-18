@@ -254,16 +254,4 @@ autocmd("TermOpen", {
 	end,
 })
 
--- Easy escape from terminal mode
-autocmd("TermOpen", {
-	group = term_group,
-	pattern = "*",
-	callback = function()
-		vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<cr>", { buffer = 0, silent = true })
-		vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<cr>", { buffer = 0, silent = true })
-		vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { buffer = 0, silent = true })
-		vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<cr>", { buffer = 0, silent = true })
-	end,
-})
-
 return {}
