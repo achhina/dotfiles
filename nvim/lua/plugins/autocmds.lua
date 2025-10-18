@@ -20,44 +20,6 @@ autocmd("BufWritePre", {
 -- Buffer management automation
 local buffer_group = augroup("BufferManagement", { clear = true })
 
--- Auto-close buffers that haven't been used in a while
-autocmd("BufEnter", {
-	group = buffer_group,
-	callback = function()
-		-- Clean up old buffers to prevent memory leaks
-		local buffers = vim.api.nvim_list_bufs()
-		local loaded_buffers = {}
-		local current_time = os.time()
-
-		for _, buf in ipairs(buffers) do
-			if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted then
-				table.insert(loaded_buffers, buf)
-			end
-		end
-
-		-- If more than 25 buffers are loaded, clean up the oldest ones
-		if #loaded_buffers > 25 then
-			for i = 1, #loaded_buffers - 20 do
-				local buf = loaded_buffers[i]
-				if vim.bo[buf].modified == false then
-					-- Check if buffer hasn't been accessed recently
-					local last_used = vim.api.nvim_buf_get_var(buf, "last_used") or 0
-					if current_time - last_used > 300 then -- 5 minutes
-						-- Don't delete buffers with active LSP clients
-						local clients = vim.lsp.get_clients({ bufnr = buf })
-						if #clients == 0 then
-							pcall(vim.api.nvim_buf_delete, buf, { force = false })
-						end
-					end
-				end
-			end
-		end
-
-		-- Update last used time for current buffer
-		pcall(vim.api.nvim_buf_set_var, 0, "last_used", current_time)
-	end,
-})
-
 -- Auto-close help, man, and other temporary buffers
 autocmd("FileType", {
 	group = buffer_group,
