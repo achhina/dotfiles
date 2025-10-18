@@ -59,38 +59,6 @@ print("Setup result:", ok, err)
 vim.cmd("qa")' 2>&1
 ```
 
-## Commit Standards
-
-Every commit involving Neovim configuration must include:
-
-1. **Baseline test results** (pre-change state)
-2. **Verification test results** (post-change state)
-3. **Test commands used** (reproducible verification)
-4. **Expected vs actual outcomes**
-
-Example commit message:
-```
-Fix copilot LSP registration issue
-
-Baseline Test:
-  LSP clients: 2 (copilot, jsonls)
-  Health warnings: vim.highlight deprecation
-
-Changes Applied:
-  - Disabled copilot suggestions (enabled=false)
-  - Updated vim.highlight to vim.hl
-
-Verification Test:
-  LSP clients: 1 (jsonls only) ✓ Expected
-  Health warnings: 0 ✓ Expected
-
-Test Commands:
-  nvim --headless -c 'lua vim.defer_fn(...)'
-  nvim --headless -c 'checkhealth' -c 'qa'
-
-Result: ✓ All tests pass, changes verified
-```
-
 ## Key Principles
 
 1. **Never commit without testing**

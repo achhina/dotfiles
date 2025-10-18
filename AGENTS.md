@@ -125,9 +125,6 @@ For complex modules or when you need implementation details:
 - `apropos` (searches system man pages, not Home Manager options)
 - Auto-generated documentation builds (not exposed by default in flakes)
 
-### Best Practice:
-Start with `man home-configuration.nix` and search interactively. For programmatic searching or listing all options for a module, use `col -b` to get clean text output. Only resort to GitHub source (Method 2) when you need to understand implementation details or see complex examples.
-
 ## 6. Remote Configuration Loading
 
 Some tools support loading configuration from URLs, allowing you to bootstrap settings on new machines without cloning the entire repository.
