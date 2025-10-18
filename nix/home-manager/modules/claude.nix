@@ -145,6 +145,7 @@
           "Bash(python:*)"
           "Bash(rg:*)"
           "Bash(tail:*)"
+          "Bash(test:*)"
           "Bash(tmux list-:*)"
           "Bash(tmux show-:*)"
           "Bash(tmux display:*)"
