@@ -167,14 +167,10 @@ function M.setup()
 	safe_keymap("n", "n", "nzzzv", { desc = "Next search result and center" })
 	safe_keymap("n", "N", "Nzzzv", { desc = "Previous search result and center" })
 
-	-- Terminal
-	safe_keymap("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-	safe_keymap("t", "<leader><Esc>", "<C-\\><C-n>a<Esc>", { desc = "Send literal ESC to terminal" })
-	-- Terminal window navigation handled by vim-tmux-navigator plugin
-
 	-- Quick commands
 	safe_keymap("n", "<leader>X", "<cmd>!chmod +x %<CR>", { desc = "Make file executable" })
 	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
+	safe_keymap("n", "<leader>Q", "<cmd>qa<CR>", { desc = "Quit all" })
 
 	-- Options toggle (moved from <leader>t to avoid test conflicts)
 	safe_keymap("n", "<leader>ow", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
