@@ -109,6 +109,12 @@
 
         Be constructive and specific. Provide code examples for suggested improvements.
       '';
+
+      code = ''
+        ```
+        $(if command -v pbpaste >/dev/null 2>&1; then pbpaste; else xclip -selection clipboard -o; fi)
+        ```
+      '';
     };
 
     settings = {
