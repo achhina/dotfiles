@@ -4,9 +4,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Disable deprecation warnings from third-party plugins
-vim.deprecate = function() end
-
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
