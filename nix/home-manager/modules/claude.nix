@@ -7,6 +7,10 @@
 
     commands = {
       debug-error = ''
+        ---
+        description: Systematically debug and fix errors with guided workflow
+        ---
+
         Systematically debug and fix the error using this approach:
 
         1. **Understand the Error**
@@ -47,6 +51,10 @@
       '';
 
       code-review = ''
+        ---
+        description: Perform comprehensive code review with structured analysis
+        ---
+
         Perform a comprehensive code review using the following structured approach:
 
         ## 1. Code Quality & Maintainability
@@ -111,6 +119,10 @@
       '';
 
       code = ''
+        ---
+        description: Insert clipboard content as code block
+        ---
+
         ```
         $(if command -v pbpaste >/dev/null 2>&1; then pbpaste; else xclip -selection clipboard -o; fi)
         ```
