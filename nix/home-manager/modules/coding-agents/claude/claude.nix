@@ -1,4 +1,8 @@
-{ config, pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # Claude Code settings configuration
@@ -8,7 +12,6 @@
     enable = true;
     package = null; # Don't install claude-code via Nix, use npm install instead
 
-    # Use commandsDir to symlink slash commands
     commandsDir = ./slash-commands;
 
     settings = {
@@ -145,7 +148,7 @@
 
   # Install Claude Code via npm if not available
   # This allows us to get the latest version without waiting for nixpkgs updates
-  home.activation.installClaude = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.installClaude = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     NPM_PREFIX="$HOME/.local/share/npm"
 
     # Check if claude command exists in npm global bin directory
