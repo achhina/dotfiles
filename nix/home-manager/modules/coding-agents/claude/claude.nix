@@ -9,6 +9,7 @@
 
   programs.claude-code = {
     enable = true;
+    package = null; # Don't install claude-code via Nix, use npm install instead
 
     # Don't use the built-in commands option (creates symlinks)
     # Instead, we'll use activation scripts to copy files
