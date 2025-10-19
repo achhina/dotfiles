@@ -179,14 +179,14 @@ return {
 		{
 			"<leader>z",
 			function()
-				Snacks.zen.zoom()
+				Snacks.toggle.zoom()
 			end,
 			desc = "Toggle Zoom",
 		},
 		{
 			"<leader>Z",
 			function()
-				Snacks.zen()
+				Snacks.toggle.zen()
 			end,
 			desc = "Toggle Zen Mode",
 		},
@@ -248,23 +248,6 @@ return {
 			desc = "which_key_ignore",
 			mode = "t",
 		},
-
-		-- Window management (commented out - methods not available in current Snacks version)
-		-- {
-		-- 	"<leader>wm",
-		-- 	function()
-		-- 		Snacks.win.maximize()
-		-- 	end,
-		-- 	desc = "Maximize Window",
-		-- },
-		-- {
-		-- 	"<leader>wr",
-		-- 	function()
-		-- 		Snacks.win.restore()
-		-- 	end,
-		-- 	desc = "Restore Window",
-		-- },
-
 		-- Word highlighting
 		{
 			"]]",
