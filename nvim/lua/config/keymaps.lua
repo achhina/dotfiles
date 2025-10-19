@@ -60,6 +60,7 @@ local function create_lsp_keymap(bufnr)
 	local has_fzf, fzf_lua = pcall(require, "fzf-lua")
 
 	-- Core LSP navigation with fzf-lua fallbacks
+	nmap("gD", vim.lsp.buf.declaration, "Goto Declaration")
 	nmap("gd", vim.lsp.buf.definition, "Goto Definition")
 	nmap("gI", vim.lsp.buf.implementation, "Goto Implementation")
 	nmap("<leader>D", vim.lsp.buf.type_definition, "Type Definition")
