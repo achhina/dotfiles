@@ -18,9 +18,6 @@
       env = {
         BASH_DEFAULT_TIMEOUT_MS = "300000";
         BASH_MAX_TIMEOUT_MS = "600000";
-        # Use Claude-specific ripgrep config without hyperlinks
-        # Hyperlinks break file path parsing in Claude Code
-        RIPGREP_CONFIG_PATH = "$HOME/.config/claude-code/ripgreprc";
       };
 
       includeCoAuthoredBy = false;
@@ -172,7 +169,4 @@
       $VERBOSE_ECHO "Claude Code already installed via npm"
     fi
   '';
-
-  # Deploy Claude-specific ripgrep config (without hyperlinks)
-  home.file.".config/claude-code/ripgreprc".source = ./files/ripgreprc;
 }

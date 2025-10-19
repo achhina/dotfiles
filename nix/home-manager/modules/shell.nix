@@ -416,10 +416,9 @@
       ll = "eza --all --long";
       lt = "eza --tree --all --level 3";
 
-      # fd aliases with hyperlink support
-      fd = "fd --hyperlink";
-      fdf = "fd --type f --hyperlink";
-      fdd = "fd --type d --hyperlink";
+      # fd aliases
+      fdf = "fd --type f";
+      fdd = "fd --type d";
 
       # Mermaid CLI with dynamic Chrome path
       mmdc = "PUPPETEER_EXECUTABLE_PATH=\"$(find $HOME/.cache/puppeteer/chrome-headless-shell -name 'chrome-headless-shell' -type f 2>/dev/null | head -1)\" command mmdc";

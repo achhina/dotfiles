@@ -15,9 +15,6 @@
       # Show colors in output
       "--color=always"
 
-      # Enable clickable hyperlinks
-      "--hyperlink-format=default"
-
       # Custom colors matching terminal theme
       "--colors=line:fg:yellow"
       "--colors=line:style:bold"
