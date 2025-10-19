@@ -32,6 +32,7 @@ in
       clang-tools              # Provides clangd LSP for C/C++
 
       # Neovim-specific tools
+      nodejs                   # Required for Copilot.lua (must be >= 22)
       tree-sitter              # Syntax highlighting parser
       chafa                    # Image viewer for fzf-lua preview
       imagemagick              # Image processing for Snacks.image
