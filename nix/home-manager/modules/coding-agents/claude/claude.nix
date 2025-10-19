@@ -113,7 +113,6 @@
         additionalDirectories = [
           "~/docs"
           "/tmp"
-          "~/.cache"
         ];
       };
 
