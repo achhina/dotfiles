@@ -143,11 +143,12 @@
     };
   };
 
-  # Copy slash commands (Claude Code can't read symlinks)
+  # Copy slash commands to skills directory (Claude Code 2.0+ uses .claude/skills/)
+  # Note: Claude Code can't read symlinks, so we copy instead
   home.activation.claudeCommands = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    $DRY_RUN_CMD mkdir -p "$HOME/.claude/commands"
-    $DRY_RUN_CMD cp -f "${./slash-commands/debug-error.md}" "$HOME/.claude/commands/debug-error.md"
-    $DRY_RUN_CMD cp -f "${./slash-commands/code-review.md}" "$HOME/.claude/commands/code-review.md"
-    $DRY_RUN_CMD cp -f "${./slash-commands/code.md}" "$HOME/.claude/commands/code.md"
+    $DRY_RUN_CMD mkdir -p "$HOME/.claude/skills"
+    $DRY_RUN_CMD cp -f "${./slash-commands/debug-error.md}" "$HOME/.claude/skills/debug-error.md"
+    $DRY_RUN_CMD cp -f "${./slash-commands/code-review.md}" "$HOME/.claude/skills/code-review.md"
+    $DRY_RUN_CMD cp -f "${./slash-commands/code.md}" "$HOME/.claude/skills/code.md"
   '';
 }
