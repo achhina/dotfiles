@@ -375,6 +375,9 @@
 
       [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
 
+      # npm configuration - use local prefix for global installs
+      export NPM_CONFIG_PREFIX="$HOME/.local/share/npm"
+
       # History substring search: disable highlighting
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
@@ -399,7 +402,8 @@
     #   - macOS: Runs after path_helper, ensuring ~/bin stays first
     #   - Linux: No path_helper exists, simple prepend in .zprofile works fine
     profileExtra = ''
-      export PATH="$HOME/bin:$PATH"
+      # npm global bin directory (before ~/bin to allow overrides)
+      export PATH="$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
     '';
 
     shellAliases = {

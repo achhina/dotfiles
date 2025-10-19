@@ -151,4 +151,19 @@
     $DRY_RUN_CMD cp -f "${./slash-commands/code-review.md}" "$HOME/.claude/skills/code-review.md"
     $DRY_RUN_CMD cp -f "${./slash-commands/code.md}" "$HOME/.claude/skills/code.md"
   '';
+
+  # Install Claude Code via npm if not available
+  # This allows us to get the latest version without waiting for nixpkgs updates
+  home.activation.installClaude = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    NPM_PREFIX="$HOME/.local/share/npm"
+
+    # Check if claude command exists in npm global bin directory
+    if ! [ -x "$NPM_PREFIX/bin/claude" ]; then
+      $VERBOSE_ECHO "Claude Code not found, installing via npm..."
+      $DRY_RUN_CMD mkdir -p "$NPM_PREFIX"
+      $DRY_RUN_CMD ${pkgs.nodejs}/bin/npm install -g --prefix "$NPM_PREFIX" @anthropic-ai/claude-code
+    else
+      $VERBOSE_ECHO "Claude Code already installed via npm"
+    fi
+  '';
 }
