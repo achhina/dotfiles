@@ -12,8 +12,13 @@
       # Compact output with no heading and filename on each line
       "--no-heading"
 
-      # Show colors in output
-      "--color=always"
+      # Show colors only when outputting to terminal (not when piped/used by tools)
+      # Using 'auto' instead of 'always' prevents ANSI codes in programmatic usage
+      # See: https://github.com/anthropics/claude-code/issues/7283#issuecomment-3342066751
+      "--color=auto"
+
+      # Enable clickable hyperlinks
+      "--hyperlink-format=default"
 
       # Custom colors matching terminal theme
       "--colors=line:fg:yellow"
