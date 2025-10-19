@@ -133,6 +133,10 @@ function M.setup()
 
 	-- Window navigation handled by vim-tmux-navigator plugin
 
+	-- Window splits
+	safe_keymap("n", "<leader>v", "<cmd>vsplit<CR>", { desc = "Vertical split" })
+	safe_keymap("n", "<leader>h", "<cmd>split<CR>", { desc = "Horizontal split" })
+
 	-- Window resizing
 	safe_keymap("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height" })
 	safe_keymap("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
