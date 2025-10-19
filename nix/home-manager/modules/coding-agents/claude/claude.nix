@@ -3,16 +3,13 @@
 {
   # Claude Code settings configuration
   # Managed declaratively through Home Manager
-  #
-  # NOTE: Claude Code cannot read symlinks, so we use activation scripts
-  # to copy command files instead of the default symlink behavior.
 
   programs.claude-code = {
     enable = true;
     package = null; # Don't install claude-code via Nix, use npm install instead
 
-    # Don't use the built-in commands option (creates symlinks)
-    # Instead, we'll use activation scripts to copy files
+    # Use commandsDir to symlink slash commands
+    commandsDir = ./slash-commands;
 
     settings = {
       env = {
@@ -145,15 +142,6 @@
       };
     };
   };
-
-  # Copy slash commands to commands directory
-  # Note: Claude Code can't read symlinks, so we copy instead
-  home.activation.claudeCommands = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    $DRY_RUN_CMD mkdir -p "$HOME/.claude/commands"
-    $DRY_RUN_CMD cp -f "${./slash-commands/debug-error.md}" "$HOME/.claude/commands/debug-error.md"
-    $DRY_RUN_CMD cp -f "${./slash-commands/code-review.md}" "$HOME/.claude/commands/code-review.md"
-    $DRY_RUN_CMD cp -f "${./slash-commands/code.md}" "$HOME/.claude/commands/code.md"
-  '';
 
   # Install Claude Code via npm if not available
   # This allows us to get the latest version without waiting for nixpkgs updates
