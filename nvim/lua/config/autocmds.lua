@@ -25,7 +25,19 @@ function M.load_autocmds()
 	-- Exit ephemeral buffers with ESC
 	autocmd("FileType", {
 		group = buffer_group,
-		pattern = { "help", "lspinfo", "man", "checkhealth", "qf", "quickfix", "lazy", "startuptime" },
+		pattern = {
+			"help",
+			"lspinfo",
+			"man",
+			"checkhealth",
+			"qf",
+			"quickfix",
+			"lazy",
+			"startuptime",
+			"fugitive",
+			"fugitiveblame",
+			"git",
+		},
 		callback = function()
 			vim.keymap.set("n", "<ESC>", "<cmd>close<cr>", { buffer = 0, silent = true })
 			vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = 0, silent = true })
