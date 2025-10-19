@@ -1,15 +1,17 @@
+{ config, pkgs, lib, ... }:
+
 {
   # Claude Code settings configuration
   # Managed declaratively through Home Manager
+  #
+  # NOTE: Claude Code cannot read symlinks, so we use activation scripts
+  # to copy command files instead of the default symlink behavior.
 
   programs.claude-code = {
     enable = true;
 
-    commands = {
-      debug-error = ./slash-commands/debug-error.md;
-      code-review = ./slash-commands/code-review.md;
-      code = ./slash-commands/code.md;
-    };
+    # Don't use the built-in commands option (creates symlinks)
+    # Instead, we'll use activation scripts to copy files
 
     settings = {
       env = {
@@ -140,4 +142,12 @@
       };
     };
   };
+
+  # Copy slash commands (Claude Code can't read symlinks)
+  home.activation.claudeCommands = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    $DRY_RUN_CMD mkdir -p "$HOME/.claude/commands"
+    $DRY_RUN_CMD cp -f "${./slash-commands/debug-error.md}" "$HOME/.claude/commands/debug-error.md"
+    $DRY_RUN_CMD cp -f "${./slash-commands/code-review.md}" "$HOME/.claude/commands/code-review.md"
+    $DRY_RUN_CMD cp -f "${./slash-commands/code.md}" "$HOME/.claude/commands/code.md"
+  '';
 }
