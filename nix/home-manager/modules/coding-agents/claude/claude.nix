@@ -126,6 +126,8 @@
 
       alwaysThinkingEnabled = true;
 
+      autoUpdates = true;
+
       theme = "dark";
 
       # Plugin configuration
