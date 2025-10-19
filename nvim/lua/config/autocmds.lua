@@ -82,7 +82,6 @@ function M.load_autocmds()
 		group = git_group,
 		pattern = { "*.git/*", ".gitignore", ".gitmodules" },
 		callback = function()
-			-- Refresh git signs
 			if package.loaded["gitsigns"] then
 				require("gitsigns").refresh()
 			end
@@ -134,7 +133,6 @@ function M.load_autocmds()
 	autocmd("BufEnter", {
 		group = ui_group,
 		callback = function()
-			-- Close help windows when entering normal buffers
 			local current_buf = vim.api.nvim_get_current_buf()
 			local current_ft = vim.bo[current_buf].filetype
 

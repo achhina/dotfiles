@@ -2,31 +2,25 @@
 return {
 	"folke/snacks.nvim",
 	dependencies = {
-		"nvim-tree/nvim-web-devicons", -- for file icons
+		"nvim-tree/nvim-web-devicons",
 	},
 	priority = 1000,
 	lazy = false,
 	config = function(_, opts)
-		-- Store original vim.notify before Snacks.setup() replaces it
 		local original_vim_notify = vim.notify
 
-		-- Call Snacks setup
 		require("snacks").setup(opts)
 
-		-- Override the notifier to call both original and Snacks
 		if opts.notifier and opts.notifier.enabled then
 			---@diagnostic disable-next-line: duplicate-set-field
 			vim.notify = function(msg, level, o)
-				-- Call original vim.notify (writes to :messages)
 				original_vim_notify(msg, level, o)
-				-- Also call Snacks.notifier (toast popups + history)
 				return require("snacks").notifier.notify(msg, level, o)
 			end
 		end
 	end,
 	---@type snacks.Config
 	opts = {
-		-- Enable most snacks modules for comprehensive functionality
 		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
 		dashboard = {
 			enabled = true,
@@ -67,9 +61,9 @@ return {
 			},
 		},
 		explorer = { enabled = false }, -- Keep oil.nvim as primary file explorer
-		indent = { enabled = true }, -- Modern indent guides
+		indent = { enabled = true },
 		input = {
-			enabled = true, -- Better vim.ui.input
+			enabled = true,
 			win = {
 				keys = {
 					n_esc = { "<esc>", "cancel", mode = "n" },
@@ -80,8 +74,8 @@ return {
 		},
 		picker = { enabled = false }, -- Keep fzf-lua as primary picker
 		notifier = { enabled = true },
-		quickfile = { enabled = true }, -- Fast file operations
-		scope = { enabled = true }, -- Enhanced scope highlighting
+		quickfile = { enabled = true },
+		scope = { enabled = true },
 		scroll = {
 			enabled = true,
 			animate = {
@@ -91,16 +85,16 @@ return {
 		},
 		statuscolumn = {
 			enabled = true,
-			left = { "mark", "sign" }, -- order of priority
-			right = { "fold", "git" }, -- order of priority
+			left = { "mark", "sign" },
+			right = { "fold", "git" },
 			folds = {
-				open = true, -- show open fold icons
-				git_hl = false, -- use git sign hl for git signs
+				open = true,
+				git_hl = false,
 			},
 			git = {
 				patterns = { "GitSign", "MiniDiffSign" },
 			},
-			refresh = 50, -- refresh at most every 50ms
+			refresh = 50,
 		},
 		words = {
 			enabled = true,
@@ -279,16 +273,14 @@ return {
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "VeryLazy",
 			callback = function()
-				-- Setup some globals for easier access
 				_G.dd = function(...)
 					Snacks.debug.inspect(...)
 				end
 				_G.bt = function()
 					Snacks.debug.backtrace()
 				end
-				vim.print = _G.dd -- Override print with snacks debug
+				vim.print = _G.dd
 
-				-- Create dashboard command
 				vim.api.nvim_create_user_command("Dashboard", function()
 					Snacks.dashboard()
 				end, { desc = "Open Dashboard" })

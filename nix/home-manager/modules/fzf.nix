@@ -2,10 +2,8 @@
   programs.fzf = {
     enable = true;
 
-    # Use fd for faster, more intelligent searching
     defaultCommand = "fd --type f --hidden --follow --exclude .git";
 
-    # Enhanced default options
     defaultOptions = [
       "--height 40%"
       "--layout=reverse"
