@@ -159,8 +159,8 @@ return {
 					backdrop = {
 						transparent = true,
 					},
-					width = 1, -- Use full width instead of inheriting 0.8 from zen
-					height = 1, -- Use full height instead of inheriting 0.8 from zen
+					width = 0, -- 0 = full width (special value for fullscreen)
+					height = 0, -- 0 = full height (special value for fullscreen)
 				},
 			},
 		},
@@ -179,14 +179,14 @@ return {
 		{
 			"<leader>z",
 			function()
-				Snacks.toggle.zoom()
+				Snacks.zen.zoom()
 			end,
 			desc = "Toggle Zoom",
 		},
 		{
 			"<leader>Z",
 			function()
-				Snacks.toggle.zen()
+				Snacks.zen()
 			end,
 			desc = "Toggle Zen Mode",
 		},
