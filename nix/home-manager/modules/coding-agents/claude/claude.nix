@@ -88,6 +88,7 @@
           "Bash(tmux display:*)"
           "Bash(tmux has-session:*)"
           "Bash(tmux capture-pane:*)"
+          "Bash(tree:*)"
           "Bash(unzip:*)"
           "Bash(uv:*)"
           "Bash(yarn:*)"
