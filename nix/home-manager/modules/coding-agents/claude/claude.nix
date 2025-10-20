@@ -113,7 +113,6 @@
         additionalDirectories = [
           "~/docs"
           "/tmp"
-          "~/.claude/skills"
         ];
       };
 
@@ -145,6 +144,23 @@
       };
     };
   };
+
+  # Symlink skills from Home Manager source to runtime directory
+  # Skills are managed declaratively in ./skills/ directory
+  home.file =
+    let
+      skillsDir = ./skills;
+      skillsExist = builtins.pathExists skillsDir;
+      skills = if skillsExist then builtins.readDir skillsDir else {};
+    in
+    lib.mkMerge [
+      (lib.mapAttrs' (name: _: {
+        name = ".claude/skills/${name}";
+        value = {
+          source = ./skills/${name};
+        };
+      }) skills)
+    ];
 
   # Install Claude Code via npm if not available
   # This allows us to get the latest version without waiting for nixpkgs updates

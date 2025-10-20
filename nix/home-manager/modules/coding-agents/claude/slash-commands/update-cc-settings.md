@@ -15,7 +15,7 @@ Update Claude Code configuration settings in Home Manager modules based on user 
    - Determine which Home Manager module(s) need to be updated
 
 2. **Locate configuration files:**
-   - Primary: `/Users/achhina/.config/nix/home-manager/modules/coding-agents/claude/claude.nix`
+   - Primary: `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/claude.nix`
    - Search for other Claude-related Home Manager modules if needed
    - Read the current configuration to understand existing values
 

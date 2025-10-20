@@ -54,7 +54,7 @@ Before drafting the skill, fetch and review official Anthropic skill documentati
    - Common patterns and anti-patterns
 
 3. **Review existing skills:**
-   - Read skills from `~/.claude/skills/` for reference
+   - Read skills from `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` for reference
    - Check superpowers plugin skills if available
    - Identify patterns and styles that work well
 
@@ -163,14 +163,19 @@ Before writing the file, validate the skill content:
    - Should clearly indicate the skill's purpose
    - Check that file doesn't already exist
 
-2. **Write to skills directory:**
-   - Path: `~/.claude/skills/[skill-name].md`
+2. **Write to Home Manager skills directory:**
+   - Path: `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/[skill-name].md`
    - Use Write tool to create the file
-   - Ensure proper permissions
+   - This will be managed by Home Manager and symlinked to `~/.claude/skills/`
 
-3. **Verify creation:**
+3. **Apply with Home Manager:**
+   - Run `hm switch` to symlink the new skill to `~/.claude/skills/`
+   - Wait for the command to complete successfully
+   - Check for any errors or warnings in the output
+
+4. **Verify creation:**
    - Read the file back to confirm it was written correctly
-   - Check file exists: `ls -l ~/.claude/skills/[skill-name].md`
+   - Check symlink exists: `ls -l ~/.claude/skills/[skill-name].md`
 
 ## Phase 6: Document and Explain
 
@@ -185,9 +190,9 @@ Before writing the file, validate the skill content:
    - Expected behavior when used
 
 3. **Next steps:**
-   - Skill is immediately available (no restart needed)
+   - Skill is available after `hm switch` completes
    - Test it with a relevant scenario if appropriate
-   - Can be modified later with the same command
+   - Can be modified later by editing the file and running `hm switch`
 
 # Validation Checklist
 
@@ -210,26 +215,31 @@ Before creating the skill file, ensure ALL of these are true:
 
 # Example Skills to Reference
 
-Look at existing skills in `~/.claude/skills/` for format examples:
+Look at existing skills in `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` for format examples:
 - `debug-error.md` - Systematic debugging workflow
 - `code-review.md` - Comprehensive code review checklist
 - `code.md` - Simple utility skill
 
+These are symlinked to `~/.claude/skills/` at runtime by Home Manager.
+
 # Notes
 
-- Skills are loaded dynamically, no restart needed
+- Skills are managed declaratively through Home Manager
+- After creating a skill, run `hm switch` to apply changes
+- Skills are symlinked from the source directory to `~/.claude/skills/`
 - Skills can include executable scripts or additional resources
 - Skills should be self-contained and comprehensive
 - Don't create skills for trivial tasks (use slash commands instead)
 - Skills are best for complex, multi-step workflows that need guidance
-- You can update or modify skills later using the same command
+- Update skills by editing the source file and running `hm switch`
 
 # Error Handling
 
 If skill creation fails:
-1. Check that `~/.claude/skills/` directory exists and is writable
+1. Check that `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` directory exists
 2. Verify the skill name doesn't conflict with existing skills
 3. Ensure markdown syntax is valid
 4. Confirm YAML frontmatter is properly formatted
+5. If `hm switch` fails, check the Nix error message and fix syntax issues
 
 Arguments: $ARGUMENTS (optional: skill name or topic)
