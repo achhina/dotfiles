@@ -201,25 +201,9 @@ return {
 			},
 		}
 
-		-- Enhanced capabilities with modern LSP features
+		-- LSP capabilities from base + blink.cmp
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
-
-		capabilities.textDocument.semanticTokens =
-			vim.lsp.protocol.make_client_capabilities().textDocument.semanticTokens
-
-		-- Enhanced completion capabilities
-		capabilities.textDocument.completion.completionItem.snippetSupport = true
-		capabilities.textDocument.completion.completionItem.resolveSupport = {
-			properties = { "documentation", "detail", "additionalTextEdits" },
-		}
-		capabilities.textDocument.foldingRange = {
-			dynamicRegistration = false,
-			lineFoldingOnly = true,
-		}
-		capabilities.textDocument.colorProvider = {
-			dynamicRegistration = false,
-		}
 
 		-- Setup Nix-managed servers with error handling
 		local function safe_setup_server(name, config)
