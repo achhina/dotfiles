@@ -22,7 +22,7 @@ in
       # Editor-only LSPs
       oldPkgs.bash-language-server
       lua-language-server
-      pyright
+      basedpyright
       typescript-language-server
       yaml-language-server
       dockerfile-language-server

@@ -375,7 +375,7 @@ return {
 					rangeVariableTypes = true,
 				},
 			},
-			pyright = {
+			basedpyright = {
 				python = {
 					pythonPath = (function()
 						-- Auto-detect virtual environment
