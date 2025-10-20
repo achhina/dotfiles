@@ -12,7 +12,6 @@ return {
 			javascriptreact = { "eslint_d" },
 			typescriptreact = { "eslint_d" },
 			go = { "golangcilint" },
-			rust = { "clippy" },
 			sh = { "shellcheck" },
 			bash = { "shellcheck" },
 			dockerfile = { "hadolint" },
