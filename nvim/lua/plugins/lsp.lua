@@ -70,36 +70,6 @@ return {
 			severity_sort = true,
 		})
 
-		-- Enhanced hover with git integration
-		local original_hover = vim.lsp.handlers["textDocument/hover"]
-		vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
-			if result and result.contents then
-				-- Could add git blame or other contextual info here
-				local bufnr = ctx.bufnr
-				local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-
-				local git_blame = vim.fn.system(
-					string.format(
-						"git blame -L %d,%d %s 2>/dev/null",
-						line + 1,
-						line + 1,
-						vim.api.nvim_buf_get_name(bufnr)
-					)
-				)
-
-				if vim.v.shell_error == 0 and git_blame and git_blame ~= "" then
-					local blame_info = git_blame:match("%((.-)%)")
-					if blame_info then
-						if type(result.contents) == "table" and result.contents.value then
-							result.contents.value = result.contents.value .. "\n\n---\n*Git: " .. blame_info .. "*"
-						end
-					end
-				end
-			end
-
-			return original_hover(err, result, ctx, config)
-		end
-
 		vim.opt.updatetime = 250
 
 		--  This function gets run when an LSP connects to a particular buffer.
