@@ -32,14 +32,14 @@ M.inline_edit = {
 			if new_value ~= "" and new_value ~= current_value then
 				-- Set new variable value
 				local set_expr = var_name .. " = " .. new_value
-				dap.session:evaluate(set_expr, function(set_err, set_result)
+				dap.session:evaluate(set_expr, function(set_err, _)
 					if set_err then
 						vim.notify("Error setting variable: " .. set_err.message, vim.log.levels.ERROR)
 					else
 						vim.notify("Variable " .. var_name .. " set to: " .. new_value, vim.log.levels.INFO)
 						-- Refresh DAP UI if available
-						local dapui = require("dapui")
-						if dapui then
+						local ok, dapui = pcall(require, "dapui")
+						if ok and dapui and dapui.refresh then
 							dapui.refresh()
 						end
 					end
@@ -70,7 +70,6 @@ M.inline_edit = {
 
 	-- Watch expression under cursor
 	add_watch = function()
-		local dapui = require("dapui")
 		local var_name = vim.fn.expand("<cword>")
 		if var_name == "" then
 			var_name = vim.fn.input("Watch expression: ")
@@ -88,7 +87,6 @@ M.inline_edit = {
 M.breakpoints = {
 	-- Conditional breakpoint with smart defaults
 	set_conditional_breakpoint = function()
-		local line = vim.api.nvim_win_get_cursor(0)[1]
 		local var_name = vim.fn.expand("<cword>")
 
 		-- Smart default conditions based on context
@@ -105,7 +103,6 @@ M.breakpoints = {
 
 	-- Log point with variable interpolation
 	set_log_point = function()
-		local line = vim.api.nvim_win_get_cursor(0)[1]
 		local var_name = vim.fn.expand("<cword>")
 
 		local default_msg = ""
@@ -146,7 +143,7 @@ M.session = {
 				file = vim.fn.expand("%:p"),
 				cursor = vim.api.nvim_win_get_cursor(0),
 				breakpoints = dap.list_breakpoints(),
-				session_config = dap.session.config,
+				session_config = dap.session.config or {},
 				timestamp = os.time(),
 			}
 

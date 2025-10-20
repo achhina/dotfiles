@@ -96,6 +96,9 @@ M.profiles = {
 			program = function()
 				-- Auto-detect target binary
 				local handle = io.popen("find target/debug -maxdepth 1 -type f -executable | head -1")
+				if not handle then
+					return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
+				end
 				local result = handle:read("*a"):gsub("%s+", "")
 				handle:close()
 				return result ~= "" and result
@@ -115,6 +118,9 @@ M.profiles = {
 						.. vim.fn.getcwd()
 						.. "\")) | .name'"
 				)
+				if not handle then
+					return vim.fn.input("Path to test executable: ", vim.fn.getcwd() .. "/target/debug/deps/", "file")
+				end
 				local package_name = handle:read("*a"):gsub("%s+", "")
 				handle:close()
 				return vim.fn.getcwd() .. "/target/debug/deps/" .. package_name:gsub("-", "_")
@@ -158,6 +164,10 @@ M.auto_attach = {
 	-- Find and attach to running processes
 	attach_to_process = function(pattern)
 		local handle = io.popen("ps aux | grep '" .. pattern .. "' | grep -v grep | awk '{print $2, $11}'")
+		if not handle then
+			vim.notify("Failed to execute ps command", vim.log.levels.ERROR)
+			return
+		end
 		local processes = {}
 
 		for line in handle:lines() do
@@ -194,6 +204,10 @@ M.auto_attach = {
 
 		-- Try to determine process type and attach appropriately
 		local handle = io.popen("ps -p " .. pid .. " -o comm=")
+		if not handle then
+			vim.notify("Failed to determine process type for PID " .. pid, vim.log.levels.ERROR)
+			return
+		end
 		local comm = handle:read("*a"):gsub("%s+", "")
 		handle:close()
 
@@ -245,7 +259,6 @@ M.workflows = {
 
 		if ft == "python" then
 			-- Find current test function/class
-			local line = vim.api.nvim_get_current_line()
 			local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
 
 			-- Search backwards for test function or class
@@ -376,7 +389,7 @@ M.sessions = {
 		local session_data = {
 			breakpoints = dap.list_breakpoints(),
 			configurations = dap.configurations,
-			session_info = dap.session and {
+			session_info = dap.session and dap.session.config and {
 				name = dap.session.config.name,
 				type = dap.session.config.type,
 			} or nil,
@@ -403,7 +416,7 @@ M.sessions = {
 			-- Restore breakpoints
 			if session_data.breakpoints then
 				local dap = require("dap")
-				for file_path, breakpoints in pairs(session_data.breakpoints) do
+				for _, breakpoints in pairs(session_data.breakpoints) do
 					for _, bp in ipairs(breakpoints) do
 						dap.set_breakpoint(bp.condition, bp.hit_condition, bp.log_message)
 					end
