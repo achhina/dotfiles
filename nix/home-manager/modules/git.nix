@@ -143,6 +143,7 @@
     ignores = [
       # Claude Code local settings
       "**/.claude/settings.local.json"
+      "CLAUDE.local.md"
     ];
   };
 
