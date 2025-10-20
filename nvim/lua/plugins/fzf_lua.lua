@@ -117,35 +117,27 @@ return {
 			},
 		})
 
-		-- Search namespace
 		vim.keymap.set("n", "<leader>s", "", { desc = "+search" })
-
-		-- Quickfix namespace
 		vim.keymap.set("n", "<leader>q", "", { desc = "+quickfix" })
 
-		-- File pickers
 		vim.keymap.set("n", "<leader>sf", function()
-			-- Combine oldfiles with all files to show recent files first
 			fzf.combine({ pickers = "oldfiles;files" })
 		end, { desc = "Search Files (recent first)" })
 		vim.keymap.set("n", "<leader>fr", fzf.oldfiles, { desc = "Find recently opened files" })
 		vim.keymap.set("n", "<leader><space>", fzf.buffers, { desc = "Find existing buffers" })
 		vim.keymap.set("n", "<leader>gf", fzf.git_files, { desc = "Search Git Files" })
 
-		-- Search pickers
 		vim.keymap.set("n", "<leader>sg", fzf.live_grep, { desc = "Search by Grep" })
 		vim.keymap.set("n", "<leader>sw", fzf.grep_cword, { desc = "Search current Word" })
 		vim.keymap.set("n", "<leader>sW", fzf.grep_cWORD, { desc = "Search current WORD" })
 		vim.keymap.set("n", "<leader>sb", fzf.blines, { desc = "Search in Buffer" })
 		vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Fuzzily search in current buffer" })
 
-		-- Git pickers
 		vim.keymap.set("n", "<leader>gc", fzf.git_commits, { desc = "Git Commits" })
 		vim.keymap.set("n", "<leader>gb", fzf.git_branches, { desc = "Git Branches" })
 		vim.keymap.set("n", "<leader>gs", fzf.git_status, { desc = "Git Status" })
 		vim.keymap.set("n", "<leader>gS", fzf.git_stash, { desc = "Git stash" })
 
-		-- LSP pickers
 		vim.keymap.set("n", "<leader>lr", fzf.lsp_references, { desc = "LSP References" })
 		vim.keymap.set("n", "<leader>ld", fzf.lsp_definitions, { desc = "LSP Definitions" })
 		vim.keymap.set("n", "<leader>li", fzf.lsp_implementations, { desc = "LSP Implementations" })
@@ -154,7 +146,6 @@ return {
 		vim.keymap.set("n", "<leader>lS", fzf.lsp_workspace_symbols, { desc = "LSP workspace Symbols" })
 		vim.keymap.set("n", "<leader>sd", fzf.diagnostics_document, { desc = "Search Diagnostics" })
 
-		-- Utility pickers
 		vim.keymap.set("n", "<leader>sh", fzf.help_tags, { desc = "Search Help" })
 		vim.keymap.set("n", "<leader>sc", fzf.commands, { desc = "Search Commands" })
 		vim.keymap.set("n", "<leader>sk", fzf.keymaps, { desc = "Search Keymaps" })
@@ -164,36 +155,32 @@ return {
 		vim.keymap.set("n", "<leader>st", fzf.colorschemes, { desc = "Search Themes" })
 		vim.keymap.set("n", "<leader>ss", fzf.spell_suggest, { desc = "Spell Suggestions" })
 
-		-- Resume last picker
 		vim.keymap.set("n", "<leader>sR", fzf.resume, { desc = "Search Resume" })
 
 		-- Fix escape key in fzf terminal buffers
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "fzf",
 			callback = function()
-				-- Map escape in terminal mode to close fzf
 				vim.keymap.set("t", "<Esc>", "<C-c>", { buffer = true, silent = true })
-				-- Map escape in normal mode within fzf buffer to close fzf
 				vim.keymap.set("n", "<Esc>", "<C-c>", { buffer = true, silent = true })
 			end,
 		})
 
-		-- Diagnostic keymaps
 		vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
 		vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 		vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 
-		-- Quickfix keymaps (use Trouble's native diagnostics mode for tree view)
+		-- Quickfix keymaps
 		vim.keymap.set("n", "<leader>qd", function()
-			vim.diagnostic.setqflist({ open = false }) -- Populate quickfix for ]q/[q navigation
-			vim.cmd("cclose") -- Close any open quickfix window
-			vim.cmd("Trouble diagnostics open focus=true") -- Use diagnostics mode for tree view
+			vim.diagnostic.setqflist({ open = false })
+			vim.cmd("cclose")
+			vim.cmd("Trouble diagnostics open focus=true")
 		end, { desc = "Workspace diagnostics tree (Trouble)" })
 
 		vim.keymap.set("n", "<leader>qe", function()
-			vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR, open = false }) -- Populate quickfix for ]q/[q
-			vim.cmd("cclose") -- Close any open quickfix window
-			vim.cmd("Trouble diagnostics open focus=true filter.severity=vim.diagnostic.severity.ERROR") -- Errors only in tree
+			vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR, open = false })
+			vim.cmd("cclose")
+			vim.cmd("Trouble diagnostics open focus=true filter.severity=vim.diagnostic.severity.ERROR")
 		end, { desc = "Workspace errors tree (Trouble)" })
 
 		vim.keymap.set(
@@ -204,7 +191,6 @@ return {
 		)
 		vim.keymap.set("n", "<leader>qc", "<cmd>Trouble qflist close<cr>", { desc = "Close quickfix (Trouble)" })
 
-		-- Traditional quickfix (for when you need the actual quickfix list)
 		vim.keymap.set("n", "<leader>qD", function()
 			vim.diagnostic.setqflist()
 			vim.cmd("copen")
@@ -216,7 +202,6 @@ return {
 		vim.keymap.set("n", "<leader>qO", ":copen<CR>", { desc = "Open traditional quickfix", silent = true })
 		vim.keymap.set("n", "<leader>qC", ":cclose<CR>", { desc = "Close traditional quickfix", silent = true })
 
-		-- Quickfix navigation with error handling
 		vim.keymap.set("n", "]q", function()
 			local qf_list = vim.fn.getqflist()
 			if #qf_list == 0 then

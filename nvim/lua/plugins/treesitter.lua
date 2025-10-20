@@ -1,5 +1,4 @@
 return {
-	-- Highlight, edit, and navigate code
 	"nvim-treesitter/nvim-treesitter",
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter-textobjects",
@@ -7,9 +6,7 @@ return {
 	},
 	build = ":TSUpdate",
 	config = function()
-		-- [[ Configure Treesitter ]]
 		require("nvim-treesitter.configs").setup({
-			-- Comprehensive language support
 			ensure_installed = {
 				"bash",
 				"c",
@@ -39,13 +36,10 @@ return {
 				"yaml",
 			},
 
-			-- Enable automatic installation for new filetypes
 			auto_install = true,
 
-			-- Enhanced highlighting with additional features
 			highlight = {
 				enable = true,
-				-- Disable slow treesitter highlighting for large files
 				disable = function(_, buf)
 					local max_filesize = 100 * 1024 -- 100 KB
 					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
@@ -53,14 +47,11 @@ return {
 						return true
 					end
 				end,
-				-- Use additional vim regex highlighting
 				additional_vim_regex_highlighting = false,
 			},
 
-			-- Better indentation
 			indent = {
 				enable = true,
-				-- Disable for specific languages that have issues
 				disable = { "python", "yaml" },
 			},
 			incremental_selection = {
@@ -72,55 +63,43 @@ return {
 					node_decremental = "<M-space>",
 				},
 			},
-			-- Enhanced folding
 			fold = {
 				enable = true,
 				disable = {},
 			},
 
-			-- Better textobjects with more comprehensive mappings
 			textobjects = {
 				select = {
 					enable = true,
-					lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+					lookahead = true,
 					keymaps = {
-						-- Parameters/arguments
 						["aa"] = "@parameter.outer",
 						["ia"] = "@parameter.inner",
-						-- Functions
 						["af"] = "@function.outer",
 						["if"] = "@function.inner",
-						-- Classes
 						["ac"] = "@class.outer",
 						["ic"] = "@class.inner",
-						-- Conditionals
 						["ai"] = "@conditional.outer",
 						["ii"] = "@conditional.inner",
-						-- Loops
 						["al"] = "@loop.outer",
 						["il"] = "@loop.inner",
-						-- Comments
 						["aC"] = "@comment.outer",
 						["iC"] = "@comment.inner",
-						-- Blocks
 						["ab"] = "@block.outer",
 						["ib"] = "@block.inner",
-						-- Calls
 						["aF"] = "@call.outer",
 						["iF"] = "@call.inner",
 					},
-					-- Selection modes
 					selection_modes = {
 						["@parameter.outer"] = "v", -- charwise
 						["@function.outer"] = "V", -- linewise
 						["@class.outer"] = "V", -- linewise
 					},
-					-- Include surrounding whitespace
 					include_surrounding_whitespace = true,
 				},
 				move = {
 					enable = true,
-					set_jumps = true, -- whether to set jumps in the jumplist
+					set_jumps = true,
 					goto_next_start = {
 						["]m"] = "@function.outer",
 						["]]"] = "@class.outer",
@@ -163,7 +142,6 @@ return {
 						["<leader>sC"] = "@class.outer",
 					},
 				},
-				-- LSP interop for better definitions
 				lsp_interop = {
 					enable = true,
 					border = "none",
@@ -175,12 +153,11 @@ return {
 				},
 			},
 
-			-- Enable playground for testing
 			playground = {
 				enable = true,
 				disable = {},
-				updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
-				persist_queries = false, -- Whether the query persists across vim sessions
+				updatetime = 25,
+				persist_queries = false,
 				keybindings = {
 					toggle_query_editor = "o",
 					toggle_hl_groups = "i",
@@ -196,27 +173,23 @@ return {
 			},
 		})
 
-		-- Configure treesitter context with performance optimizations
 		require("treesitter-context").setup({
 			enable = true,
-			max_lines = 3, -- Limit context lines for performance
-			min_window_height = 10, -- Don't show context in small windows
+			max_lines = 3,
+			min_window_height = 10,
 			line_numbers = true,
-			multiline_threshold = 2, -- Reduced threshold for better performance
+			multiline_threshold = 2,
 			trim_scope = "outer",
 			mode = "cursor",
 			separator = nil,
 			zindex = 20,
-			-- Performance: disable for large files and certain file types
 			on_attach = function(buf)
-				-- Disable for large files
-				local max_filesize = 100 * 1024 -- 100 KB
+				local max_filesize = 100 * 1024
 				local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
 				if ok and stats and stats.size > max_filesize then
 					return false
 				end
 
-				-- Disable for specific filetypes
 				local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
 				local excluded_filetypes = {
 					"help",
@@ -242,12 +215,10 @@ return {
 			end,
 		})
 
-		-- Additional performance optimizations
-		-- Disable treesitter for very large buffers
 		vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
 			callback = function()
 				local buf = vim.api.nvim_get_current_buf()
-				local max_filesize = 500 * 1024 -- 500 KB
+				local max_filesize = 500 * 1024
 				local filename = vim.api.nvim_buf_get_name(buf)
 
 				if filename == "" then

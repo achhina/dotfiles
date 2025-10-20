@@ -4,10 +4,8 @@ function M.load_autocmds()
 	local autocmd = vim.api.nvim_create_autocmd
 	local augroup = vim.api.nvim_create_augroup
 
-	-- General workflow automation
 	local workflow_group = augroup("WorkflowAutomation", { clear = true })
 
-	-- Auto-create parent directories when saving
 	autocmd("BufWritePre", {
 		group = workflow_group,
 		callback = function(event)
@@ -19,10 +17,8 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Buffer management automation
 	local buffer_group = augroup("BufferManagement", { clear = true })
 
-	-- Exit ephemeral buffers with ESC
 	autocmd("FileType", {
 		group = buffer_group,
 		pattern = {
@@ -44,17 +40,14 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Development workflow automation
 	local dev_group = augroup("DevelopmentWorkflow", { clear = true })
 
-	-- Auto-reload files when they change on disk
 	autocmd({ "FocusGained", "CursorHold" }, {
 		group = dev_group,
 		pattern = "*",
 		command = "if mode() != 'c' | checktime | endif",
 	})
 
-	-- Notification when file changes on disk
 	autocmd("FileChangedShellPost", {
 		group = dev_group,
 		pattern = "*",
@@ -63,7 +56,6 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Auto-compile on save for certain filetypes
 	autocmd("BufWritePost", {
 		group = dev_group,
 		pattern = "*.tex",
@@ -74,10 +66,8 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Git workflow automation
 	local git_group = augroup("GitWorkflow", { clear = true })
 
-	-- Auto-reload git status when entering git-related files
 	autocmd({ "BufEnter", "FocusGained" }, {
 		group = git_group,
 		pattern = { "*.git/*", ".gitignore", ".gitmodules" },
@@ -88,10 +78,8 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- UI/UX improvements
 	local ui_group = augroup("UIImprovements", { clear = true })
 
-	-- Highlight yanked text
 	autocmd("TextYankPost", {
 		group = ui_group,
 		pattern = "*",
@@ -103,7 +91,6 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Auto-resize splits when window is resized
 	autocmd("VimResized", {
 		group = ui_group,
 		callback = function()
@@ -111,7 +98,6 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Remember last position in file
 	autocmd("BufReadPost", {
 		group = ui_group,
 		callback = function()
@@ -129,7 +115,6 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Auto-close unnecessary windows
 	autocmd("BufEnter", {
 		group = ui_group,
 		callback = function()
@@ -148,10 +133,8 @@ function M.load_autocmds()
 		end,
 	})
 
-	-- Terminal automation
 	local term_group = augroup("TerminalAutomation", { clear = true })
 
-	-- Start in insert mode when entering terminal
 	autocmd("TermOpen", {
 		group = term_group,
 		pattern = "*",

@@ -1,8 +1,6 @@
 return {
-	-- LSP Configuration & Plugins
 	"neovim/nvim-lspconfig",
 	dependencies = {
-		-- Enhanced LSP progress notifications
 		{
 			"j-hui/fidget.nvim",
 			opts = {
@@ -31,8 +29,6 @@ return {
 		},
 	},
 	config = function()
-		-- [[ Configure LSP ]]
-		-- Enhanced LSP handlers and diagnostics
 		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
 			border = "rounded",
 			max_width = 80,
@@ -44,7 +40,6 @@ return {
 			silent = true,
 		})
 
-		-- Enhanced diagnostics with Git integration
 		vim.diagnostic.config({
 			virtual_text = {
 				severity = { min = vim.diagnostic.severity.WARN },
@@ -73,12 +68,10 @@ return {
 		vim.opt.updatetime = 250
 		vim.lsp.inlay_hint.enable(true)
 
-		--  This function gets run when an LSP connects to a particular buffer.
 		local on_attach = function(_client, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 		end
 
-		-- All servers now managed by Nix
 		local nix_servers = {
 			clangd = {},
 			gopls = {
@@ -102,41 +95,30 @@ return {
 			basedpyright = {
 				python = {
 					pythonPath = (function()
-						-- 1. Check VIRTUAL_ENV environment variable
 						local venv_path = os.getenv("VIRTUAL_ENV")
 						if venv_path then
 							return venv_path .. "/bin/python3"
 						end
 
-						-- 2. Check for .venv in current working directory
 						local cwd = vim.fn.getcwd()
 						local local_venv = cwd .. "/.venv/bin/python3"
 						if vim.fn.executable(local_venv) == 1 then
 							return local_venv
 						end
 
-						-- 3. Fall back to system Python
 						return vim.fn.exepath("python3") or vim.fn.exepath("python")
 					end)(),
 				},
 				analysis = {
-					-- Type checking mode: "off", "basic", "standard", "recommended", "strict", "all"
 					typeCheckingMode = "recommended",
-
-					-- Diagnostics
-					diagnosticMode = "workspace", -- Analyze all files in workspace
-
-					-- Search and import
+					diagnosticMode = "workspace",
 					autoSearchPaths = true,
 					useLibraryCodeForTypes = true,
 					autoImportCompletions = true,
 					extraPaths = { "." },
-
-					-- Basedpyright-specific features
 					indexing = true,
 					autoFormatStrings = true,
 
-					-- Inlay hints
 					inlayHints = {
 						variableTypes = true,
 						callArgumentNames = true,
@@ -144,7 +126,6 @@ return {
 						genericTypes = false,
 					},
 
-					-- Diagnostic overrides
 					diagnosticSeverityOverrides = {
 						reportMissingTypeStubs = "none",
 					},
@@ -201,11 +182,9 @@ return {
 			},
 		}
 
-		-- LSP capabilities from base + blink.cmp
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
 
-		-- Setup Nix-managed servers with error handling
 		local function safe_setup_server(name, config)
 			local server_setup_ok, server_setup_err = pcall(function()
 				vim.lsp.config[name] = {
