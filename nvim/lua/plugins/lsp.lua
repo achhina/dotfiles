@@ -71,14 +71,11 @@ return {
 		})
 
 		vim.opt.updatetime = 250
+		vim.lsp.inlay_hint.enable(true)
 
 		--  This function gets run when an LSP connects to a particular buffer.
 		local on_attach = function(client, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
-
-			if client:supports_method("textDocument/inlayHint") then
-				vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-			end
 
 			-- Document highlighting
 			if client:supports_method("textDocument/documentHighlight") then
