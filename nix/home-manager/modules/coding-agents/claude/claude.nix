@@ -143,10 +143,17 @@
             repo = "wshobson/agents";
           };
         };
+        elements-of-style = {
+          source = {
+            source = "github";
+            repo = "obra/the-elements-of-style";
+          };
+        };
       };
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
+        "elements-of-style" = true;
       };
     };
   };
