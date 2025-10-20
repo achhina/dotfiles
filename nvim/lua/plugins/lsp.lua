@@ -111,39 +111,7 @@ return {
 		-- Memory management
 		vim.g.lsp_zero_extend_cmp = 0
 
-		-- LSP Health Monitoring
-		local function setup_lsp_monitoring()
-			-- Track server restarts and crashes
-			vim.api.nvim_create_autocmd("LspDetach", {
-				callback = function(args)
-					local client = vim.lsp.get_client_by_id(args.data.client_id)
-					if client then
-						-- Skip notification for copilot disconnections (expected behavior)
-						if client.name ~= "copilot" then
-							vim.notify("LSP server disconnected: " .. client.name, vim.log.levels.WARN)
-						end
-						-- Disable auto-restart to prevent buffer thrashing that triggers E36
-						-- The auto-restart was causing rapid buffer events that overwhelm noice
-						-- Use manual :LspRestart if needed
-					end
-				end,
-			})
-
-			-- Monitor LSP performance
-			vim.api.nvim_create_autocmd("LspRequest", {
-				callback = function(args)
-					if vim.g.lsp_performance_tracking and args.data.client_name then
-						local tracking = vim.g.lsp_performance_tracking[args.data.client_name]
-						if tracking then
-							tracking.requests = (tracking.requests or 0) + 1
-						end
-					end
-				end,
-			})
-		end
-		setup_lsp_monitoring()
-
-		-- Advanced LSP metrics and status
+		-- LSP status for statusline
 		_G.lsp_status = function()
 			local clients = vim.lsp.get_clients({ bufnr = 0 })
 			if #clients == 0 then
@@ -152,28 +120,7 @@ return {
 
 			local names = {}
 			for _, client in ipairs(clients) do
-				local status = "●"
-				local perf_info = ""
-
-				if vim.g.lsp_performance_tracking and vim.g.lsp_performance_tracking[client.name] then
-					local tracking = vim.g.lsp_performance_tracking[client.name]
-					local elapsed = (vim.loop.hrtime() - tracking.start_time) / 1e9
-					local rps = tracking.requests / math.max(elapsed, 1) -- requests per second
-
-					if rps > 10 then
-						status = "⚡" -- High activity
-					elseif client.is_stopped() then
-						status = "●" -- Stopped
-					else
-						status = "●" -- Normal
-					end
-
-					if elapsed > 300 then -- 5 minutes
-						perf_info = string.format("(%d req, %.0fs)", tracking.requests, elapsed)
-					end
-				end
-
-				table.insert(names, status .. client.name .. perf_info)
+				table.insert(names, client.name)
 			end
 			return " " .. table.concat(names, " ")
 		end
