@@ -137,7 +137,7 @@
             repo = "obra/superpowers-marketplace";
           };
         };
-        agents = {
+        claude-code-workflows = {
           source = {
             source = "github";
             repo = "wshobson/agents";
@@ -154,6 +154,7 @@
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
         "elements-of-style" = true;
+        "shell-scripting@claude-code-workflows" = true;
       };
     };
   };
