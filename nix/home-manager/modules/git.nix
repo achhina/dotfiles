@@ -141,9 +141,24 @@
 
     # Global ignore patterns
     ignores = [
+      # OS-specific files
+      ".DS_Store"
+      "Thumbs.db"
+
+      # Vim swap/backup files
+      "*.swp"
+      "*.swo"
+      "*~"
+
+      # Personal notes and local configs
+      "*.local.md"
+      ".envrc.local"
+
+      # Development artifacts
+      "dump.rdb"
+
       # Claude Code local settings
       "**/.claude/settings.local.json"
-      "CLAUDE.local.md"
     ];
   };
 
