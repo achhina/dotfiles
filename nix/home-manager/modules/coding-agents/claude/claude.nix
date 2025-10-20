@@ -130,6 +130,7 @@
       theme = "dark";
 
       # Plugin configuration
+      # Marketplaces contain multiple plugins
       extraKnownMarketplaces = {
         superpowers-marketplace = {
           source = {
@@ -143,10 +144,14 @@
             repo = "wshobson/agents";
           };
         };
+      };
+
+      # Standalone plugins from GitHub
+      plugins = {
         elements-of-style = {
           source = {
-            source = "github";
-            repo = "obra/the-elements-of-style";
+            source = "url";
+            url = "https://github.com/obra/the-elements-of-style.git";
           };
         };
       };
