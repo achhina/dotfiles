@@ -82,7 +82,6 @@ return {
 				local bufnr = ctx.bufnr
 				local line = vim.api.nvim_win_get_cursor(0)[1] - 1
 
-				-- Add git blame info if available
 				local git_blame = vim.fn.system(
 					string.format(
 						"git blame -L %d,%d %s 2>/dev/null",
@@ -95,7 +94,6 @@ return {
 				if vim.v.shell_error == 0 and git_blame and git_blame ~= "" then
 					local blame_info = git_blame:match("%((.-)%)")
 					if blame_info then
-						-- Add git info to hover (simplified)
 						if type(result.contents) == "table" and result.contents.value then
 							result.contents.value = result.contents.value .. "\n\n---\n*Git: " .. blame_info .. "*"
 						end
@@ -157,7 +155,6 @@ return {
 				local status = "●"
 				local perf_info = ""
 
-				-- Check performance metrics
 				if vim.g.lsp_performance_tracking and vim.g.lsp_performance_tracking[client.name] then
 					local tracking = vim.g.lsp_performance_tracking[client.name]
 					local elapsed = (vim.loop.hrtime() - tracking.start_time) / 1e9
@@ -183,7 +180,6 @@ return {
 
 		-- Advanced diagnostic filtering and metrics
 		local function setup_diagnostic_metrics()
-			-- Track diagnostic counts
 			vim.g.diagnostic_metrics = {
 				errors = 0,
 				warnings = 0,
@@ -191,7 +187,6 @@ return {
 				hints = 0,
 			}
 
-			-- Update metrics when diagnostics change
 			vim.api.nvim_create_autocmd("DiagnosticChanged", {
 				callback = function()
 					local diagnostics = vim.diagnostic.get(0)
@@ -217,7 +212,6 @@ return {
 			local original_handler = vim.diagnostic.handlers.virtual_text
 			vim.diagnostic.handlers.virtual_text = {
 				show = function(namespace, bufnr, diagnostics, opts)
-					-- Filter diagnostics based on context
 					local filtered = vim.tbl_filter(function(diagnostic)
 						-- Hide certain diagnostics in large files
 						local line_count = vim.api.nvim_buf_line_count(bufnr)
@@ -247,7 +241,6 @@ return {
 		end
 		setup_diagnostic_metrics()
 
-		-- Global function to get diagnostic summary
 		_G.diagnostic_summary = function()
 			if vim.g.diagnostic_metrics then
 				local m = vim.g.diagnostic_metrics
@@ -275,34 +268,10 @@ return {
 			return ""
 		end
 
-		-- Future optimization functions (currently unused)
-		-- local function should_load_lsp(server, bufnr)
-		-- 	local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
-		-- 	local server_filetypes = {
-		-- 		ts_ls = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
-		-- 		pyright = { "python" },
-		-- 		gopls = { "go" },
-		-- 		rust_analyzer = { "rust" },
-		-- 		lua_ls = { "lua" },
-		-- 		clangd = { "c", "cpp", "objc", "objcpp" },
-		-- 		marksman = { "markdown" },
-		-- 		yamlls = { "yaml" },
-		-- 		dockerls = { "dockerfile" },
-		-- 		taplo = { "toml" },
-		-- 	}
-		-- 	return vim.tbl_contains(server_filetypes[server] or {}, filetype)
-		-- end
-
-		-- local function get_project_root()
-		-- 	local patterns = { ".git", "package.json", "Cargo.toml", "go.mod", "pyproject.toml", "Makefile" }
-		-- 	return vim.fs.dirname(vim.fs.find(patterns, { upward = true })[1])
-		-- end
-
 		--  This function gets run when an LSP connects to a particular buffer.
 		local on_attach = function(client, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 
-			-- Enable inlay hints if supported
 			if client:supports_method("textDocument/inlayHint") then
 				vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
 			end
@@ -507,7 +476,6 @@ return {
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
 
-		-- Add semantic tokens support
 		capabilities.textDocument.semanticTokens =
 			vim.lsp.protocol.make_client_capabilities().textDocument.semanticTokens
 
