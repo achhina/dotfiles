@@ -113,6 +113,7 @@
         additionalDirectories = [
           "~/docs"
           "/tmp"
+          "~/.claude/skills"
         ];
       };
 
