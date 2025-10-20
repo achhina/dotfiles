@@ -378,22 +378,11 @@ return {
 			basedpyright = {
 				python = {
 					pythonPath = (function()
-						-- Try venv-selector first (if available)
-						local ok, venv_selector = pcall(require, "venv-selector")
-						if ok then
-							local python_path = venv_selector.python()
-							if python_path and python_path ~= "" then
-								return python_path
-							end
-						end
-
-						-- Fallback to VIRTUAL_ENV environment variable
+						-- Auto-detect virtual environment
 						local venv_path = os.getenv("VIRTUAL_ENV")
 						if venv_path then
 							return venv_path .. "/bin/python"
 						end
-
-						-- Fallback to system Python
 						return vim.fn.exepath("python3") or vim.fn.exepath("python")
 					end)(),
 				},

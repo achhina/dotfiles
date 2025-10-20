@@ -91,57 +91,6 @@ return {
 		end,
 	},
 
-	-- Python virtual environment selector
-	{
-		"linux-cultist/venv-selector.nvim",
-		dependencies = {
-			"neovim/nvim-lspconfig",
-			"mfussenegger/nvim-dap",
-			"mfussenegger/nvim-dap-python", --optional
-			"nvim-lua/plenary.nvim",
-		},
-		lazy = false,
-		keys = {
-			{
-				"<leader>vs",
-				"<cmd>VenvSelect<cr>",
-				desc = "Select virtual environment",
-			},
-			{
-				"<leader>vc",
-				"<cmd>VenvSelectCached<cr>",
-				desc = "Select cached virtual environment",
-			},
-		},
-		config = function()
-			require("venv-selector").setup({
-				options = {
-					notify_user_on_venv_activation = true,
-				},
-				search = {
-					my_venvs = {
-						command = "fd 'pyvenv.cfg' ~/.virtualenvs --max-depth 2",
-					},
-					pipenv = {
-						command = "fd 'pyvenv.cfg' ~/.local/share/virtualenvs --max-depth 2",
-					},
-					poetry = {
-						command = "fd 'pyvenv.cfg' ~/Library/Caches/pypoetry/virtualenvs --max-depth 2",
-					},
-					conda = {
-						command = "fd 'pyvenv.cfg' ~/miniconda3/envs --max-depth 2",
-					},
-					pyenv = {
-						command = "fd 'pyvenv.cfg' ~/.pyenv/versions --max-depth 2",
-					},
-					workspace = {
-						command = "fd 'pyvenv.cfg' . --max-depth 4 --type f",
-					},
-				},
-			})
-		end,
-	},
-
 	-- Enhanced Markdown support
 	{
 		"tadmccorkle/markdown.nvim",
