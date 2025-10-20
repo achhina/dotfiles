@@ -57,7 +57,6 @@ return {
 				border = "rounded",
 				source = "always",
 				format = function(diagnostic)
-					-- Enhanced format with potential git blame info
 					local message = diagnostic.message
 					if diagnostic.source then
 						message = string.format("[%s] %s", diagnostic.source, message)
@@ -74,9 +73,6 @@ return {
 		-- Enhanced hover with git integration
 		local original_hover = vim.lsp.handlers["textDocument/hover"]
 		vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
-			config = config or {}
-			config.border = "rounded"
-
 			if result and result.contents then
 				-- Could add git blame or other contextual info here
 				local bufnr = ctx.bufnr
@@ -104,12 +100,7 @@ return {
 			return original_hover(err, result, ctx, config)
 		end
 
-		-- Performance optimizations
-		vim.lsp.set_log_level("WARN")
 		vim.opt.updatetime = 250
-
-		-- Memory management
-		vim.g.lsp_zero_extend_cmp = 0
 
 		--  This function gets run when an LSP connects to a particular buffer.
 		local on_attach = function(client, bufnr)
@@ -146,24 +137,6 @@ return {
 					end,
 				})
 			end
-
-			-- Resource management and limits
-			local function setup_client_limits(lsp_client)
-				if lsp_client.name == "ts_ls" then
-					-- TypeScript memory management
-					if lsp_client.config.init_options then
-						lsp_client.config.init_options.maxTsServerMemory = 4096
-					end
-				elseif lsp_client.name == "rust_analyzer" then
-					-- Rust analyzer can be CPU intensive
-					if lsp_client.config.settings and lsp_client.config.settings["rust-analyzer"] then
-						lsp_client.config.settings["rust-analyzer"].cargo = lsp_client.config.settings["rust-analyzer"].cargo
-							or {}
-						lsp_client.config.settings["rust-analyzer"].cargo.target = nil -- Don't specify target for performance
-					end
-				end
-			end
-			setup_client_limits(client)
 		end
 
 		-- All servers now managed by Nix
@@ -261,32 +234,6 @@ return {
 				},
 			},
 			bashls = {},
-			ts_ls = {
-				init_options = {
-					maxTsServerMemory = 4096,
-				},
-				typescript = {
-					updateImportsOnFileMove = { enabled = "always" },
-					suggest = {
-						includeCompletionsForModuleExports = true,
-						autoImports = true,
-					},
-					preferences = {
-						includePackageJsonAutoImports = "auto",
-						importModuleSpecifier = "relative",
-					},
-					inlayHints = {
-						includeInlayParameterNameHints = "literals",
-						includeInlayFunctionParameterTypeHints = true,
-						includeInlayVariableTypeHints = false,
-					},
-					workspaceSymbols = { scope = "allOpenProjects" },
-				},
-				javascript = {
-					updateImportsOnFileMove = { enabled = "always" },
-					suggest = { autoImports = true },
-				},
-			},
 			lua_ls = {
 				Lua = {
 					runtime = { version = "LuaJIT" },
