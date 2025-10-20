@@ -74,24 +74,8 @@ return {
 		vim.lsp.inlay_hint.enable(true)
 
 		--  This function gets run when an LSP connects to a particular buffer.
-		local on_attach = function(client, bufnr)
+		local on_attach = function(_client, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
-
-			-- Document highlighting
-			if client:supports_method("textDocument/documentHighlight") then
-				local group = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = false })
-				vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
-				vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-					buffer = bufnr,
-					group = group,
-					callback = vim.lsp.buf.document_highlight,
-				})
-				vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-					buffer = bufnr,
-					group = group,
-					callback = vim.lsp.buf.clear_references,
-				})
-			end
 		end
 
 		-- All servers now managed by Nix
