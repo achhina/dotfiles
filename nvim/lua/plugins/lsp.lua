@@ -385,13 +385,37 @@ return {
 						end
 						return vim.fn.exepath("python3") or vim.fn.exepath("python")
 					end)(),
-					analysis = {
-						typeCheckingMode = "standard",
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
-						autoImportCompletions = true,
-						indexing = true,
-						extraPaths = { "." },
+				},
+				analysis = {
+					-- Type checking mode: "off", "basic", "standard", "recommended", "strict", "all"
+					typeCheckingMode = "recommended",
+
+					-- Diagnostics
+					diagnosticMode = "workspace", -- Analyze all files in workspace
+
+					-- Search and import
+					autoSearchPaths = true,
+					useLibraryCodeForTypes = true,
+					autoImportCompletions = true,
+					extraPaths = { "." },
+
+					-- Basedpyright-specific features
+					indexing = true,
+					autoFormatStrings = true,
+
+					-- Inlay hints
+					inlayHints = {
+						variableTypes = true,
+						callArgumentNames = true,
+						functionReturnTypes = true,
+						genericTypes = false,
+					},
+
+					-- Diagnostic overrides to reduce noise
+					diagnosticSeverityOverrides = {
+						reportUnusedVariable = "hint",
+						reportUnusedParameter = "hint",
+						reportMissingTypeStubs = "information",
 					},
 				},
 			},
