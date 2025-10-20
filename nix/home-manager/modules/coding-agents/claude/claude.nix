@@ -151,8 +151,10 @@
     };
   };
 
+  # Ensure Claude Code directories exist for plugin installations
+  # These directories will contain both declaratively-managed symlinks (from Home Manager)
+  # and dynamically-created files (from plugin installations)
   # Symlink skills from Home Manager source to runtime directory
-  # Skills are managed declaratively in ./skills/ directory
   home.file =
     let
       skillsDir = ./skills;
@@ -160,6 +162,13 @@
       skills = if skillsExist then builtins.readDir skillsDir else {};
     in
     lib.mkMerge [
+      # Create .keep files to ensure directories exist
+      {
+        ".claude/commands/.keep".text = "";
+        ".claude/agents/.keep".text = "";
+        ".claude/skills/.keep".text = "";
+      }
+      # Symlink skills from declarative source
       (lib.mapAttrs' (name: _: {
         name = ".claude/skills/${name}";
         value = {
