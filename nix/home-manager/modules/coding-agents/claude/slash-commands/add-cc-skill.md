@@ -54,7 +54,8 @@ Before drafting the skill, fetch and review official Anthropic skill documentati
    - Common patterns and anti-patterns
 
 3. **Review existing skills:**
-   - Read skills from `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` for reference
+   - First, determine the config directory: `echo "${XDG_CONFIG_HOME:-$HOME/.config}"`
+   - Read skills from `<config-dir>/nix/home-manager/modules/coding-agents/claude/skills/` for reference
    - Check superpowers plugin skills if available
    - Identify patterns and styles that work well
 
@@ -164,7 +165,8 @@ Before writing the file, validate the skill content:
    - Check that file doesn't already exist
 
 2. **Write to Home Manager skills directory:**
-   - Path: `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/[skill-name].md`
+   - Determine config directory: `echo "${XDG_CONFIG_HOME:-$HOME/.config}"`
+   - Path: `<config-dir>/nix/home-manager/modules/coding-agents/claude/skills/[skill-name].md`
    - Use Write tool to create the file
    - This will be managed by Home Manager and symlinked to `~/.claude/skills/`
 
@@ -215,7 +217,7 @@ Before creating the skill file, ensure ALL of these are true:
 
 # Example Skills to Reference
 
-Look at existing skills in `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` for format examples:
+Look at existing skills in `<config-dir>/nix/home-manager/modules/coding-agents/claude/skills/` for format examples (where `<config-dir>` is `${XDG_CONFIG_HOME:-$HOME/.config}`):
 - `debug-error.md` - Systematic debugging workflow
 - `code-review.md` - Comprehensive code review checklist
 - `code.md` - Simple utility skill
@@ -236,7 +238,7 @@ These are symlinked to `~/.claude/skills/` at runtime by Home Manager.
 # Error Handling
 
 If skill creation fails:
-1. Check that `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/skills/` directory exists
+1. Check that `<config-dir>/nix/home-manager/modules/coding-agents/claude/skills/` directory exists (where `<config-dir>` is `${XDG_CONFIG_HOME:-$HOME/.config}`)
 2. Verify the skill name doesn't conflict with existing skills
 3. Ensure markdown syntax is valid
 4. Confirm YAML frontmatter is properly formatted

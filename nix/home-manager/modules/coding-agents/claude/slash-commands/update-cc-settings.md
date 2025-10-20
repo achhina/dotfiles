@@ -15,8 +15,9 @@ Update Claude Code configuration settings in Home Manager modules based on user 
    - Determine which Home Manager module(s) need to be updated
 
 2. **Locate configuration files:**
-   - Primary: `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/coding-agents/claude/claude.nix`
-   - Search for other Claude-related Home Manager modules if needed
+   - First, determine the config directory: `echo "${XDG_CONFIG_HOME:-$HOME/.config}"`
+   - Primary config file: `<config-dir>/nix/home-manager/modules/coding-agents/claude/claude.nix`
+   - Search for other Claude-related Home Manager modules if needed in `<config-dir>/nix/home-manager/modules/`
    - Read the current configuration to understand existing values
 
 3. **Validate changes:**
