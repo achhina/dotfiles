@@ -411,11 +411,9 @@ return {
 						genericTypes = false,
 					},
 
-					-- Diagnostic overrides to reduce noise
+					-- Diagnostic overrides
 					diagnosticSeverityOverrides = {
-						reportUnusedVariable = "hint",
-						reportUnusedParameter = "hint",
-						reportMissingTypeStubs = "information",
+						reportMissingTypeStubs = "none",
 					},
 				},
 			},
