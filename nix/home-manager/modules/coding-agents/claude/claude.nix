@@ -137,6 +137,12 @@
             repo = "obra/superpowers-marketplace";
           };
         };
+        agents = {
+          source = {
+            source = "github";
+            repo = "wshobson/agents";
+          };
+        };
       };
 
       enabledPlugins = {
