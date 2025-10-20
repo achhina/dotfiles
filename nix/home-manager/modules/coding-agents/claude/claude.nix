@@ -155,6 +155,8 @@
         "superpowers@superpowers-marketplace" = true;
         "elements-of-style" = true;
         "shell-scripting@claude-code-workflows" = true;
+        "python-development@claude-code-workflows" = true;
+        "javascript-typescript@claude-code-workflows" = true;
       };
     };
   };
