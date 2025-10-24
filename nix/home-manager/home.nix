@@ -51,6 +51,7 @@ in
   # Enable copying apps to ~/Applications on macOS (replaces mac-app-util)
   targets.darwin.linkApps.enable = false; # Disable default symlinking
   targets.darwin.copyApps.enable = true;  # Enable copying for Spotlight compatibility
+  targets.darwin.copyApps.enableChecks = false;  # Disable sudo prompts for app management checks
 
   # Environment variables
   home.sessionVariables = {
