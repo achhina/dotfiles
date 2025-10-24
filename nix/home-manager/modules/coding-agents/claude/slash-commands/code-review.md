@@ -2,6 +2,26 @@
 description: Perform comprehensive code review with structured analysis
 ---
 
+# Scope Determination
+
+First, determine what to review:
+
+1. **Check for uncommitted changes:**
+   - Run `git status` to check for modified, staged, or untracked files
+   - Run `git diff` to see unstaged changes
+   - Run `git diff --cached` to see staged changes
+
+2. **If there are uncommitted changes:**
+   - Review the uncommitted changes using `git diff HEAD`
+
+3. **If working tree is clean:**
+   - Find the remote target branch (typically `origin/main` or `upstream/main`)
+   - Run `git log --oneline origin/main..HEAD` to see local commits
+   - Review changes using `git diff origin/main...HEAD`
+   - Focus on all commits that haven't been pushed to the remote
+
+# Code Review Framework
+
 Perform a comprehensive code review using the following structured approach:
 
 ## 1. Code Quality & Maintainability
