@@ -36,6 +36,7 @@
           "Bash(git commit:*)"
           "Bash(git log:*)"
           "Bash(git ls-tree:*)"
+          "Bash(git worktree:*)"
           "Bash(gh attestation verify:*)"
           "Bash(gh auth status:*)"
           "Bash(gh browse:*)"
