@@ -104,6 +104,14 @@
           "Write"
           "mcp__context7__get-library-docs"
           "mcp__context7__resolve-library-id"
+          "Glob"
+          "Grep"
+          "Task"
+          "Skill"
+          "SlashCommand"
+          "TodoWrite"
+          "NotebookEdit"
+          "AskUserQuestion"
         ];
 
         deny = [
