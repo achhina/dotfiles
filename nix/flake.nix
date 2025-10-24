@@ -7,11 +7,9 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Don't follow our nixpkgs - uses its own pinned version to avoid SBCL 2.5.7 build failures on macOS
-    mac-app-util.url = "github:hraban/mac-app-util";
   };
 
-  outputs = { self, nixpkgs, home-manager, mac-app-util }:
+  outputs = { self, nixpkgs, home-manager }:
     let
       # Automatically detect system architecture
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
@@ -24,11 +22,8 @@
             inherit system;
             config.allowUnfree = true;
           };
-          # Only include mac-app-util on Darwin systems
           modules = [
             ./home-manager/home.nix
-          ] ++ nixpkgs.lib.optionals (nixpkgs.lib.hasSuffix "darwin" system) [
-            mac-app-util.homeManagerModules.default
           ];
         in
         home-manager.lib.homeManagerConfiguration {

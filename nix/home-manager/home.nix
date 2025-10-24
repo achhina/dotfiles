@@ -48,6 +48,10 @@ in
   # release notes.
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
+  # Enable copying apps to ~/Applications on macOS (replaces mac-app-util)
+  targets.darwin.linkApps.enable = false; # Disable default symlinking
+  targets.darwin.copyApps.enable = true;  # Enable copying for Spotlight compatibility
+
   # Environment variables
   home.sessionVariables = {
     EZA_COLORS = "gm=33:ga=31";
