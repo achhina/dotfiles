@@ -113,20 +113,21 @@ function M.check_autocmds()
 
 	for _, autocmd in ipairs(all_autocmds) do
 		local event = autocmd.event
-		local pattern = autocmd.pattern or "*"
-		local group_name = autocmd.group_name or "default"
+		if event then
+			local group_name = autocmd.group_name or "default"
 
-		-- Track by group
-		if not groups[group_name] then
-			groups[group_name] = {}
-		end
-		table.insert(groups[group_name], autocmd)
+			-- Track by group
+			if not groups[group_name] then
+				groups[group_name] = {}
+			end
+			table.insert(groups[group_name], autocmd)
 
-		-- Track by event
-		if not autocmds[event] then
-			autocmds[event] = {}
+			-- Track by event
+			if not autocmds[event] then
+				autocmds[event] = {}
+			end
+			table.insert(autocmds[event], autocmd)
 		end
-		table.insert(autocmds[event], autocmd)
 	end
 
 	-- Format output

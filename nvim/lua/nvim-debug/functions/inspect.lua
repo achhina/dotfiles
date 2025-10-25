@@ -90,7 +90,7 @@ function M.trace_last_error()
 	-- Current buffer context
 	local buf = vim.api.nvim_get_current_buf()
 	local buf_name = vim.api.nvim_buf_get_name(buf)
-	local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+	local filetype = vim.bo[buf].filetype
 	local cursor = vim.api.nvim_win_get_cursor(0)
 
 	table.insert(output, "CURRENT CONTEXT:")
@@ -132,7 +132,7 @@ function M.inspect_cursor()
 	-- Buffer info
 	local buf = vim.api.nvim_get_current_buf()
 	local buf_name = vim.api.nvim_buf_get_name(buf)
-	local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+	local filetype = vim.bo[buf].filetype
 
 	table.insert(output, "BUFFER INFO:")
 	table.insert(output, string.format("Name: %s", buf_name ~= "" and buf_name or "[No Name]"))
@@ -316,6 +316,7 @@ function M.health_summary()
 			if plugin._.loaded then
 				loaded = loaded + 1
 			end
+			---@diagnostic disable-next-line: undefined-field
 			if plugin._.error then
 				errors = errors + 1
 			end

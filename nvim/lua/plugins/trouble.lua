@@ -102,7 +102,8 @@ return {
 			"]t",
 			function()
 				if vim.bo.filetype == "trouble" then
-					require("trouble").next()
+					---@diagnostic disable-next-line: missing-parameter
+					require("trouble").next({ skip_groups = true, jump = true })
 				else
 					-- Traditional quickfix navigation
 					local qf_list = vim.fn.getqflist()
@@ -110,7 +111,9 @@ return {
 						vim.notify("No quickfix items", vim.log.levels.WARN)
 						return
 					end
-					local ok = pcall(vim.cmd, "cnext")
+					local ok = pcall(function()
+						vim.cmd("cnext")
+					end)
 					if not ok then
 						vim.cmd("cfirst")
 						vim.notify("Wrapped to first quickfix item", vim.log.levels.INFO)
@@ -123,7 +126,8 @@ return {
 			"[t",
 			function()
 				if vim.bo.filetype == "trouble" then
-					require("trouble").prev()
+					---@diagnostic disable-next-line: missing-parameter
+					require("trouble").prev({ skip_groups = true, jump = true })
 				else
 					-- Traditional quickfix navigation
 					local qf_list = vim.fn.getqflist()
@@ -131,7 +135,9 @@ return {
 						vim.notify("No quickfix items", vim.log.levels.WARN)
 						return
 					end
-					local ok = pcall(vim.cmd, "cprev")
+					local ok = pcall(function()
+						vim.cmd("cprev")
+					end)
 					if not ok then
 						vim.cmd("clast")
 						vim.notify("Wrapped to last quickfix item", vim.log.levels.INFO)

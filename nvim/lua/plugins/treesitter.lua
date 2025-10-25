@@ -42,7 +42,7 @@ return {
 				enable = true,
 				disable = function(_, buf)
 					local max_filesize = 100 * 1024 -- 100 KB
-					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
 					if ok and stats and stats.size > max_filesize then
 						return true
 					end
@@ -185,12 +185,12 @@ return {
 			zindex = 20,
 			on_attach = function(buf)
 				local max_filesize = 100 * 1024
-				local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+				local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
 				if ok and stats and stats.size > max_filesize then
 					return false
 				end
 
-				local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+				local filetype = vim.bo[buf].filetype
 				local excluded_filetypes = {
 					"help",
 					"alpha",
@@ -225,10 +225,10 @@ return {
 					return
 				end
 
-				local ok, stats = pcall(vim.loop.fs_stat, filename)
+				local ok, stats = pcall(vim.uv.fs_stat, filename)
 				if ok and stats and stats.size > max_filesize then
 					vim.notify("Large file detected. Disabling treesitter for performance.", vim.log.levels.WARN)
-					vim.api.nvim_buf_set_option(buf, "syntax", "off")
+					vim.bo[buf].syntax = "off"
 					vim.treesitter.stop(buf)
 				end
 			end,

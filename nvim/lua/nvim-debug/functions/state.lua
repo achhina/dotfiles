@@ -1,3 +1,6 @@
+---@diagnostic disable: undefined-field, deprecated, redefined-local
+-- luacheck: ignore (debug introspection tool intentionally redefines/shadows variables)
+
 local M = {}
 
 local function get_timestamp()
@@ -208,7 +211,7 @@ local function get_tabs_and_layout()
 	local tabs = vim.api.nvim_list_tabpages()
 	table.insert(tab_info, string.format("Current tab: %d of %d", current_tab, #tabs))
 
-	for i, tab in ipairs(tabs) do
+	for _, tab in ipairs(tabs) do
 		local tab_wins = vim.api.nvim_tabpage_list_wins(tab)
 		local is_current = tab == current_tab and " (current)" or ""
 		table.insert(tab_info, string.format("Tab %d: %d windows%s", tab, #tab_wins, is_current))
@@ -377,7 +380,7 @@ function M.capture_state()
 	end
 
 	-- Global marks
-	local marks = vim.api.nvim_get_mark("A", {})
+	local _ = vim.api.nvim_get_mark("A", {})
 	local global_marks = {}
 	for i = string.byte("A"), string.byte("Z") do
 		local mark_char = string.char(i)
@@ -577,7 +580,7 @@ function M.capture_state()
 		local global_desc_width = 26
 
 		-- Create table borders
-		local function create_border(left, sep, right, corners)
+		local function create_border(_, _, _, corners)
 			local key_line = string.rep("─", key_width + 2)
 			local buffer_line = string.rep("─", buffer_desc_width + 2)
 			local global_line = string.rep("─", global_desc_width + 2)
@@ -999,7 +1002,7 @@ function M.capture_config()
 	local ts_info = {}
 	if package.loaded["nvim-treesitter"] then
 		local ts_parsers = require("nvim-treesitter.parsers")
-		local ts_configs = require("nvim-treesitter.configs")
+		local _ = require("nvim-treesitter.configs")
 		local parser_configs = ts_parsers.get_parser_configs()
 
 		local installed = {}
@@ -1011,7 +1014,7 @@ function M.capture_config()
 				table.insert(installed, lang)
 
 				-- Basic health check for parser
-				local ok, parser = pcall(ts_parsers.get_parser, 0, lang)
+				local ok, _ = pcall(ts_parsers.get_parser, 0, lang)
 				if not ok then
 					table.insert(broken, lang)
 				end
@@ -1180,7 +1183,7 @@ function M.capture_performance()
 
 	-- Autocmd red flags
 	local autocmd_count = 0
-	for _, event in pairs(vim.api.nvim_get_autocmds({})) do
+	for _, _ in pairs(vim.api.nvim_get_autocmds({})) do
 		autocmd_count = autocmd_count + 1
 	end
 	if autocmd_count > 200 then
@@ -1200,7 +1203,7 @@ function M.capture_performance()
 			if not ts_parsers.has_parser(lang) then
 				missing_count = missing_count + 1
 			else
-				local ok, parser = pcall(ts_parsers.get_parser, 0, lang)
+				local ok, _ = pcall(ts_parsers.get_parser, 0, lang)
 				if not ok then
 					broken_count = broken_count + 1
 				end

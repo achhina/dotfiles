@@ -63,7 +63,8 @@ return {
 				if vim.wo.diff then
 					vim.cmd.normal({ "]c", bang = true })
 				else
-					gitsigns.nav_hunk("next")
+					---@diagnostic disable-next-line: param-type-mismatch
+					gitsigns.nav_hunk("next", { navigation_message = false })
 				end
 			end, { desc = "Next git hunk" })
 
@@ -71,7 +72,8 @@ return {
 				if vim.wo.diff then
 					vim.cmd.normal({ "[c", bang = true })
 				else
-					gitsigns.nav_hunk("prev")
+					---@diagnostic disable-next-line: param-type-mismatch
+					gitsigns.nav_hunk("prev", { navigation_message = false })
 				end
 			end, { desc = "Previous git hunk" })
 
@@ -85,21 +87,24 @@ return {
 				gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
 			end, { desc = "Reset hunk" })
 			map("n", "<leader>ghS", gitsigns.stage_buffer, { desc = "Stage buffer" })
-			map("n", "<leader>ghu", gitsigns.undo_stage_hunk, { desc = "Undo stage hunk" })
+			map("n", "<leader>ghu", gitsigns.reset_buffer_index, { desc = "Undo stage hunk" })
 			map("n", "<leader>ghR", gitsigns.reset_buffer, { desc = "Reset buffer" })
-			map("n", "<leader>ghp", gitsigns.preview_hunk, { desc = "Preview hunk" })
+			map("n", "<leader>ghp", gitsigns.preview_hunk_inline, { desc = "Preview hunk" })
 			map("n", "<leader>ghb", function()
 				gitsigns.blame_line({ full = true })
 			end, { desc = "Blame line" })
 			map("n", "<leader>ghd", gitsigns.diffthis, { desc = "Diff against index" })
 			map("n", "<leader>ghD", function()
-				gitsigns.diffthis("~")
+				---@diagnostic disable-next-line: param-type-mismatch
+				gitsigns.diffthis("HEAD~1")
 			end, { desc = "Diff against last commit" })
 
 			-- Toggles
 			map("n", "<leader>gtb", gitsigns.toggle_current_line_blame, { desc = "Toggle git blame line" })
 			map("n", "<leader>gtl", gitsigns.toggle_linehl, { desc = "Toggle git blame highlights" })
-			map("n", "<leader>gtd", gitsigns.toggle_deleted, { desc = "Toggle git show deleted" })
+			map("n", "<leader>gtd", function()
+				gitsigns.toggle_deleted()
+			end, { desc = "Toggle git show deleted" })
 
 			-- Text object
 			map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Select git hunk" })

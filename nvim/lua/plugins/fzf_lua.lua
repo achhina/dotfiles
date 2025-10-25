@@ -208,7 +208,9 @@ return {
 				vim.notify("No quickfix items", vim.log.levels.WARN)
 				return
 			end
-			local ok = pcall(vim.cmd, "cnext")
+			local ok = pcall(function()
+				vim.cmd("cnext")
+			end)
 			if not ok then
 				vim.cmd("cfirst")
 				vim.notify("Wrapped to first quickfix item", vim.log.levels.INFO)
@@ -221,7 +223,9 @@ return {
 				vim.notify("No quickfix items", vim.log.levels.WARN)
 				return
 			end
-			local ok = pcall(vim.cmd, "cprev")
+			local ok = pcall(function()
+				vim.cmd("cprev")
+			end)
 			if not ok then
 				vim.cmd("clast")
 				vim.notify("Wrapped to last quickfix item", vim.log.levels.INFO)

@@ -29,13 +29,13 @@ return {
 		},
 	},
 	config = function()
-		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers["textDocument/hover"], {
 			border = "rounded",
 			max_width = 80,
 			max_height = 20,
 		})
 
-		vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+		vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers["textDocument/signatureHelp"], {
 			border = "rounded",
 			silent = true,
 		})
@@ -68,7 +68,7 @@ return {
 		vim.opt.updatetime = 250
 		vim.lsp.inlay_hint.enable(true)
 
-		local on_attach = function(_client, bufnr)
+		local on_attach = function(_, bufnr)
 			require("config.keymaps").load_lsp_keymaps(bufnr)
 		end
 

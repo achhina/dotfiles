@@ -68,7 +68,7 @@ return {
 			{
 				"<leader>rv",
 				function()
-					require("refactoring").debug.print_var()
+					require("refactoring").debug.print_var({})
 				end,
 				mode = { "x", "n" },
 				desc = "Debug print variable",

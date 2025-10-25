@@ -13,6 +13,8 @@ M.inline_edit = {
 			return
 		end
 
+		local session = dap.session
+
 		-- Get word under cursor (variable name)
 		local var_name = vim.fn.expand("<cword>")
 		if var_name == "" then
@@ -20,7 +22,7 @@ M.inline_edit = {
 		end
 
 		-- Get current variable value
-		dap.session:evaluate(var_name, function(err, result)
+		session:evaluate(var_name, function(err, result)
 			if err then
 				vim.notify("Error getting variable: " .. err.message, vim.log.levels.ERROR)
 				return
@@ -32,7 +34,7 @@ M.inline_edit = {
 			if new_value ~= "" and new_value ~= current_value then
 				-- Set new variable value
 				local set_expr = var_name .. " = " .. new_value
-				dap.session:evaluate(set_expr, function(set_err, _)
+				session:evaluate(set_expr, function(set_err, _)
 					if set_err then
 						vim.notify("Error setting variable: " .. set_err.message, vim.log.levels.ERROR)
 					else
@@ -56,9 +58,11 @@ M.inline_edit = {
 			return
 		end
 
+		local session = dap.session
+
 		local expr = vim.fn.input("Evaluate expression: ")
 		if expr ~= "" then
-			dap.session:evaluate(expr, function(err, result)
+			session:evaluate(expr, function(err, result)
 				if err then
 					vim.notify("Error: " .. err.message, vim.log.levels.ERROR)
 				else
@@ -138,12 +142,14 @@ M.session = {
 	auto_save_workspace = function()
 		local dap = require("dap")
 		if dap.session then
+			local session = dap.session
+
 			-- Save current debug state
 			local workspace = {
 				file = vim.fn.expand("%:p"),
 				cursor = vim.api.nvim_win_get_cursor(0),
 				breakpoints = dap.list_breakpoints(),
-				session_config = dap.session.config or {},
+				session_config = session.config or {},
 				timestamp = os.time(),
 			}
 

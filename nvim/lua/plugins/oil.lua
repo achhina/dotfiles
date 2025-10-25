@@ -111,11 +111,11 @@ return {
 				-- Show files and directories that start with "."
 				show_hidden = false,
 				-- This function defines what is considered a "hidden" file
-				is_hidden_file = function(name, _bufnr)
+				is_hidden_file = function(name, _)
 					return vim.startswith(name, ".")
 				end,
 				-- This function defines what will never be shown, even when `show_hidden` is set
-				is_always_hidden = function(name, _bufnr)
+				is_always_hidden = function(name, _)
 					local always_hidden = { "..", ".git", ".DS_Store", "__pycache__", ".pytest_cache" }
 					return vim.tbl_contains(always_hidden, name)
 				end,
@@ -132,13 +132,13 @@ return {
 			-- EXPERIMENTAL support for performing file operations with git
 			git = {
 				-- Return true to automatically git add/mv/rm files
-				add = function(_path)
+				add = function(_)
 					return false
 				end,
-				mv = function(_src_path, _dest_path)
+				mv = function(_, _)
 					return false
 				end,
-				rm = function(_path)
+				rm = function(_)
 					return false
 				end,
 			},

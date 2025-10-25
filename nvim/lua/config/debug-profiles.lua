@@ -386,13 +386,17 @@ M.workflows = {
 M.sessions = {
 	save_session = function(name)
 		local dap = require("dap")
+		local session_info = nil
+		if dap.session and dap.session.config then
+			session_info = {
+				name = dap.session.config.name,
+				type = dap.session.config.type,
+			}
+		end
 		local session_data = {
 			breakpoints = dap.list_breakpoints(),
 			configurations = dap.configurations,
-			session_info = dap.session and dap.session.config and {
-				name = dap.session.config.name,
-				type = dap.session.config.type,
-			} or nil,
+			session_info = session_info,
 		}
 
 		local session_file = vim.fn.stdpath("data") .. "/dap_sessions/" .. (name or "default") .. ".json"

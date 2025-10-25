@@ -304,6 +304,7 @@ return {
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = { "sql", "mysql", "plsql" },
 				callback = function()
+					---@diagnostic disable-next-line: redundant-parameter
 					require("cmp").setup.buffer({ sources = { { name = "vim-dadbod-completion" } } })
 				end,
 			})

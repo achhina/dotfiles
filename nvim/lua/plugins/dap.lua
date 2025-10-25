@@ -270,7 +270,7 @@ return {
 				function()
 					-- List breakpoints using quickfix
 					local dap = require("dap")
-					local breakpoints = dap.list_breakpoints()
+					local breakpoints = dap.list_breakpoints() or {}
 					local qf_list = {}
 					for _, bp in pairs(breakpoints) do
 						for _, item in ipairs(bp) do

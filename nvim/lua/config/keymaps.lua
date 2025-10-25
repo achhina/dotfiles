@@ -210,12 +210,6 @@ function M.load_dap_keymaps()
 	safe_keymap("n", "<leader>dt", dap.terminate, { desc = "Debug: Terminate Session" })
 
 	safe_keymap("n", "<leader>dq", dap.repl.toggle, { desc = "Debug: Toggle REPL" })
-
-	if dap.session then
-		safe_keymap("n", "<leader>dh", function()
-			dapui.hover()
-		end, { desc = "Debug: Hover Variables" })
-	end
 end
 
 -- Test execution

@@ -14,12 +14,13 @@ return {
 	config = function()
 		-- Temporarily suppress vim.tbl_flatten deprecation warning from neotest-jest
 		local original_deprecate = vim.deprecate
-		vim.deprecate = function(name, alternative, version, plugin, backtrace)
-			if name == "vim.tbl_flatten" and backtrace and backtrace:find("neotest%-jest") then
+		---@diagnostic disable-next-line: duplicate-set-field
+		vim.deprecate = function(name, alternative, version, plugin)
+			if name == "vim.tbl_flatten" then
 				-- Suppress this specific deprecation warning from neotest-jest
 				return
 			end
-			return original_deprecate(name, alternative, version, plugin, backtrace)
+			return original_deprecate(name, alternative, version, plugin)
 		end
 
 		require("neotest").setup({

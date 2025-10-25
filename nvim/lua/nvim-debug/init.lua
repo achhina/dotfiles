@@ -37,7 +37,7 @@ local function_modules = {
 
 local function get_all_functions()
 	local all_functions = {}
-	for category, functions in pairs(function_modules) do
+	for _, functions in pairs(function_modules) do
 		for func_name, func_info in pairs(functions) do
 			all_functions[func_name] = func_info
 		end
@@ -74,7 +74,7 @@ end
 function M.get_function_list()
 	local all_functions = get_all_functions()
 	local function_list = {}
-	for func_name, func_info in pairs(all_functions) do
+	for func_name, _ in pairs(all_functions) do
 		table.insert(function_list, func_name)
 	end
 	table.sort(function_list)
@@ -115,7 +115,7 @@ function M.setup()
 		end
 	end, {
 		nargs = "?",
-		complete = function(arglead, cmdline, cursorpos)
+		complete = function(arglead, _, _)
 			return vim.tbl_filter(function(func_name)
 				return func_name:match("^" .. arglead)
 			end, M.get_function_list())

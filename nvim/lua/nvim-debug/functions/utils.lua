@@ -137,7 +137,7 @@ function M.backup_session()
 
 		local log_content =
 			string.format("Session backup created:\nFile: %s\nBuffers: %d\nCWD: %s", session_file, #buffers, cwd)
-		local log_file = write_to_log(format_section("SESSION BACKUP", log_content), "backup_session")
+		write_to_log(format_section("SESSION BACKUP", log_content), "backup_session")
 
 		return string.format("Session backed up to %s (%d buffers)", session_file, #buffers)
 	else
@@ -176,7 +176,9 @@ function M.restore_session(session_name)
 		return "Session file not found: " .. session_file
 	end
 
-	local ok, err = pcall(vim.cmd, "source " .. session_file)
+	local ok, err = pcall(function()
+		vim.cmd("source " .. session_file)
+	end)
 	if ok then
 		return "Session restored from " .. session_file
 	else
