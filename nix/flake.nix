@@ -11,38 +11,32 @@
 
   outputs = { self, nixpkgs, home-manager }:
     let
-      # Automatically detect system architecture
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      supportedSystems = [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
-      # Function to create home configuration for any system
       mkHomeConfiguration = system:
-        let
+        home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
           };
-          modules = [
-            ./home-manager/home.nix
-          ];
-        in
-        home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          inherit modules;
+          modules = [ ./home-manager/home.nix ];
         };
     in {
-      homeConfigurations.achhina = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
-      # Alias for backward compatibility
-      homeConfigurations.default = mkHomeConfiguration (builtins.currentSystem or "x86_64-darwin");
+      # Create a configuration for each system with system name as key
+      homeConfigurations = (forAllSystems (system:
+        mkHomeConfiguration system
+      )) // {
+        # Named alias
+        achhina = mkHomeConfiguration "aarch64-darwin";
+      };
 
-      # Development shells for different project types
       devShells = forAllSystems (system:
-        let
+        import ./modules/devshells.nix {
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
           };
-        in
-        import ./modules/devshells.nix { inherit pkgs; });
+        });
     };
 }
