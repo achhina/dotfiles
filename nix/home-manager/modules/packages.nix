@@ -135,6 +135,13 @@ let
     gh-copilot               # AI-powered command suggestions
   ];
 
+  # Container tools
+  containerTools = with pkgs; [
+    docker                   # Container runtime and CLI
+    docker-compose           # Multi-container orchestration
+    docker-buildx            # Extended build capabilities
+  ];
+
 
   # macOS-specific packages
   darwinPackages = with pkgs; [
@@ -165,6 +172,7 @@ in
     ++ documentTools
     ++ systemServices
     ++ githubExtensions
+    ++ containerTools
     ++ [ notify-script ]  # Custom notification script
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages;
