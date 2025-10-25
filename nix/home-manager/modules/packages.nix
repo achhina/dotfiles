@@ -140,9 +140,6 @@ let
     docker                   # Container runtime and CLI
     docker-compose           # Multi-container orchestration
     docker-buildx            # Extended build capabilities
-    lazydocker               # Terminal UI for docker management
-    dive                     # Explore docker image layers
-    ctop                     # Real-time container metrics
   ];
 
 
