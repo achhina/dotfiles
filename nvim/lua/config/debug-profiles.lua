@@ -387,9 +387,12 @@ M.sessions = {
 	save_session = function(name)
 		local dap = require("dap")
 		local session_info = nil
+		---@diagnostic disable-next-line: undefined-field
 		if dap.session and dap.session.config then
 			session_info = {
+				---@diagnostic disable-next-line: undefined-field
 				name = dap.session.config.name,
+				---@diagnostic disable-next-line: undefined-field
 				type = dap.session.config.type,
 			}
 		end
