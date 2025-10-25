@@ -29,12 +29,14 @@ return {
 		},
 	},
 	config = function()
+		---@diagnostic disable-next-line: deprecated
 		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers["textDocument/hover"], {
 			border = "rounded",
 			max_width = 80,
 			max_height = 20,
 		})
 
+		---@diagnostic disable-next-line: deprecated
 		vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers["textDocument/signatureHelp"], {
 			border = "rounded",
 			silent = true,
@@ -50,7 +52,7 @@ return {
 			},
 			float = {
 				border = "rounded",
-				source = "always",
+				source = true, -- true = always show source
 				format = function(diagnostic)
 					local message = diagnostic.message
 					if diagnostic.source then
