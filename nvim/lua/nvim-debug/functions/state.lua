@@ -70,17 +70,26 @@ local function get_current_context()
 		-- TreeSitter info at cursor
 		if vim.treesitter.highlighter.active[buf] then
 			local ok, parser = pcall(vim.treesitter.get_parser, buf)
-			if ok then
-				local tree = parser:parse()[1]
-				local root = tree:root()
-				local node = root:descendant_for_range(line - 1, col, line - 1, col)
-				if node then
-					table.insert(context_info, string.format("TreeSitter Node: %s", node:type()))
-					local start_row, start_col, end_row, end_col = node:range()
-					table.insert(
-						context_info,
-						string.format("Node Range: (%d,%d) to (%d,%d)", start_row + 1, start_col, end_row + 1, end_col)
-					)
+			if ok and parser then
+				local trees = parser:parse()
+				local tree = trees and trees[1]
+				if tree then
+					local root = tree:root()
+					local node = root:descendant_for_range(line - 1, col, line - 1, col)
+					if node then
+						table.insert(context_info, string.format("TreeSitter Node: %s", node:type()))
+						local start_row, start_col, end_row, end_col = node:range()
+						table.insert(
+							context_info,
+							string.format(
+								"Node Range: (%d,%d) to (%d,%d)",
+								start_row + 1,
+								start_col,
+								end_row + 1,
+								end_col
+							)
+						)
+					end
 				end
 			end
 		end

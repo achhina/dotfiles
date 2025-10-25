@@ -53,7 +53,7 @@ function M.reset_cache()
 	-- Clear LSP cache if available
 	if vim.lsp then
 		-- Clear LSP client capabilities cache
-		for _, client in pairs(vim.lsp.get_active_clients()) do
+		for _, client in pairs(vim.lsp.get_clients()) do
 			if client.server_capabilities then
 				table.insert(actions, string.format("Cleared LSP cache for %s", client.name))
 			end

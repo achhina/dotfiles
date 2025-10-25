@@ -159,8 +159,12 @@ function M.inspect_cursor()
 
 		-- Get the parser
 		local ok, parser = pcall(vim.treesitter.get_parser, buf)
-		if ok then
-			local tree = parser:parse()[1]
+		if ok and parser then
+			local trees = parser:parse()
+			local tree = trees and trees[1]
+			if not tree then
+				return nil
+			end
 			local root = tree:root()
 
 			-- Get node at cursor
