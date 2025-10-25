@@ -102,9 +102,10 @@ return {
 			-- Toggles
 			map("n", "<leader>gtb", gitsigns.toggle_current_line_blame, { desc = "Toggle git blame line" })
 			map("n", "<leader>gtl", gitsigns.toggle_linehl, { desc = "Toggle git blame highlights" })
-			map("n", "<leader>gtd", function()
-				gitsigns.toggle_deleted()
-			end, { desc = "Toggle git show deleted" })
+			-- NOTE: LSP false positive - gitsigns source has @deprecated annotation on wrong function
+			-- The deprecation notice belongs to preview_hunk, not toggle_deleted
+			---@diagnostic disable-next-line: deprecated
+			map("n", "<leader>gtd", gitsigns.toggle_deleted, { desc = "Toggle git show deleted" })
 
 			-- Text object
 			map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Select git hunk" })
