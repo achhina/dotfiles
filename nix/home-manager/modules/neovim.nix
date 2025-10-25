@@ -6,6 +6,9 @@ let
     url = "https://github.com/NixOS/nixpkgs/archive/fa0ef8a6bb1651aa26c939aeb51b5f499e86b0ec.tar.gz";
     sha256 = "sha256:2Kp9St3Pbsmu+xMsobLcgzzUxPvZR7alVJWyuk2BAPc=";
   }) { system = pkgs.system; };
+
+  # Architecture detection for Intel-specific workarounds
+  isIntelDarwin = pkgs.stdenv.system == "x86_64-darwin";
 in
 {
   programs.neovim = {
@@ -40,9 +43,10 @@ in
       pkgs.texlivePackages.detex  # LaTeX to plain text for render-markdown plugin
       pkgs.tectonic            # LaTeX engine for document compilation
       pkgs.lazygit             # Terminal UI for Git (for Snacks.lazygit)
-    ] ++ lib.optionals pkgs.stdenv.isDarwin [
-      # Pin vscode-js-debug to older nixpkgs on macOS to avoid node-gyp build failures
-      oldPkgs.vscode-js-debug  # JavaScript debugger for nvim-dap
+    ] ++ [
+      # Pin vscode-js-debug to older nixpkgs on Intel macOS to avoid node-gyp build failures
+      # Use current nixpkgs on Apple Silicon and other platforms
+      (if isIntelDarwin then oldPkgs.vscode-js-debug else pkgs.vscode-js-debug)
     ];
   };
 }
