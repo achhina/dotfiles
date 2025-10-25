@@ -149,6 +149,7 @@ M.session = {
 				file = vim.fn.expand("%:p"),
 				cursor = vim.api.nvim_win_get_cursor(0),
 				breakpoints = dap.list_breakpoints(),
+				---@diagnostic disable-next-line: undefined-field
 				session_config = session.config or {},
 				timestamp = os.time(),
 			}
@@ -227,13 +228,13 @@ M.session = {
 M.performance = {
 	-- Monitor debug performance
 	start_performance_monitoring = function()
-		vim.g.dap_perf_start = vim.loop.hrtime()
+		vim.g.dap_perf_start = vim.uv.hrtime()
 		vim.notify("Performance monitoring started", vim.log.levels.INFO)
 	end,
 
 	stop_performance_monitoring = function()
 		if vim.g.dap_perf_start then
-			local duration = (vim.loop.hrtime() - vim.g.dap_perf_start) / 1e9
+			local duration = (vim.uv.hrtime() - vim.g.dap_perf_start) / 1e9
 			vim.notify(string.format("Debug session duration: %.2fs", duration), vim.log.levels.INFO)
 			vim.g.dap_perf_start = nil
 		end
