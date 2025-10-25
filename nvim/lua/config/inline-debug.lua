@@ -22,6 +22,7 @@ M.inline_edit = {
 		end
 
 		-- Get current variable value
+		---@diagnostic disable-next-line: undefined-field
 		session:evaluate(var_name, function(err, result)
 			if err then
 				vim.notify("Error getting variable: " .. err.message, vim.log.levels.ERROR)
@@ -34,6 +35,7 @@ M.inline_edit = {
 			if new_value ~= "" and new_value ~= current_value then
 				-- Set new variable value
 				local set_expr = var_name .. " = " .. new_value
+				---@diagnostic disable-next-line: undefined-field
 				session:evaluate(set_expr, function(set_err, _)
 					if set_err then
 						vim.notify("Error setting variable: " .. set_err.message, vim.log.levels.ERROR)
@@ -41,8 +43,8 @@ M.inline_edit = {
 						vim.notify("Variable " .. var_name .. " set to: " .. new_value, vim.log.levels.INFO)
 						-- Refresh DAP UI if available
 						local ok, dapui = pcall(require, "dapui")
-						if ok and dapui and dapui.refresh then
-							dapui.refresh()
+						if ok and dapui and dapui.update_render then
+							dapui.update_render({})
 						end
 					end
 				end)
@@ -62,6 +64,7 @@ M.inline_edit = {
 
 		local expr = vim.fn.input("Evaluate expression: ")
 		if expr ~= "" then
+			---@diagnostic disable-next-line: undefined-field
 			session:evaluate(expr, function(err, result)
 				if err then
 					vim.notify("Error: " .. err.message, vim.log.levels.ERROR)
