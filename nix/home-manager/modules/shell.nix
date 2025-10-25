@@ -1,5 +1,9 @@
 { pkgs, lib, ... }:
 
+let
+  # Architecture detection for Intel-specific workarounds
+  isIntelDarwin = pkgs.stdenv.system == "x86_64-darwin";
+in
 {
   # Enable direnv for automatic environment loading
   programs.direnv = {
@@ -17,7 +21,8 @@
   # Terminal emulator
   programs.ghostty = {
     enable = true;
-    package = null; # Don't install ghostty, just manage config
+    # Disable package installation on Intel macOS, use ghostty-bin on Apple Silicon
+    package = if isIntelDarwin then null else pkgs.ghostty-bin;
 
     settings = {
       # Theme and font settings
