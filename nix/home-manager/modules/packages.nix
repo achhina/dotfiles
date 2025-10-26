@@ -1,11 +1,6 @@
 { pkgs, ... }:
 
 let
-  # Pin bash-language-server to working version
-  oldPkgs = import (fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/fa0ef8a6bb1651aa26c939aeb51b5f499e86b0ec.tar.gz";
-    sha256 = "sha256:2Kp9St3Pbsmu+xMsobLcgzzUxPvZR7alVJWyuk2BAPc=";
-  }) { system = pkgs.system; };
   # Core system tools and utilities
   coreTools = with pkgs; [
     git                    # Version control

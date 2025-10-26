@@ -23,7 +23,6 @@ in
     # LSP servers and tools available only within Neovim
     extraPackages = with pkgs; [
       # Editor-only LSPs
-      oldPkgs.bash-language-server
       lua-language-server
       basedpyright
       typescript-language-server
@@ -44,8 +43,9 @@ in
       pkgs.tectonic            # LaTeX engine for document compilation
       pkgs.lazygit             # Terminal UI for Git (for Snacks.lazygit)
     ] ++ [
-      # Pin vscode-js-debug to older nixpkgs on Intel macOS to avoid node-gyp build failures
+      # Pin to older nixpkgs on Intel macOS to avoid build failures
       # Use current nixpkgs on Apple Silicon and other platforms
+      (if isIntelDarwin then oldPkgs.bash-language-server else pkgs.bash-language-server)
       (if isIntelDarwin then oldPkgs.vscode-js-debug else pkgs.vscode-js-debug)
     ];
   };
