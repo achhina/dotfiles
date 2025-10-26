@@ -292,6 +292,11 @@ in
     executable = true;
   };
 
+  home.file."bin/notify" = {
+    source = ../files/scripts/notify;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;

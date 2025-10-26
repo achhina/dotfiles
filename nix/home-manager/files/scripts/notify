@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# notify - Send desktop notifications with tmux support
+# Usage: notify "title" "body"
+#        notify "single message" (uses "Notification" as title)
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: notify \"title\" \"body\""
+    echo "       notify \"message\" (uses default title)"
+    exit 1
+fi
+
+# Set title and body based on arguments
+if [[ $# -eq 1 ]]; then
+    title="Notification"
+    body="$1"
+else
+    title="$1"
+    body="$2"
+fi
+
+# Send OSC 777 notification sequence
+esc=$'\033'
+if [[ -n "$TMUX" ]]; then
+    # Inside tmux: use manual passthrough syntax
+    printf "${esc}Ptmux;${esc}${esc}]777;notify;%s;%s${esc}${esc}\\${esc}\\" "$title" "$body"
+else
+    # Outside tmux: send directly
+    printf "${esc}]777;notify;%s;%s${esc}\\" "$title" "$body"
+fi

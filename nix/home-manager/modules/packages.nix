@@ -1,39 +1,6 @@
 { pkgs, ... }:
 
 let
-  # Shell script for cross-platform notifications with tmux support
-  notify-script = pkgs.writeShellScriptBin "notify" ''
-    #!/usr/bin/env bash
-
-    # notify - Send desktop notifications with tmux support
-    # Usage: notify "title" "body"
-    #        notify "single message" (uses "Notification" as title)
-
-    if [[ $# -eq 0 ]]; then
-        echo "Usage: notify \"title\" \"body\""
-        echo "       notify \"message\" (uses default title)"
-        exit 1
-    fi
-
-    # Set title and body based on arguments
-    if [[ $# -eq 1 ]]; then
-        title="Notification"
-        body="$1"
-    else
-        title="$1"
-        body="$2"
-    fi
-
-    # Send OSC 777 notification sequence
-    esc=$'\033'
-    if [[ -n "$TMUX" ]]; then
-        # Inside tmux: use manual passthrough syntax
-        printf "''${esc}Ptmux;''${esc}''${esc}]777;notify;%s;%s''${esc}''${esc}\\''${esc}\\" "$title" "$body"
-    else
-        # Outside tmux: send directly
-        printf "''${esc}]777;notify;%s;%s''${esc}\\" "$title" "$body"
-    fi
-  '';
   # Pin bash-language-server to working version
   oldPkgs = import (fetchTarball {
     url = "https://github.com/NixOS/nixpkgs/archive/fa0ef8a6bb1651aa26c939aeb51b5f499e86b0ec.tar.gz";
@@ -178,7 +145,6 @@ in
     ++ githubExtensions
     ++ containerTools
     ++ guiApps
-    ++ [ notify-script ]  # Custom notification script
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages;
 }
