@@ -149,6 +149,7 @@ let
     iterm2               # Terminal emulator
     jankyborders         # Window border enhancement for Aerospace
     keycastr             # Keystroke visualizer for presentations
+    obsidian             # Knowledge base on local Markdown files
   ];
 
   # Linux-specific packages
