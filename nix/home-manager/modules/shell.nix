@@ -407,6 +407,11 @@ in
     #   - macOS: Runs after path_helper, ensuring ~/bin stays first
     #   - Linux: No path_helper exists, simple prepend in .zprofile works fine
     profileExtra = ''
+      # Initialize Homebrew (Apple Silicon)
+      if [ -f /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      fi
+
       # npm global bin directory (before ~/bin to allow overrides)
       export PATH="$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
     '';

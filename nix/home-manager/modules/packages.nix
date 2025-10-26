@@ -142,6 +142,10 @@ let
     docker-buildx            # Extended build capabilities
   ];
 
+  # Cross-platform GUI applications
+  guiApps = with pkgs; [
+    obsidian                 # Knowledge base on local Markdown files
+  ];
 
   # macOS-specific packages
   darwinPackages = with pkgs; [
@@ -149,7 +153,6 @@ let
     iterm2               # Terminal emulator
     jankyborders         # Window border enhancement for Aerospace
     keycastr             # Keystroke visualizer for presentations
-    obsidian             # Knowledge base on local Markdown files
   ];
 
   # Linux-specific packages
@@ -174,6 +177,7 @@ in
     ++ systemServices
     ++ githubExtensions
     ++ containerTools
+    ++ guiApps
     ++ [ notify-script ]  # Custom notification script
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages;
