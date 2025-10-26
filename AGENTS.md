@@ -30,6 +30,18 @@ This is the primary, system-level package manager and the single source of truth
     - Run the `hm switch` OR `home-manager switch` after EVERY change to a nix module.
 - **How to Debug:** If a package is missing or the wrong version, check `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix` and the `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.lock` file.
 
+### Tier 1.5: Homebrew (macOS System-Level Packages)
+On macOS, Homebrew complements Nix for packages that require system-level integration or have Nix compatibility issues.
+
+- **Role:** Manages macOS applications and system-level PAM modules that need stable paths.
+- **Use Cases:**
+  - GUI applications (Firefox, Chrome, Signal) where Nix has build issues on macOS
+  - System integration packages like `pam-reattach` that require stable `/opt/homebrew` paths
+  - Applications not available or broken in nixpkgs for darwin
+- **How to Update:** `brew upgrade` updates all Homebrew packages
+- **Integration:** Homebrew PATH is initialized in shell.nix `profileExtra` section
+- **Why not Nix?** Some packages (like Firefox) have gtk+3 build failures on macOS, and PAM modules need stable paths that don't change with Nix store hashes
+
 ### Tier 2: Application-Specific Managers
 These managers operate within a specific application, handling its internal ecosystem of plugins and extensions. They are installed by Home Manager.
 
@@ -137,3 +149,48 @@ Some tools support loading configuration from URLs, allowing you to bootstrap se
   :source --url https://raw.githubusercontent.com/user/repo/main/nix/home-manager/files/tridactylrc
   ```
 - **Workflow:** Edit the source file (`nix/home-manager/files/tridactylrc`), then run `hm switch` to deploy the symlink locally.
+
+## 7. Package Organization Patterns
+
+Packages in `packages.nix` are organized into functional categories to make platform-specific management clear:
+
+### Package Categories
+
+- **coreTools**: Version control, system monitors, network tools
+- **modernCLI**: Modern alternatives to traditional Unix tools (bat, eza, fd, ripgrep)
+- **aiTools**: AI interfaces and productivity tools
+- **editorTools**: Terminal multiplexer, prompts
+- **languageServers**: LSPs used outside of editors (gopls, rust-analyzer, nil)
+- **formatters**: Code linters and formatters
+- **languageRuntimes**: Programming language compilers and package managers
+- **documentTools**: Diagram generation, terminal recording
+- **systemServices**: System daemons and services
+- **githubExtensions**: GitHub CLI extensions
+- **containerTools**: Docker and container orchestration
+- **guiApps**: Cross-platform GUI applications (works on both macOS and Linux)
+- **darwinPackages**: macOS-only packages (aerospace, iterm2, jankyborders, keycastr)
+- **linuxPackages**: Linux-only packages (firefox, alacritty, signal-desktop)
+
+### Platform-Specific Patterns
+
+Use conditional expressions for platform-specific package variants:
+
+```nix
+# Pin to older nixpkgs on Intel macOS only
+(if isIntelDarwin then oldPkgs.bash-language-server else pkgs.bash-language-server)
+```
+
+This pattern allows newer working versions on Apple Silicon while maintaining compatibility with Intel Macs that have build issues.
+
+### Script Management
+
+Shell scripts belong in `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/files/scripts/` and are deployed via `shell.nix`:
+
+```nix
+home.file."bin/script-name" = {
+  source = ../files/scripts/script-name;
+  executable = true;
+};
+```
+
+Do NOT use `pkgs.writeShellScriptBin` inline in `packages.nix`. Keep scripts as separate files for easier maintenance and version control.
