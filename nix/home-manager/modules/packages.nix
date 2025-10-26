@@ -119,7 +119,7 @@ let
 
   # Linux-specific packages
   linuxPackages = with pkgs; [
-    firefox              # Web browser
+    firefox              # Web browser (builds on Linux, has gtk+3 issues on macOS)
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
     isd                  # TUI to interactively work with systemd units
