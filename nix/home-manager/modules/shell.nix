@@ -316,9 +316,6 @@ in
     ];
 
     completionInit = ''
-      # Add Docker completions directory for interactive shells
-      fpath=(~/.docker/completions $fpath)
-
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
       zstyle ':completion:*:git-checkout:*' sort false
@@ -379,10 +376,6 @@ in
     historySubstringSearch.enable = true;
 
     envExtra = ''
-      # Add Docker completions directory to FPATH for non-interactive shells
-      # Docker Desktop checks FPATH in non-interactive shells and requires export
-      export FPATH="$HOME/.docker/completions:''${FPATH:-}"
-
       ${lib.optionalString pkgs.stdenv.isDarwin ''
         # Fallback for macOS: ensure Nix daemon is sourced
         # macOS updates wipe /etc/zshrc, breaking system-wide Nix initialization
@@ -469,27 +462,4 @@ in
     };
   };
 
-  # Generate Docker completions using docker CLI commands
-  # This ensures Docker Desktop GUI recognizes completions are installed
-  home.activation.generateDockerCompletions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    COMPLETIONS_DIR="$HOME/.docker/completions"
-
-    # Ensure docker is in PATH (it may come from /usr/local/bin on macOS)
-    export PATH="/usr/local/bin:$PATH"
-
-    if command -v docker >/dev/null 2>&1; then
-      $VERBOSE_ECHO "Found docker at: $(command -v docker)"
-      mkdir -p "$COMPLETIONS_DIR"
-
-      # Always regenerate docker completion (it's fast and ensures it's up-to-date)
-      $VERBOSE_ECHO "Generating docker completion to $COMPLETIONS_DIR/_docker"
-      docker completion zsh > "$COMPLETIONS_DIR/_docker" 2>&1 || $VERBOSE_ECHO "Failed to generate docker completion"
-
-      # Always regenerate docker compose completion
-      $VERBOSE_ECHO "Generating docker compose completion to $COMPLETIONS_DIR/_docker-compose"
-      docker compose completion zsh > "$COMPLETIONS_DIR/_docker-compose" 2>&1 || $VERBOSE_ECHO "Failed to generate docker compose completion"
-    else
-      $VERBOSE_ECHO "Docker command not found in PATH"
-    fi
-  '';
 }

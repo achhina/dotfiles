@@ -97,13 +97,6 @@ let
     gh-copilot               # AI-powered command suggestions
   ];
 
-  # Container tools
-  containerTools = with pkgs; [
-    docker                   # Container runtime and CLI
-    docker-compose           # Multi-container orchestration
-    docker-buildx            # Extended build capabilities
-  ];
-
   # Cross-platform GUI applications
   guiApps = with pkgs; [
     obsidian                 # Knowledge base on local Markdown files
@@ -138,7 +131,6 @@ in
     ++ documentTools
     ++ systemServices
     ++ githubExtensions
-    ++ containerTools
     ++ guiApps
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages;
