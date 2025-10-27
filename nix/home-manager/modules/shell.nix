@@ -307,6 +307,13 @@ in
     syntaxHighlighting.enable = true;
     defaultKeymap = "emacs";
 
+    # initContent runs before oh-my-zsh initialization and compinit
+    # This is where we need to set fpath for completions to be found
+    initContent = ''
+      # Add custom completions directory (includes Docker Desktop symlinks)
+      fpath=(~/.zsh/completions $fpath)
+    '';
+
     setOptions = [
       "GLOB_DOTS" # include hidden files in glob patterns
       "AUTO_PUSHD" # automatically push directories to stack
@@ -316,9 +323,6 @@ in
     ];
 
     completionInit = ''
-      # Add custom completions directory (includes Docker Desktop symlinks)
-      fpath=(~/.zsh/completions $fpath)
-
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
       zstyle ':completion:*:git-checkout:*' sort false
