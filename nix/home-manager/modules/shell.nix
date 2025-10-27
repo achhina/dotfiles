@@ -316,8 +316,8 @@ in
     ];
 
     completionInit = ''
-      # Add custom completion directory for generated Docker completions
-      fpath=(~/.zsh/completions $fpath)
+      # Add Docker completions directory for interactive shells
+      fpath=(~/.docker/completions $fpath)
 
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
@@ -379,9 +379,9 @@ in
     historySubstringSearch.enable = true;
 
     envExtra = ''
-      # Add custom completions directory to fpath for non-interactive shells
-      # This ensures Docker Desktop GUI can detect completions
-      fpath=(~/.zsh/completions $fpath)
+      # Add Docker completions directory to FPATH for non-interactive shells
+      # Docker Desktop checks FPATH in non-interactive shells and requires export
+      export FPATH="$HOME/.docker/completions:''${FPATH:-}"
 
       ${lib.optionalString pkgs.stdenv.isDarwin ''
         # Fallback for macOS: ensure Nix daemon is sourced
@@ -472,7 +472,7 @@ in
   # Generate Docker completions using docker CLI commands
   # This ensures Docker Desktop GUI recognizes completions are installed
   home.activation.generateDockerCompletions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    COMPLETIONS_DIR="$HOME/.zsh/completions"
+    COMPLETIONS_DIR="$HOME/.docker/completions"
 
     # Ensure docker is in PATH (it may come from /usr/local/bin on macOS)
     export PATH="/usr/local/bin:$PATH"
