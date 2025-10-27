@@ -308,10 +308,13 @@ in
     defaultKeymap = "emacs";
 
     # initContent runs before oh-my-zsh initialization and compinit
-    # This is where we need to set fpath for completions to be found
     initContent = ''
-      # Add custom completions directory (includes Docker Desktop symlinks)
-      fpath=(~/.zsh/completions $fpath)
+      # Load Docker completions directly from docker command
+      if command -v docker &>/dev/null; then
+        eval "$(docker completion zsh)"
+        # Note: docker-compose is now 'docker compose' subcommand
+        # The docker completion already includes 'docker compose' completions
+      fi
     '';
 
     setOptions = [
@@ -468,29 +471,4 @@ in
       save = 100000;
     };
   };
-
-  # Set up Docker Desktop completion symlinks for zsh
-  # Docker Desktop provides completion files but with non-standard naming
-  home.activation.linkDockerCompletions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    ${lib.optionalString pkgs.stdenv.isDarwin ''
-      COMPLETIONS_DIR="$HOME/.zsh/completions"
-      DOCKER_ETC="/Applications/Docker.app/Contents/Resources/etc"
-
-      if [[ -d "$DOCKER_ETC" ]]; then
-        mkdir -p "$COMPLETIONS_DIR"
-
-        # Link docker completion (docker.zsh-completion -> _docker)
-        if [[ -f "$DOCKER_ETC/docker.zsh-completion" ]]; then
-          $VERBOSE_ECHO "Linking Docker completion to $COMPLETIONS_DIR/_docker"
-          ln -sf "$DOCKER_ETC/docker.zsh-completion" "$COMPLETIONS_DIR/_docker"
-        fi
-
-        # Link docker-compose completion (docker-compose.zsh-completion -> _docker-compose)
-        if [[ -f "$DOCKER_ETC/docker-compose.zsh-completion" ]]; then
-          $VERBOSE_ECHO "Linking Docker Compose completion to $COMPLETIONS_DIR/_docker-compose"
-          ln -sf "$DOCKER_ETC/docker-compose.zsh-completion" "$COMPLETIONS_DIR/_docker-compose"
-        fi
-      fi
-    ''}
-  '';
 }
