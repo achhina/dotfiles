@@ -238,6 +238,11 @@
       skills = if skillsExist then builtins.readDir skillsDir else {};
     in
     lib.mkMerge [
+      # Force overwrite settings.json to allow reset on hm switch
+      # The activation scripts will convert it from symlink to mutable file with backup
+      {
+        ".claude/settings.json".force = true;
+      }
       # Create .keep files to ensure directories exist
       {
         ".claude/commands/.keep".text = "";
@@ -252,6 +257,42 @@
         };
       }) skills)
     ];
+
+  # Backup existing mutable settings.json before Home Manager regenerates it
+  # This runs before writeBoundary to preserve user modifications
+  home.activation.backupClaudeSettings = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+    SETTINGS_FILE="$HOME/.claude/settings.json"
+    BACKUP_FILE="$HOME/.claude/settings.json.backup"
+
+    # Only backup if the file exists and is a regular file (not a symlink)
+    # This captures any modifications Claude Code made during the session
+    if [ -f "$SETTINGS_FILE" ] && [ ! -L "$SETTINGS_FILE" ]; then
+      $VERBOSE_ECHO "Backing up mutable Claude Code settings to settings.json.backup"
+      $DRY_RUN_CMD cp "$SETTINGS_FILE" "$BACKUP_FILE"
+    fi
+  '';
+
+  # Convert settings.json from symlink to mutable file
+  # This runs after writeBoundary, which creates the symlink to Nix store
+  home.activation.makeClaudeSettingsMutable = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SETTINGS_FILE="$HOME/.claude/settings.json"
+
+    # If settings.json is a symlink, convert it to a mutable copy
+    if [ -L "$SETTINGS_FILE" ]; then
+      $VERBOSE_ECHO "Converting Claude Code settings from symlink to mutable file"
+      # Copy the content to a temporary file
+      $DRY_RUN_CMD cp -L "$SETTINGS_FILE" "$SETTINGS_FILE.tmp"
+      # Remove the symlink
+      $DRY_RUN_CMD rm "$SETTINGS_FILE"
+      # Move the copy to the final location
+      $DRY_RUN_CMD mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+    fi
+
+    # Ensure settings.json is writable (whether freshly created or already existing)
+    if [ -f "$SETTINGS_FILE" ]; then
+      $DRY_RUN_CMD chmod u+w "$SETTINGS_FILE"
+    fi
+  '';
 
   # Install Claude Code via npm if not available
   # This allows us to get the latest version without waiting for nixpkgs updates
