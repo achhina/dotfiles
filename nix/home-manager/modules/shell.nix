@@ -316,6 +316,9 @@ in
     ];
 
     completionInit = ''
+      # Add custom completions directory (includes Docker Desktop symlinks)
+      fpath=(~/.zsh/completions $fpath)
+
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
       zstyle ':completion:*:git-checkout:*' sort false
@@ -462,4 +465,28 @@ in
     };
   };
 
+  # Set up Docker Desktop completion symlinks for zsh
+  # Docker Desktop provides completion files but with non-standard naming
+  home.activation.linkDockerCompletions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${lib.optionalString pkgs.stdenv.isDarwin ''
+      COMPLETIONS_DIR="$HOME/.zsh/completions"
+      DOCKER_ETC="/Applications/Docker.app/Contents/Resources/etc"
+
+      if [[ -d "$DOCKER_ETC" ]]; then
+        mkdir -p "$COMPLETIONS_DIR"
+
+        # Link docker completion (docker.zsh-completion -> _docker)
+        if [[ -f "$DOCKER_ETC/docker.zsh-completion" ]]; then
+          $VERBOSE_ECHO "Linking Docker completion to $COMPLETIONS_DIR/_docker"
+          ln -sf "$DOCKER_ETC/docker.zsh-completion" "$COMPLETIONS_DIR/_docker"
+        fi
+
+        # Link docker-compose completion (docker-compose.zsh-completion -> _docker-compose)
+        if [[ -f "$DOCKER_ETC/docker-compose.zsh-completion" ]]; then
+          $VERBOSE_ECHO "Linking Docker Compose completion to $COMPLETIONS_DIR/_docker-compose"
+          ln -sf "$DOCKER_ETC/docker-compose.zsh-completion" "$COMPLETIONS_DIR/_docker-compose"
+        fi
+      fi
+    ''}
+  '';
 }
