@@ -379,6 +379,10 @@ in
     historySubstringSearch.enable = true;
 
     envExtra = ''
+      # Add custom completions directory to fpath for non-interactive shells
+      # This ensures Docker Desktop GUI can detect completions
+      fpath=(~/.zsh/completions $fpath)
+
       ${lib.optionalString pkgs.stdenv.isDarwin ''
         # Fallback for macOS: ensure Nix daemon is sourced
         # macOS updates wipe /etc/zshrc, breaking system-wide Nix initialization
