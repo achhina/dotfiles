@@ -11,8 +11,10 @@ Personal dotfiles managed with Nix flakes and Home Manager for reproducible deve
   - [Adding Packages](#adding-packages)
   - [Managing Configurations](#managing-configurations)
   - [Development Shells](#development-shells)
-- [🏗️ Architecture](#️-architecture)
-  - [Configuration Philosophy](#configuration-philosophy)
+- [🔧 Troubleshooting & Migration](#-troubleshooting--migration)
+  - [Common Issues](#common-issues)
+  - [Machine Migration](#machine-migration)
+  - [Getting Help](#getting-help)
 
 ## 🚀 First Time Setup
 
@@ -25,11 +27,16 @@ bash <(curl -L https://raw.githubusercontent.com/achhina/dotfiles/main/scripts/b
 ```
 
 The script handles:
+- Architecture detection and migration warnings (Intel ↔ Apple Silicon)
+- Broken symlink cleanup from previous installations
+- Pre-existing Nix backup file detection and removal
 - Nix installation (with platform detection) or skips if already installed
 - Enabling flakes before they're needed
 - Smart ~/.config conflict resolution
 - Home Manager bootstrap with correct flake path
 - First activation
+
+The bootstrap script has been hardened for machine migrations and architecture changes.
 
 ---
 
@@ -166,3 +173,37 @@ nix develop .#go        # Go environment
 ```
 
 Available shells defined in: `~/.config/nix/modules/devshells.nix`
+
+## 🔧 Troubleshooting & Migration
+
+### Common Issues
+
+If you encounter problems during setup or migration:
+
+**Bootstrap script automatically handles:**
+- Broken symlinks from previous installations
+- Pre-existing Nix backup files
+- Architecture-specific warnings (Intel ↔ Apple Silicon)
+
+**For manual intervention required:**
+- See [docs/troubleshooting.md](docs/troubleshooting.md) for comprehensive edge case coverage
+- PAM/Touch ID configuration for Apple Silicon
+- Docker architecture setup
+- Homebrew dual-installation cleanup
+- Development environment issues
+
+### Machine Migration
+
+When migrating to a new machine (especially Intel → Apple Silicon):
+
+1. **Pre-migration:** Clean up caches and old artifacts (see troubleshooting guide)
+2. **Bootstrap:** Run the bootstrap script - it detects architecture and handles common issues
+3. **Post-migration:** Follow verification steps in troubleshooting guide
+
+The bootstrap script has been hardened based on real-world M4 MacBook migration experience.
+
+### Getting Help
+
+- **Architecture details:** See [AGENTS.md](AGENTS.md) for system organization
+- **Troubleshooting:** See [docs/troubleshooting.md](docs/troubleshooting.md)
+- **Bootstrap script issues:** Check script output for specific error messages
