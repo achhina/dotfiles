@@ -251,7 +251,24 @@ main() {
 
   # Always apply home-manager configuration to ensure system is up to date
   log_info "Applying home-manager configuration..."
-  run_cmd home-manager switch --flake "$CONFIG_HOME/nix"
+
+  # Detect system for flake configuration (mirrors hm alias logic)
+  local arch="$HOSTTYPE"  # bash built-in: arm64, x86_64, etc.
+  local system_type
+  case "$arch" in
+    arm64|aarch64)
+      system_type="aarch64-darwin"
+      ;;
+    x86_64)
+      system_type="x86_64-darwin"
+      ;;
+    *)
+      log_error "Unsupported system architecture: $arch"
+      exit 1
+      ;;
+  esac
+
+  run_cmd home-manager switch --flake "$CONFIG_HOME/nix#$system_type"
 
   # Show package changes between previous and current generation
   log_info "Package changes in this update:"
