@@ -23,11 +23,19 @@
           modules = [ ./home-manager/home.nix ];
         };
     in {
-      # Create a configuration for each system with system name as key
+      # homeConfigurations naming strategy:
+      # - System-based: "aarch64-darwin", "x86_64-darwin", etc. (auto-generated)
+      # - User alias: "achhina" (for convenience, points to primary system)
+      #
+      # Shell aliases (shell.nix) use ${pkgs.system} which automatically resolves
+      # to the correct system-based configuration (e.g., "aarch64-darwin").
+      #
+      # Note: Do NOT use hostname-based configurations (e.g., "MacBook-Pro").
+      # Hostnames vary per machine, but system type is consistent and portable.
       homeConfigurations = (forAllSystems (system:
         mkHomeConfiguration system
       )) // {
-        # Named alias
+        # Personal alias for primary development machine
         achhina = mkHomeConfiguration "aarch64-darwin";
       };
 
