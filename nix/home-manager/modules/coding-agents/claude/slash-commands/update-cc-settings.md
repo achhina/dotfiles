@@ -1,6 +1,7 @@
 ---
 description: Update Claude Code configuration in Home Manager
 argument-hint: [setting description]
+mode: edit
 ---
 
 # Task

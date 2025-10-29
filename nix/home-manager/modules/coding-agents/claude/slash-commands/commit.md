@@ -1,5 +1,6 @@
 ---
 description: Create a well-formatted commit with smart message
+mode: edit
 ---
 
 # Task
