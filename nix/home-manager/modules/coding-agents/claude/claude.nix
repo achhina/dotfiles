@@ -206,18 +206,11 @@
       };
 
       # Standalone plugins from GitHub
-      plugins = {
-        elements-of-style = {
-          source = {
-            source = "url";
-            url = "https://github.com/obra/the-elements-of-style.git";
-          };
-        };
-      };
+      plugins = { };
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
-        "elements-of-style" = true;
+        "elements-of-style@superpowers-marketplace" = true;
         "shell-scripting@claude-code-workflows" = true;
         "python-development@claude-code-workflows" = true;
         "javascript-typescript@claude-code-workflows" = true;
