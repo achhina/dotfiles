@@ -157,6 +157,9 @@
       # Development artifacts
       "dump.rdb"
 
+      # Git worktrees
+      ".worktrees"
+
       # Claude Code local settings
       "**/.claude/settings.local.json"
     ];

@@ -15,8 +15,9 @@ Create a new git worktree for parallel development, enabling you to work on mult
 
 2. **Create worktree:**
    - Generate a branch name from the task description (lowercase, hyphens, no special chars)
+   - Ensure `.worktrees/` directory exists: `mkdir -p .worktrees`
    - Run `git worktree list` to see existing worktrees
-   - Create worktree: `git worktree add -b <branch-name> ../<directory-name> <base-branch>`
+   - Create worktree: `git worktree add -b <branch-name> .worktrees/<directory-name> <base-branch>`
    - Base branch is typically `main` or `master`
 
 3. **Initialize task file:**
@@ -26,7 +27,7 @@ Create a new git worktree for parallel development, enabling you to work on mult
 
 4. **Show next steps:**
    - Print the path to the new worktree
-   - Suggest: `cd ../<directory-name> && claude`
+   - Suggest: `cd .worktrees/<directory-name> && claude`
    - Explain that the new worktree has its own isolated file state
 
 # Cleanup
@@ -42,7 +43,7 @@ git worktree remove <path>
 Input: `/worktree Add user authentication`
 
 Output:
-- Creates worktree at `../add-user-authentication`
+- Creates worktree at `.worktrees/add-user-authentication`
 - Creates branch `add-user-authentication`
 - Initializes `.llm/todo.md` with `[ ] Add user authentication`
-- Shows: `cd ../add-user-authentication && claude`
+- Shows: `cd .worktrees/add-user-authentication && claude`
