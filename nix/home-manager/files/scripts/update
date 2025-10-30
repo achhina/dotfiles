@@ -253,7 +253,8 @@ main() {
   log_info "Applying home-manager configuration..."
 
   # Detect system for flake configuration (mirrors hm alias logic)
-  local arch="$HOSTTYPE"  # bash built-in: arm64, x86_64, etc.
+  local arch
+  arch="$(uname -m)"  # Use uname for consistent detection (works under Rosetta)
   local system_type
   case "$arch" in
     arm64|aarch64)
