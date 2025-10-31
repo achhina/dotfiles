@@ -52,28 +52,33 @@ def extract_commands(node, commands_dict):
             extract_commands(item, commands_dict)
 
 
+def process_lines(lines, shell_type, commands_dict, source_name="input"):
+    """Process lines from any source with error handling."""
+    for line_num, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+
+        try:
+            cmd = extract_command_from_line(line, shell_type)
+            if cmd:
+                nodes = bashlex.parse(cmd)
+                for node in nodes:
+                    extract_commands(node, commands_dict)
+        except (bashlex.errors.ParsingError, NotImplementedError):
+            # Skip unparseable lines and unsupported bash features silently
+            pass
+        except Exception as e:
+            # Log unexpected errors to stderr
+            err_console.print(
+                f"[dim red]Warning: {source_name}:{line_num}: {e}[/dim red]"
+            )
+
+
 def process_history_file(file_path, shell_type, commands_dict):
     """Process a single history file with error handling."""
     try:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            for line_num, line in enumerate(f, 1):
-                if not line.strip():
-                    continue
-
-                try:
-                    cmd = extract_command_from_line(line, shell_type)
-                    if cmd:
-                        nodes = bashlex.parse(cmd)
-                        for node in nodes:
-                            extract_commands(node, commands_dict)
-                except (bashlex.errors.ParsingError, NotImplementedError):
-                    # Skip unparseable lines and unsupported bash features silently
-                    pass
-                except Exception as e:
-                    # Log unexpected errors to stderr
-                    err_console.print(
-                        f"[dim red]Warning: {file_path}:{line_num}: {e}[/dim red]"
-                    )
+            process_lines(f, shell_type, commands_dict, str(file_path))
     except FileNotFoundError:
         err_console.print(
             f"[red]Error: History file not found: {file_path}[/red]"
@@ -98,23 +103,35 @@ def print_categorized(commands_dict, use_json):
 
 @click.command()
 @click.option('--json', is_flag=True, help='Output as JSON')
-def main(json):
+@click.option('--file', type=str, help='Read from file (use "-" for stdin) instead of auto-detecting history files')
+@click.option('--shell-type', type=click.Choice(['zsh', 'bash']), default='zsh', help='Shell type for parsing (default: zsh)')
+def main(json, file, shell_type):
     """Extract commands and subcommands from shell history."""
     commands_dict = {}
 
-    # Auto-detect history files
-    history_files = []
-    if (zsh_hist := Path.home() / '.zsh_history').exists():
-        history_files.append(('zsh', zsh_hist))
-    if (bash_hist := Path.home() / '.bash_history').exists():
-        history_files.append(('bash', bash_hist))
+    if file:
+        # Read from specified file or stdin
+        if file == '-':
+            # Read from stdin
+            process_lines(sys.stdin, shell_type, commands_dict, "stdin")
+        else:
+            # Read from specified file
+            file_path = Path(file)
+            process_history_file(file_path, shell_type, commands_dict)
+    else:
+        # Auto-detect history files
+        history_files = []
+        if (zsh_hist := Path.home() / '.zsh_history').exists():
+            history_files.append(('zsh', zsh_hist))
+        if (bash_hist := Path.home() / '.bash_history').exists():
+            history_files.append(('bash', bash_hist))
 
-    if not history_files:
-        err_console.print("[red]No history files found[/red]")
-        sys.exit(1)
+        if not history_files:
+            err_console.print("[red]No history files found[/red]")
+            sys.exit(1)
 
-    for shell_type, file_path in history_files:
-        process_history_file(file_path, shell_type, commands_dict)
+        for shell_type, file_path in history_files:
+            process_history_file(file_path, shell_type, commands_dict)
 
     print_categorized(commands_dict, json)
 
