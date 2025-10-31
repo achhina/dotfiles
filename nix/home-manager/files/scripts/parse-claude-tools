@@ -1,0 +1,226 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = ["claude-code-log", "click", "rich"]
+# ///
+
+import sys
+import json
+from pathlib import Path
+from datetime import datetime, timedelta
+import click
+from rich.console import Console
+
+console = Console()
+err_console = Console(stderr=True)
+
+
+def get_current_project():
+    """Detect project slug based on current working directory."""
+    cwd = Path.cwd()
+    return str(cwd).replace('/', '-')
+
+
+def find_session_files(project_filter=None, session_id=None, time_filter=None):
+    """Find session JSONL files based on filters."""
+    projects_dir = Path.home() / '.claude' / 'projects'
+
+    if not projects_dir.exists():
+        err_console.print("[red]Error: No Claude projects directory found[/red]")
+        sys.exit(1)
+
+    # Specific session
+    if session_id:
+        if project_filter:
+            session_file = projects_dir / project_filter / f"{session_id}.jsonl"
+            return [session_file] if session_file.exists() else []
+        # Search all projects for this session
+        for project_dir in projects_dir.iterdir():
+            if project_dir.is_dir():
+                session_file = project_dir / f"{session_id}.jsonl"
+                if session_file.exists():
+                    return [session_file]
+        return []
+
+    # Collect files
+    if project_filter:
+        project_dir = projects_dir / project_filter
+        if not project_dir.exists():
+            err_console.print(f"[red]Error: Project not found: {project_filter}[/red]")
+            sys.exit(1)
+        session_files = list(project_dir.glob('*.jsonl'))
+    else:
+        # All projects
+        session_files = []
+        for project_dir in projects_dir.iterdir():
+            if project_dir.is_dir():
+                session_files.extend(project_dir.glob('*.jsonl'))
+
+    # Apply time filter
+    if time_filter:
+        now = datetime.now()
+        if time_filter == 'today':
+            cutoff = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif time_filter == 'yesterday':
+            cutoff = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        elif time_filter == 'last-week':
+            cutoff = now - timedelta(days=7)
+        else:
+            cutoff = None
+
+        if cutoff:
+            filtered_files = []
+            for f in session_files:
+                mtime = datetime.fromtimestamp(f.stat().st_mtime)
+                if mtime >= cutoff:
+                    filtered_files.append(f)
+            session_files = filtered_files
+
+    return sorted(session_files, key=lambda f: f.stat().st_mtime, reverse=True)
+
+
+def extract_tool_calls(session_path):
+    """Extract tool calls from a session JSONL file."""
+    tool_calls = []
+
+    try:
+        with open(session_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if not line.strip():
+                    continue
+
+                try:
+                    msg = json.loads(line)
+
+                    # Filter for assistant messages with tool_use
+                    if msg.get('type') == 'assistant' and 'message' in msg:
+                        content = msg['message'].get('content', [])
+                        timestamp = msg.get('timestamp', '')
+
+                        for item in content:
+                            if isinstance(item, dict) and item.get('type') == 'tool_use':
+                                tool_calls.append({
+                                    'timestamp': timestamp,
+                                    'tool': item['name'],
+                                    'input': item.get('input', {})
+                                })
+                except json.JSONDecodeError:
+                    # Skip malformed lines
+                    pass
+    except Exception as e:
+        err_console.print(f"[dim red]Warning: {session_path.name}: {e}[/dim red]")
+
+    return tool_calls
+
+
+def process_all_sessions(session_files):
+    """Process multiple session files."""
+    all_tool_calls = {}
+
+    for session_file in session_files:
+        tool_calls = extract_tool_calls(session_file)
+
+        for call in tool_calls:
+            tool_name = call['tool']
+            if tool_name not in all_tool_calls:
+                all_tool_calls[tool_name] = []
+            all_tool_calls[tool_name].append(call)
+
+    return all_tool_calls
+
+
+def format_timestamp(ts_str):
+    """Format ISO timestamp to readable string."""
+    try:
+        dt = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+    except:
+        return ts_str
+
+
+def truncate_value(value, max_length=80):
+    """Truncate long values for display."""
+    value_str = str(value)
+    if len(value_str) > max_length:
+        return value_str[:max_length] + '...'
+    return value_str
+
+
+def print_categorized(tool_calls_dict):
+    """Print tool calls categorized by tool name."""
+    if not tool_calls_dict:
+        console.print("[yellow]No tool calls found[/yellow]")
+        return
+
+    for tool_name in sorted(tool_calls_dict.keys()):
+        calls = tool_calls_dict[tool_name]
+        console.print(f"\n[bold cyan]{tool_name}[/bold cyan] ([dim]{len(calls)} calls[/dim])")
+
+        for call in calls:
+            timestamp = format_timestamp(call['timestamp'])
+            console.print(f"  [dim]{timestamp}[/dim]")
+
+            # Format input based on tool
+            input_data = call['input']
+            if isinstance(input_data, dict):
+                for key, value in input_data.items():
+                    display_value = truncate_value(value)
+                    console.print(f"    {key}: {display_value}")
+            else:
+                console.print(f"    {truncate_value(input_data)}")
+
+
+def print_json(tool_calls_dict):
+    """Print tool calls as JSON."""
+    output = {}
+    for tool_name, calls in tool_calls_dict.items():
+        output[tool_name] = [
+            {
+                'timestamp': call['timestamp'],
+                'input': call['input']
+            }
+            for call in calls
+        ]
+    print(json.dumps(output, indent=2))
+
+
+@click.command()
+@click.option('--current', is_flag=True, help='Filter to current project')
+@click.option('--project', help='Filter to specific project slug')
+@click.option('--session', help='Show specific session UUID')
+@click.option('--today', 'time_filter', flag_value='today', help='Show today\'s sessions')
+@click.option('--yesterday', 'time_filter', flag_value='yesterday', help='Show yesterday\'s sessions')
+@click.option('--last-week', 'time_filter', flag_value='last-week', help='Show last week\'s sessions')
+@click.option('--json', 'output_json', is_flag=True, help='Output as JSON')
+def main(current, project, session, time_filter, output_json):
+    """Extract tool calls from Claude Code session transcripts."""
+
+    # Determine project filter
+    project_filter = None
+    if current:
+        project_filter = get_current_project()
+    elif project:
+        project_filter = project
+
+    # Find session files
+    session_files = find_session_files(
+        project_filter=project_filter,
+        session_id=session,
+        time_filter=time_filter
+    )
+
+    if not session_files:
+        err_console.print("[yellow]No session files found matching filters[/yellow]")
+        sys.exit(0)
+
+    # Process sessions
+    tool_calls_dict = process_all_sessions(session_files)
+
+    # Output
+    if output_json:
+        print_json(tool_calls_dict)
+    else:
+        print_categorized(tool_calls_dict)
+
+
+if __name__ == '__main__':
+    main()

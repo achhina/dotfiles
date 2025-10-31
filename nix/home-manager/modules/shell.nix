@@ -302,6 +302,11 @@ in
     executable = true;
   };
 
+  home.file."bin/parse-claude-tools" = {
+    source = ../files/scripts/parse-claude-tools;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
