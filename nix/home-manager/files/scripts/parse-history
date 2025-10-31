@@ -103,21 +103,22 @@ def print_categorized(commands_dict, use_json):
 
 @click.command()
 @click.option('--json', is_flag=True, help='Output as JSON')
-@click.option('--file', type=str, help='Read from file (use "-" for stdin) instead of auto-detecting history files')
+@click.option('--file', type=str, help='Read from specific file instead of auto-detecting')
 @click.option('--shell-type', type=click.Choice(['zsh', 'bash']), default='zsh', help='Shell type for parsing (default: zsh)')
 def main(json, file, shell_type):
     """Extract commands and subcommands from shell history."""
     commands_dict = {}
 
+    # Check if stdin is being piped (not a TTY)
+    stdin_has_data = not sys.stdin.isatty()
+
     if file:
-        # Read from specified file or stdin
-        if file == '-':
-            # Read from stdin
-            process_lines(sys.stdin, shell_type, commands_dict, "stdin")
-        else:
-            # Read from specified file
-            file_path = Path(file)
-            process_history_file(file_path, shell_type, commands_dict)
+        # Read from specified file
+        file_path = Path(file)
+        process_history_file(file_path, shell_type, commands_dict)
+    elif stdin_has_data:
+        # Auto-detect stdin
+        process_lines(sys.stdin, shell_type, commands_dict, "stdin")
     else:
         # Auto-detect history files
         history_files = []
