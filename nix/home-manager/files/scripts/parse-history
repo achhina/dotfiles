@@ -105,7 +105,8 @@ def print_categorized(commands_dict, use_json):
 @click.option('--json', is_flag=True, help='Output as JSON')
 @click.option('--file', type=str, help='Read from specific file instead of auto-detecting')
 @click.option('--shell-type', type=click.Choice(['zsh', 'bash']), default='zsh', help='Shell type for parsing (default: zsh)')
-def main(json, file, shell_type):
+@click.option('--include-history', is_flag=True, help='Also include auto-detected history files when reading from stdin/file')
+def main(json, file, shell_type, include_history):
     """Extract commands and subcommands from shell history."""
     commands_dict = {}
 
@@ -120,14 +121,18 @@ def main(json, file, shell_type):
         # Auto-detect stdin
         process_lines(sys.stdin, shell_type, commands_dict, "stdin")
     else:
-        # Auto-detect history files
+        # Auto-detect history files (default behavior)
+        include_history = True
+
+    # Also process history files if requested
+    if include_history:
         history_files = []
         if (zsh_hist := Path.home() / '.zsh_history').exists():
             history_files.append(('zsh', zsh_hist))
         if (bash_hist := Path.home() / '.bash_history').exists():
             history_files.append(('bash', bash_hist))
 
-        if not history_files:
+        if not history_files and not (file or stdin_has_data):
             err_console.print("[red]No history files found[/red]")
             sys.exit(1)
 
