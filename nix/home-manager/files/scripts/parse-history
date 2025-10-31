@@ -11,6 +11,7 @@ from rich.console import Console
 import bashlex
 
 console = Console()
+err_console = Console(stderr=True)
 
 
 def extract_command_from_line(line, shell_type):
@@ -19,11 +20,6 @@ def extract_command_from_line(line, shell_type):
         # Strip zsh timestamp metadata: ': 1234567890:0;command'
         if line.startswith(':'):
             line = line.split(';', 1)[1] if ';' in line else line
-        # Unescape zsh sequences
-        try:
-            line = line.encode().decode('unicode_escape')
-        except Exception:
-            pass  # Keep original if decode fails
     return line.strip()
 
 
@@ -70,19 +66,17 @@ def process_history_file(file_path, shell_type, commands_dict):
                         nodes = bashlex.parse(cmd)
                         for node in nodes:
                             extract_commands(node, commands_dict)
-                except bashlex.errors.ParsingError:
-                    # Skip unparseable lines silently
+                except (bashlex.errors.ParsingError, NotImplementedError):
+                    # Skip unparseable lines and unsupported bash features silently
                     pass
                 except Exception as e:
                     # Log unexpected errors to stderr
-                    console.print(
-                        f"[dim red]Warning: {file_path}:{line_num}: {e}[/dim red]",
-                        file=sys.stderr
+                    err_console.print(
+                        f"[dim red]Warning: {file_path}:{line_num}: {e}[/dim red]"
                     )
     except FileNotFoundError:
-        console.print(
-            f"[red]Error: History file not found: {file_path}[/red]",
-            file=sys.stderr
+        err_console.print(
+            f"[red]Error: History file not found: {file_path}[/red]"
         )
         sys.exit(1)
 
@@ -116,7 +110,7 @@ def main(json):
         history_files.append(('bash', bash_hist))
 
     if not history_files:
-        console.print("[red]No history files found[/red]", file=sys.stderr)
+        err_console.print("[red]No history files found[/red]")
         sys.exit(1)
 
     for shell_type, file_path in history_files:
