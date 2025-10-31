@@ -17,7 +17,7 @@ err_console = Console(stderr=True)
 def get_current_project():
     """Detect project slug based on current working directory."""
     cwd = Path.cwd()
-    return str(cwd).replace('/', '-')
+    return str(cwd).replace('/', '-').replace('.', '-')
 
 
 def find_session_files(project_filter=None, session_id=None, time_filter=None):
