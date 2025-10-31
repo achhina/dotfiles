@@ -297,6 +297,11 @@ in
     executable = true;
   };
 
+  home.file."bin/parse-history" = {
+    source = ../files/scripts/parse-history;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
