@@ -372,6 +372,9 @@ in
       "HIST_IGNORE_DUPS" # don't record consecutive duplicate commands
       "HIST_IGNORE_SPACE" # don't record commands starting with space
       "COMPLETE_IN_WORD" # complete from cursor position, not just end
+      "NO_BEEP" # disable beep on error in ZLE
+      "NO_LIST_BEEP" # disable beep on ambiguous completion
+      "NO_HIST_BEEP" # disable beep when accessing non-existent history
     ];
 
     completionInit = ''
