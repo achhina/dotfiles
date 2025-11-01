@@ -69,6 +69,7 @@
           "Bash(jest:*)"
           "Bash(just:*)"
           "Bash(ls:*)"
+          "Bash(lsof:*)"
           "Bash(man:*)"
           "Bash(mkdir:*)"
           "Bash(mypy:*)"
