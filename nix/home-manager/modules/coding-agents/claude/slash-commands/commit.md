@@ -1,45 +1,51 @@
 ---
 description: Create a well-formatted commit with smart message
-mode: edit
 ---
 
 # Task
 
-Create a commit with a well-formatted message following best practices.
+Launch a specialized commit agent to review changes, remove obvious comments, verify code quality, and create a well-formatted commit.
 
 # Instructions
 
-1. **Review changes:**
-   - Run `git status` to see modified files
-   - Run `git diff` to see staged and unstaged changes
+Use the Task tool to launch a commit agent that will:
+
+1. **Review uncommitted changes:**
+   - Run `git status` and `git diff` to identify all changes
    - Understand what was changed and why
 
-2. **Stage changes:**
-   - If changes aren't staged, stage relevant files with `git add`
+2. **Clean up obvious comments:**
+   - Remove comments that simply restate what the code does
+   - Remove edit history comments ("added", "removed", "changed")
+   - Remove commented-out code blocks
+   - Keep TODO/FIXME markers, "why" comments, and documentation
+
+3. **Stage changes:**
+   - Stage relevant files with `git add`
    - Verify staged changes with `git diff --cached`
 
-3. **Draft commit message:**
+4. **Draft commit message:**
    - **Format:** `<Verb> <what> [optional details]`
    - **Length:** 60-120 characters for the summary line
    - **Style rules:**
      - Start with present-tense verb (Add, Fix, Update, Remove, Refactor, Implement)
      - Be concise and specific
-     - No praise adjectives (e.g., avoid "great", "awesome", "better")
+     - No praise adjectives (avoid "great", "awesome", "better")
      - Single line (no body unless necessary)
      - End with a period
      - Focus on "what" and "why", not "how"
 
-4. **Verify message quality:**
+5. **Verify message quality:**
    - Is it clear what changed?
    - Is it clear why it changed?
    - Would someone reading the git log understand this?
    - Does it follow the format rules above?
 
-5. **Create commit:**
+6. **Create commit:**
    - Use `git commit -m "message"` with HEREDOC for proper formatting
    - Show the commit hash after successful commit
 
-6. **Verify:**
+7. **Verify:**
    - Run `git status` to confirm commit succeeded
    - Run `git log -1 --oneline` to show the commit
 
@@ -59,9 +65,29 @@ Create a commit with a well-formatted message following best practices.
 - `WIP` (not descriptive)
 - `asdf` (meaningless)
 
+# Comment Removal Guidelines
+
+**Remove:**
+- Comments that restate code: `// Calculate elapsed time` above `elapsed = end - start`
+- Edit history: "added", "removed", "changed", "updated"
+- Commented-out code
+- Obvious explanations: `// User ID` above `userId`
+
+**Keep:**
+- TODO, FIXME, HACK, NOTE markers
+- "Why" explanations
+- Important context not obvious from code
+- Documentation comments (JSDoc, docstrings)
+- License headers
+
 # Notes
 
-- This command pairs with `/todo` for a tight development loop
+- The agent will work through changes systematically
+- Comment removal happens before commit creation
 - Each task from `/todo` should result in one atomic commit
 - If changes are complex, consider multiple smaller commits
 - Never commit without understanding what changed
+
+# Agent Invocation
+
+Use the Task tool with subagent_type="general-purpose" to execute this workflow autonomously.
