@@ -57,6 +57,7 @@ in
       hidpi = "off";
       active_color = "0xff0099cc";
       inactive_color = "0xff414550";
+      blacklist = "iPhone Mirroring";
     };
   };
 
