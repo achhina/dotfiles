@@ -22,7 +22,37 @@ in
   programs.readline = {
     enable = true;
     variables = {
+      # Disable terminal bell
       bell-style = "none";
+
+      # Completion enhancements
+      show-all-if-ambiguous = true;
+      show-all-if-unmodified = true;
+      completion-ignore-case = true;
+      completion-map-case = true;
+      colored-stats = true;
+      colored-completion-prefix = true;
+      mark-symlinked-directories = true;
+      menu-complete-display-prefix = true;
+      visible-stats = true;
+
+      # Editing improvements
+      skip-completed-text = true;
+
+      # History navigation
+      history-preserve-point = true;
+      revert-all-at-newline = true;
+
+      # Display settings
+      page-completions = false;
+      completion-query-items = 200;
+      echo-control-characters = false;
+    };
+
+    bindings = {
+      # Arrow keys for partial history search
+      "\\e[A" = "history-search-backward";
+      "\\e[B" = "history-search-forward";
     };
   };
 
