@@ -2,9 +2,22 @@
 description: Perform comprehensive code review with structured analysis
 ---
 
+# Task
+
+Launch a specialized code-review agent to perform comprehensive analysis of code changes with focus on security, performance, and best practices.
+
+# Agent Invocation
+
+Use the Task tool with `subagent_type="tdd-workflows:code-reviewer"` to launch the elite code review specialist.
+
+The agent will autonomously:
+1. Determine review scope (uncommitted changes vs. unpushed commits)
+2. Analyze code against the comprehensive review framework
+3. Provide structured findings with actionable recommendations
+
 # Scope Determination
 
-First, determine what to review:
+The agent will determine what to review:
 
 1. **Check for uncommitted changes:**
    - Run `git status` to check for modified, staged, or untracked files
@@ -22,7 +35,7 @@ First, determine what to review:
 
 # Code Review Framework
 
-Perform a comprehensive code review using the following structured approach:
+The agent performs comprehensive review using the following structured approach:
 
 ## 1. Code Quality & Maintainability
 - **Readability**: Is the code clear and self-documenting?
