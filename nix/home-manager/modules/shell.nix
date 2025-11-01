@@ -18,6 +18,14 @@ in
     enableZshIntegration = true;
   };
 
+  # Readline configuration
+  programs.readline = {
+    enable = true;
+    variables = {
+      bell-style = "none";
+    };
+  };
+
   # Terminal emulator
   programs.ghostty = {
     enable = true;
