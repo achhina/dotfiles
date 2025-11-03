@@ -10,7 +10,31 @@
     launchd.enable = true;
     userSettings = {
       after-login-command = [ ];
-      after-startup-command = [ ];
+      # Workaround for AeroSpace bug where default-root-container-layout is not
+      # reliably applied on startup. Explicitly set accordion horizontal layout
+      # for all workspaces. See: https://github.com/nikitabobko/AeroSpace/issues/568
+      after-startup-command = [
+        "workspace 1"
+        "layout h_accordion"
+        "workspace 2"
+        "layout h_accordion"
+        "workspace 3"
+        "layout h_accordion"
+        "workspace 4"
+        "layout h_accordion"
+        "workspace 5"
+        "layout h_accordion"
+        "workspace 6"
+        "layout h_accordion"
+        "workspace 7"
+        "layout h_accordion"
+        "workspace 8"
+        "layout h_accordion"
+        "workspace 9"
+        "layout h_accordion"
+        "workspace 10"
+        "layout h_accordion"
+      ];
 
       on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
 
