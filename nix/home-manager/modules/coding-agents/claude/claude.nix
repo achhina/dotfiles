@@ -162,7 +162,9 @@
           "Bash(git config --list:*)"
           # GitHub CLI read-only API calls
           "Bash(gh api --method GET:*)"
+          "Bash(gh api --method=GET:*)"
           "Bash(gh api -X GET:*)"
+          "Bash(gh api -XGET:*)"
           # System information commands
           "Bash(which:*)"
           "Bash(whence:*)"
