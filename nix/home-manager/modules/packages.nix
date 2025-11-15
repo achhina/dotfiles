@@ -82,7 +82,15 @@ let
 
   # Document processing and generation tools
   documentTools = with pkgs; [
-    mermaid-cli                # Diagram generation
+    # Wrap mermaid-cli to use Chrome from Nix for puppeteer
+    (pkgs.writeShellScriptBin "mmdc" ''
+      ${if pkgs.stdenv.isDarwin then ''
+        export PUPPETEER_EXECUTABLE_PATH="${pkgs.google-chrome}/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      '' else ''
+        export PUPPETEER_EXECUTABLE_PATH="${pkgs.google-chrome}/bin/google-chrome-stable"
+      ''}
+      exec ${pkgs.mermaid-cli}/bin/mmdc "$@"
+    '')
     vhs                        # Terminal recording tool
   ];
 

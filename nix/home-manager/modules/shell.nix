@@ -498,9 +498,6 @@ in
       fdf = "fd --type f --hyperlink";
       fdd = "fd --type d --hyperlink";
 
-      # Mermaid CLI with Chrome from Nix
-      mmdc = "PUPPETEER_EXECUTABLE_PATH=\"${pkgs.google-chrome}/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" command mmdc";
-
       t = "tmux";
       ta = "tmux attach || tmux new-session";
 
