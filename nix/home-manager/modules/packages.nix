@@ -100,6 +100,7 @@ let
   # Cross-platform GUI applications
   guiApps = with pkgs; [
     obsidian                 # Knowledge base on local Markdown files
+    google-chrome            # Web browser (used by puppeteer for mermaid-cli)
   ];
 
   # macOS-specific packages

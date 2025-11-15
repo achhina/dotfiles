@@ -207,6 +207,8 @@
           "Write"
           "mcp__context7__get-library-docs"
           "mcp__context7__resolve-library-id"
+          "mcp__plugin_episodic-memory_episodic-memory__search"
+          "mcp__plugin_episodic-memory_episodic-memory__read"
           "Glob"
           "Grep"
           "Task"

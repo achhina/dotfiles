@@ -77,6 +77,7 @@ in
         "nix-command"
         "flakes"
       ];
+      accept-flake-config = true;
     }
     // (
       if isTrusted then

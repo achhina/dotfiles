@@ -498,8 +498,8 @@ in
       fdf = "fd --type f --hyperlink";
       fdd = "fd --type d --hyperlink";
 
-      # Mermaid CLI with dynamic Chrome path
-      mmdc = "PUPPETEER_EXECUTABLE_PATH=\"$(find $HOME/.cache/puppeteer/chrome-headless-shell -name 'chrome-headless-shell' -type f 2>/dev/null | head -1)\" command mmdc";
+      # Mermaid CLI with Chrome from Nix
+      mmdc = "PUPPETEER_EXECUTABLE_PATH=\"${pkgs.google-chrome}/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" command mmdc";
 
       t = "tmux";
       ta = "tmux attach || tmux new-session";

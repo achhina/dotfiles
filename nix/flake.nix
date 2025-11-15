@@ -1,6 +1,12 @@
 {
   description = "Home Manager configuration";
 
+  nixConfig = {
+    extra-substituters = [ "https://cache.nixos.org/" ];
+    extra-trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+    allow-unfree = true;
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/63bdb5d90fa2fa11c42f9716ad1e23565613b07c";
     home-manager = {
