@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SessionStart hook to detect Python projects and load development context
+# SessionStart hook to detect Python projects and load PYTHON.md context
 # Triggers when in a git repository with pyproject.toml at the root
 
 set -euo pipefail
@@ -17,28 +17,17 @@ if [[ ! -f "$git_root/pyproject.toml" ]]; then
     exit 0
 fi
 
-# Python project detected - load context files
-software_principles_md="$HOME/.claude/SOFTWARE_PRINCIPLES.md"
+# Python project detected - load PYTHON.md context
 python_md="$HOME/.claude/PYTHON.md"
 
-echo "=== Python Project Detected ==="
-echo ""
-echo "Found pyproject.toml at repository root: $git_root"
-echo "Loading development context..."
-echo ""
-echo "---"
-echo ""
-
-# Load SOFTWARE_PRINCIPLES.md first (general principles)
-if [[ -f "$software_principles_md" ]]; then
-    cat "$software_principles_md"
+if [[ -f "$python_md" ]]; then
+    echo "=== Python Project Detected ==="
+    echo ""
+    echo "Found pyproject.toml at repository root: $git_root"
+    echo "Loading Python development context..."
     echo ""
     echo "---"
     echo ""
-fi
-
-# Load PYTHON.md (Python-specific practices)
-if [[ -f "$python_md" ]]; then
     cat "$python_md"
 fi
 

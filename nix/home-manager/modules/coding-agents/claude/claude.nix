@@ -5,7 +5,10 @@
 }:
 
 let
-  # Python project detector hook script
+  # Software development detector hook script (general principles for any git repo)
+  softwareDevelopmentDetector = pkgs.writeShellScript "software-development-detector.sh" (builtins.readFile ./hooks/software-development-detector.sh);
+
+  # Python project detector hook script (Python-specific practices)
   pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (builtins.readFile ./hooks/python-project-detector.sh);
 in
 {
@@ -294,6 +297,10 @@ in
         SessionStart = [
           {
             hooks = [
+              {
+                type = "command";
+                command = "${softwareDevelopmentDetector}";
+              }
               {
                 type = "command";
                 command = "${pythonProjectDetector}";
