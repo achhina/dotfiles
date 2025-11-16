@@ -15,7 +15,8 @@
     commandsDir = ./slash-commands;
 
     # User-level memory (personal preferences across all projects)
-    memory.source = ./context/CLAUDE.md;
+    # AGENTS.md is the source file, deployed as CLAUDE.md for Claude Code
+    memory.source = ./context/AGENTS.md;
 
     settings = {
       env = {
@@ -307,6 +308,11 @@
         ".claude/commands/.keep".text = "";
         ".claude/agents/.keep".text = "";
         ".claude/skills/.keep".text = "";
+      }
+      # Deploy additional context files for progressive disclosure
+      {
+        ".claude/SOFTWARE_PRINCIPLES.md".source = ./context/SOFTWARE_PRINCIPLES.md;
+        ".claude/PYTHON.md".source = ./context/PYTHON.md;
       }
       # Symlink skills from declarative source
       (lib.mapAttrs' (name: _: {
