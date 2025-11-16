@@ -4,6 +4,10 @@
   ...
 }:
 
+let
+  # Python project detector hook script
+  pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (builtins.readFile ./hooks/python-project-detector.sh);
+in
 {
   # Claude Code settings configuration
   # Managed declaratively through Home Manager
@@ -283,6 +287,20 @@
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
+      };
+
+      # Session hooks
+      hooks = {
+        SessionStart = [
+          {
+            hooks = [
+              {
+                type = "command";
+                command = "${pythonProjectDetector}";
+              }
+            ];
+          }
+        ];
       };
     };
   };
