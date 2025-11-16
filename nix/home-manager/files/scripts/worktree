@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # /// script
-# dependencies = ["click", "structlog", "rich"]
+# dependencies = ["click", "structlog", "rich", "pydantic"]
 # ///
 
 """
@@ -10,15 +10,16 @@ Manages git worktrees in a centralized directory structure:
 ~/worktrees/<project>/<worktree-name>/
 """
 
+import json
 import logging
 import subprocess
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import click
 import structlog
+from pydantic import BaseModel, ConfigDict
 from rich.console import Console
 from rich.table import Table
 
@@ -26,15 +27,16 @@ from rich.table import Table
 DEFAULT_WORKTREE_BASE = Path.home() / "worktrees"
 DEFAULT_LOG_LEVEL = "warning"
 
-# Global logger and console
-logger = structlog.get_logger()
+# Global console (logger configured per-invocation)
 console = Console()
 console_err = Console(stderr=True)
+logger = structlog.get_logger()
 
 
-@dataclass(frozen=True)
-class WorktreeInfo:
+class WorktreeInfo(BaseModel):
     """Represents a git worktree with its metadata."""
+
+    model_config = ConfigDict(frozen=True)
 
     path: Path
     branch: str
@@ -42,12 +44,32 @@ class WorktreeInfo:
     is_current_repo: bool
 
 
-@dataclass(frozen=True)
-class GitRepo:
+class GitRepo(BaseModel):
     """Represents the current git repository context."""
+
+    model_config = ConfigDict(frozen=True)
 
     root: Path
     project_name: str
+
+
+def format_worktrees(worktrees: list[WorktreeInfo], format: str) -> None:
+    """Format and display worktrees in the specified format."""
+    if format == "json":
+        # Use Pydantic's built-in serialization
+        output = [wt.model_dump(mode="json") for wt in worktrees]
+        print(json.dumps(output, indent=2))
+    elif format == "rich":
+        # Create rich table
+        table = Table(title="Git Worktrees")
+        table.add_column("Project", style="cyan")
+        table.add_column("Branch", style="green")
+        table.add_column("Path", style="blue")
+
+        for wt in worktrees:
+            table.add_row(wt.project, wt.branch, str(wt.path))
+
+        console.print(table)
 
 
 def get_git_root(cwd: Path = Path.cwd()) -> Optional[Path]:
@@ -188,14 +210,26 @@ def complete_worktree_names(ctx, param, incomplete):
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
+    "--global",
+    "-g",
+    "show_global",
+    is_flag=True,
+    help="Show worktrees from all projects (global scope)",
+)
+@click.option(
     "--log-level",
     type=click.Choice(["debug", "info", "warning", "error"], case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level",
 )
-def cli(log_level: str):
+@click.pass_context
+def cli(ctx: click.Context, show_global: bool, log_level: str):
     """Git worktree manager for multi-project workflows."""
-    # Configure structlog
+    # Store global flag in context for subcommands
+    ctx.ensure_object(dict)
+    ctx.obj["show_global"] = show_global
+
+    # Configure structlog to output to stderr
     level = log_level.upper()
     level_int = getattr(logging, level, logging.INFO)
     structlog.configure(
@@ -205,20 +239,23 @@ def cli(log_level: str):
             structlog.dev.ConsoleRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(level_int),
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
     )
 
 
 @cli.command()
 @click.option(
-    "--global",
-    "-g",
-    "show_global",
-    is_flag=True,
-    help="Show worktrees from all projects",
+    "--format",
+    "-f",
+    type=click.Choice(["rich", "json"], case_sensitive=False),
+    default="rich",
+    help="Output format",
 )
-def list(show_global: bool):
+@click.pass_context
+def list(ctx: click.Context, format: str):
     """List git worktrees."""
+    show_global = ctx.obj["show_global"]
+
     current_repo = None
     if not show_global:
         git_root = get_git_root()
@@ -235,24 +272,18 @@ def list(show_global: bool):
         worktrees = [wt for wt in worktrees if wt.is_current_repo]
 
     if not worktrees:
-        if current_repo:
-            console.print(
-                f"[yellow]No worktrees found for project '{current_repo.project_name}'[/yellow]"
-            )
+        if format == "json":
+            print("[]")
         else:
-            console.print("[yellow]No worktrees found[/yellow]")
+            if current_repo:
+                console.print(
+                    f"[yellow]No worktrees found for project '{current_repo.project_name}'[/yellow]"
+                )
+            else:
+                console.print("[yellow]No worktrees found[/yellow]")
         return
 
-    # Create table
-    table = Table(title="Git Worktrees")
-    table.add_column("Project", style="cyan")
-    table.add_column("Branch", style="green")
-    table.add_column("Path", style="blue")
-
-    for wt in worktrees:
-        table.add_row(wt.project, wt.branch, str(wt.path))
-
-    console.print(table)
+    format_worktrees(worktrees, format)
     logger.info("listed worktrees", count=len(worktrees))
 
 
