@@ -82,11 +82,13 @@ let
 
   # Document processing and generation tools
   documentTools = with pkgs; [
-    # Wrap mermaid-cli to use Chrome from Nix for puppeteer
+    # Wrap mermaid-cli to use Chrome for puppeteer
     (pkgs.writeShellScriptBin "mmdc" ''
       ${if pkgs.stdenv.isDarwin then ''
-        export PUPPETEER_EXECUTABLE_PATH="${pkgs.google-chrome}/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        # On macOS, use Homebrew Chrome (stable path, no GC issues)
+        export PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
       '' else ''
+        # On Linux, use Nix Chrome
         export PUPPETEER_EXECUTABLE_PATH="${pkgs.google-chrome}/bin/google-chrome-stable"
       ''}
       exec ${pkgs.mermaid-cli}/bin/mmdc "$@"
@@ -108,7 +110,6 @@ let
   # Cross-platform GUI applications
   guiApps = with pkgs; [
     obsidian                 # Knowledge base on local Markdown files
-    google-chrome            # Web browser (used by puppeteer for mermaid-cli)
   ];
 
   # macOS-specific packages
@@ -121,6 +122,7 @@ let
 
   # Linux-specific packages
   linuxPackages = with pkgs; [
+    google-chrome        # Web browser (macOS protects app bundles in Nix store from GC)
     firefox              # Web browser (builds on Linux, has gtk+3 issues on macOS)
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
