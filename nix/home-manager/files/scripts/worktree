@@ -172,6 +172,20 @@ def discover_worktrees(
     return worktrees
 
 
+def complete_worktree_names(ctx, param, incomplete):
+    """Provide worktree names for shell completion."""
+    current_repo = None
+    git_root = get_git_root()
+    if git_root:
+        current_repo = GitRepo(root=git_root, project_name=git_root.name)
+
+    worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
+    if current_repo:
+        worktrees = [wt for wt in worktrees if wt.is_current_repo]
+
+    return [wt.path.name for wt in worktrees if wt.path.name.startswith(incomplete)]
+
+
 @click.group()
 @click.option(
     "--log-level",
@@ -202,14 +216,7 @@ def cli(log_level: str):
     is_flag=True,
     help="Show worktrees from all projects",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["table", "names"], case_sensitive=False),
-    default="table",
-    hidden=True,
-    help="Output format (names for shell completion)",
-)
-def list(show_all: bool, format: str):
+def list(show_all: bool):
     """List git worktrees."""
     current_repo = None
     if not show_all:
@@ -225,12 +232,6 @@ def list(show_all: bool, format: str):
     # Filter to current repo if needed
     if not show_all and current_repo:
         worktrees = [wt for wt in worktrees if wt.is_current_repo]
-
-    if format == "names":
-        # Output just names for shell completion
-        for wt in worktrees:
-            print(wt.path.name)
-        return
 
     if not worktrees:
         if current_repo:
@@ -316,7 +317,7 @@ def create(name: str):
 
 
 @cli.command()
-@click.argument("name")
+@click.argument("name", shell_complete=complete_worktree_names)
 def remove(name: str):
     """Remove a git worktree (keeps the branch)."""
     validate_worktree_name(name)
@@ -360,73 +361,6 @@ def remove(name: str):
     except subprocess.CalledProcessError as e:
         console_err.print(f"[red]Error removing worktree: {e.stderr}[/red]")
         sys.exit(1)
-
-
-@cli.command()
-@click.argument(
-    "shell",
-    type=click.Choice(["zsh", "bash"], case_sensitive=False),
-)
-def completion(shell: str):
-    """Generate shell completion script."""
-    if shell == "zsh":
-        print(
-            """#compdef worktree
-
-_worktree() {
-    local -a commands
-    commands=(
-        'list:List git worktrees'
-        'create:Create a new git worktree'
-        'remove:Remove a git worktree'
-        'completion:Generate shell completion script'
-    )
-
-    _arguments -C \
-        '1: :->command' \
-        '*::arg:->args'
-
-    case $state in
-        command)
-            _describe 'command' commands
-            ;;
-        args)
-            case $words[1] in
-                remove)
-                    local -a worktrees
-                    worktrees=($(worktree list --format=names 2>/dev/null))
-                    _describe 'worktree' worktrees
-                    ;;
-            esac
-            ;;
-    esac
-}
-
-_worktree"""
-        )
-    elif shell == "bash":
-        print(
-            """_worktree_completion() {
-    local cur prev opts
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    if [ $COMP_CWORD -eq 1 ]; then
-        opts="list create remove completion"
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-        return 0
-    fi
-
-    if [ "${COMP_WORDS[1]}" = "remove" ] && [ $COMP_CWORD -eq 2 ]; then
-        local worktrees=$(worktree list --format=names 2>/dev/null)
-        COMPREPLY=( $(compgen -W "${worktrees}" -- ${cur}) )
-        return 0
-    fi
-}
-
-complete -F _worktree_completion worktree"""
-        )
 
 
 if __name__ == "__main__":
