@@ -260,7 +260,14 @@
       };
 
       # Standalone plugins from GitHub
-      plugins = { };
+      plugins = {
+        d3js = {
+          source = {
+            source = "github";
+            repo = "chrisvoncsefalvay/claude-d3js-skill";
+          };
+        };
+      };
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
@@ -271,6 +278,7 @@
         "javascript-typescript@claude-code-workflows" = true;
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
+        "d3js" = true;
       };
     };
   };
