@@ -69,6 +69,57 @@ Use the src/ layout to prevent implicit imports from the current working directo
 - Use `pytest-cov` to measure coverage
 - Don't just chase coverage numbers; write meaningful tests
 
+### Advanced Testing Techniques
+
+**Property-Based Testing**
+- Use `hypothesis` to automatically generate test cases and find edge cases
+- Define properties that should always hold true
+- Let hypothesis discover inputs that break your assumptions
+
+```python
+from hypothesis import given, strategies as st
+
+@given(st.integers(), st.integers())
+def test_addition_commutative(a, b):
+    """Addition should be commutative."""
+    assert a + b == b + a
+```
+
+**Performance Testing**
+- Use `pytest-benchmark` to track performance over time
+- Detect performance regressions in CI/CD
+- Establish performance baselines for critical code paths
+
+```python
+def test_search_performance(benchmark):
+    """Ensure search stays under 100ms."""
+    result = benchmark(search_function, large_dataset)
+    assert benchmark.stats.mean < 0.1  # 100ms
+```
+
+**Test Data Factories**
+- Use `factory_boy` for complex test data generation
+- Create reusable factories instead of manual fixtures
+- Generate realistic test data with Faker integration
+
+```python
+import factory
+from factory import Faker
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    name = Faker('name')
+    email = Faker('email')
+    created_at = Faker('date_time')
+```
+
+**Integration Testing**
+- Test with real databases, not just mocks
+- Use `pytest-docker` or testcontainers for isolated environments
+- Verify actual system integration, not just unit behavior
+
 ## Error Handling
 
 ### Exception Practices
@@ -148,6 +199,191 @@ class UserInput(BaseModel):
         return v
 ```
 
+## Architecture and Design Patterns
+
+### SOLID Principles
+
+Apply SOLID principles for maintainable, scalable Python code:
+
+**Single Responsibility**
+- Each class/module should have one reason to change
+- Separate concerns (data access, business logic, presentation)
+
+**Open/Closed**
+- Open for extension, closed for modification
+- Use inheritance, composition, or protocols for extensibility
+
+**Liskov Substitution**
+- Subtypes must be substitutable for their base types
+- Honor the contract defined by base classes
+
+**Interface Segregation**
+- Use `Protocol` for interface definitions
+- Many specific interfaces over one general interface
+
+```python
+from typing import Protocol
+
+class Readable(Protocol):
+    def read(self) -> str: ...
+
+class Writable(Protocol):
+    def write(self, data: str) -> None: ...
+```
+
+**Dependency Inversion**
+- Depend on abstractions (protocols), not concrete implementations
+- Inject dependencies rather than creating them internally
+
+```python
+class UserService:
+    def __init__(self, db: Database, cache: Cache):
+        """Dependencies injected, not created internally."""
+        self.db = db
+        self.cache = cache
+```
+
+### Dependency Injection
+
+Use dependency injection for testable, flexible code:
+
+```python
+# Bad: Hard to test, tightly coupled
+class UserService:
+    def __init__(self):
+        self.db = PostgresDatabase()  # Hard-coded dependency
+
+# Good: Easy to test, loosely coupled
+class UserService:
+    def __init__(self, db: Database):
+        self.db = db  # Injected dependency
+
+# Usage
+service = UserService(db=MockDatabase())  # Easy to test
+```
+
+### Event-Driven Architecture
+
+Use events for decoupled systems:
+
+```python
+from typing import Callable, Dict, List
+
+class EventBus:
+    def __init__(self):
+        self._listeners: Dict[str, List[Callable]] = {}
+
+    def subscribe(self, event: str, callback: Callable):
+        self._listeners.setdefault(event, []).append(callback)
+
+    def publish(self, event: str, data: any):
+        for callback in self._listeners.get(event, []):
+            callback(data)
+
+# Usage
+bus = EventBus()
+bus.subscribe("user.created", send_welcome_email)
+bus.publish("user.created", user)
+```
+
+### Plugin Architectures
+
+Create extensible systems with plugin patterns:
+
+**Entry Points (setuptools)**
+```python
+# pyproject.toml
+[project.entry-points."myapp.plugins"]
+plugin_name = "myapp.plugins.plugin_module:PluginClass"
+```
+
+**Dynamic Loading**
+```python
+import importlib.metadata
+
+def load_plugins():
+    for entry_point in importlib.metadata.entry_points(group="myapp.plugins"):
+        plugin_class = entry_point.load()
+        yield plugin_class()
+```
+
+### Common Design Patterns
+
+**Factory Pattern**
+```python
+class UserFactory:
+    @staticmethod
+    def create(user_type: str) -> User:
+        if user_type == "admin":
+            return AdminUser()
+        elif user_type == "regular":
+            return RegularUser()
+        raise ValueError(f"Unknown user type: {user_type}")
+```
+
+**Singleton Pattern (with metaclass)**
+```python
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class Database(metaclass=Singleton):
+    pass
+```
+
+**Observer Pattern**
+```python
+class Subject:
+    def __init__(self):
+        self._observers = []
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def notify(self, data):
+        for observer in self._observers:
+            observer.update(data)
+```
+
+### Advanced Python Features
+
+**Context Managers**
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def database_transaction(db):
+    """Custom context manager for transactions."""
+    db.begin()
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+```
+
+**Descriptors**
+```python
+class Validated:
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __set_name__(self, owner, name):
+        self.name = f"_{name}"
+
+    def __get__(self, obj, type):
+        return getattr(obj, self.name)
+
+    def __set__(self, obj, value):
+        self.validator(value)
+        setattr(obj, self.name, value)
+```
+
 ## Async Programming
 
 ### asyncio Best Practices
@@ -175,6 +411,68 @@ async def main():
     )
     return results
 ```
+
+### Async Libraries and Ecosystem
+
+**HTTP Clients**
+- Use `aiohttp` for async HTTP requests
+- Prefer `httpx` for compatibility with both sync and async code
+- Handle connection pooling and timeouts properly
+
+```python
+import aiohttp
+
+async def fetch_with_aiohttp(url: str) -> dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.json()
+```
+
+**Async Database Access**
+- Use `SQLAlchemy 2.0+` with async engine for database operations
+- Use `asyncpg` for PostgreSQL (fastest async driver)
+- Use `motor` for async MongoDB access
+
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+
+engine = create_async_engine("postgresql+asyncpg://user:pass@localhost/db")
+
+async def get_user(user_id: int) -> User:
+    async with AsyncSession(engine) as session:
+        result = await session.execute(select(User).where(User.id == user_id))
+        return result.scalar_one()
+```
+
+**Background Task Processing**
+- Use `Celery` with `Redis` for distributed task queues
+- Use `arq` for simpler async task processing
+- Consider `dramatiq` as an alternative to Celery
+
+**WebSockets**
+- Use `FastAPI` WebSocket support for real-time communication
+- Use `Django Channels` for WebSocket support in Django
+- Handle connection lifecycle and graceful disconnection
+
+```python
+from fastapi import FastAPI, WebSocket
+
+app = FastAPI()
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Echo: {data}")
+    except WebSocketDisconnect:
+        pass
+```
+
+**Alternative Async Frameworks**
+- Consider `trio` for structured concurrency and better error handling
+- Use `anyio` for writing code compatible with both asyncio and trio
 
 ## Performance
 
