@@ -24,7 +24,7 @@ from rich.table import Table
 
 # Constants
 DEFAULT_WORKTREE_BASE = Path.home() / "worktrees"
-DEFAULT_LOG_LEVEL = "info"
+DEFAULT_LOG_LEVEL = "warning"
 
 # Global logger and console
 logger = structlog.get_logger()
