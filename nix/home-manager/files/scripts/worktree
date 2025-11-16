@@ -10,7 +10,6 @@ Manages git worktrees in a centralized directory structure:
 ~/worktrees/<project>/<worktree-name>/
 """
 
-import json
 import logging
 import subprocess
 import sys
@@ -53,12 +52,26 @@ class GitRepo(BaseModel):
     project_name: str
 
 
-def format_worktrees(worktrees: list[WorktreeInfo], format: str) -> None:
+class WorktreesInfo(BaseModel):
+    """Container for worktree list with metadata."""
+
+    model_config = ConfigDict(frozen=True)
+
+    worktrees: list[WorktreeInfo]
+    is_global_scope: bool
+    current_project: Optional[str] = None
+
+    @property
+    def total_count(self) -> int:
+        """Total number of worktrees."""
+        return len(self.worktrees)
+
+
+def format_worktrees(worktrees_info: WorktreesInfo, format: str) -> None:
     """Format and display worktrees in the specified format."""
     if format == "json":
-        # Use Pydantic's built-in serialization
-        output = [wt.model_dump(mode="json") for wt in worktrees]
-        print(json.dumps(output, indent=2))
+        # Use Pydantic's built-in serialization for the entire container
+        print(worktrees_info.model_dump_json(indent=2))
     elif format == "rich":
         # Create rich table
         table = Table(title="Git Worktrees")
@@ -66,7 +79,7 @@ def format_worktrees(worktrees: list[WorktreeInfo], format: str) -> None:
         table.add_column("Branch", style="green")
         table.add_column("Path", style="blue")
 
-        for wt in worktrees:
+        for wt in worktrees_info.worktrees:
             table.add_row(wt.project, wt.branch, str(wt.path))
 
         console.print(table)
@@ -147,7 +160,10 @@ def discover_worktrees(
                 if line.startswith("worktree "):
                     if current_worktree:
                         path = Path(current_worktree["worktree"])
-                        if path.parent.parent == base_dir and path.parent.name == project_name:
+                        if (
+                            path.parent.parent == base_dir
+                            and path.parent.name == project_name
+                        ):
                             is_current = (
                                 current_repo is not None
                                 and current_repo.project_name == project_name
@@ -271,9 +287,17 @@ def list(ctx: click.Context, format: str):
     if not show_global and current_repo:
         worktrees = [wt for wt in worktrees if wt.is_current_repo]
 
-    if not worktrees:
+    # Create container with metadata
+    worktrees_info = WorktreesInfo(
+        worktrees=worktrees,
+        is_global_scope=show_global,
+        current_project=current_repo.project_name if current_repo else None,
+    )
+
+    if not worktrees_info.worktrees:
         if format == "json":
-            print("[]")
+            # Output empty container for consistency
+            print(worktrees_info.model_dump_json(indent=2))
         else:
             if current_repo:
                 console.print(
@@ -283,8 +307,8 @@ def list(ctx: click.Context, format: str):
                 console.print("[yellow]No worktrees found[/yellow]")
         return
 
-    format_worktrees(worktrees, format)
-    logger.info("listed worktrees", count=len(worktrees))
+    format_worktrees(worktrees_info, format)
+    logger.info("listed worktrees", count=worktrees_info.total_count)
 
 
 @cli.command()
