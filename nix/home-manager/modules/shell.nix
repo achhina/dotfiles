@@ -347,7 +347,7 @@ in
   };
 
   home.file."bin/worktree" = {
-    source = ../files/scripts/worktree;
+    source = ../files/scripts/worktree.py;
     executable = true;
   };
 
