@@ -369,6 +369,11 @@ in
         # Note: docker-compose is now 'docker compose' subcommand
         # The docker completion already includes 'docker compose' completions
       fi
+
+      # Load worktree completion using Click's built-in support
+      if command -v worktree &>/dev/null; then
+        eval "$(_WORKTREE_COMPLETE=zsh_source worktree)"
+      fi
     '';
 
     setOptions = [
