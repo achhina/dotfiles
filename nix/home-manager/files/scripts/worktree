@@ -186,7 +186,7 @@ def complete_worktree_names(ctx, param, incomplete):
     return [wt.path.name for wt in worktrees if wt.path.name.startswith(incomplete)]
 
 
-@click.group()
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
     "--log-level",
     type=click.Choice(["debug", "info", "warning", "error"], case_sensitive=False),
