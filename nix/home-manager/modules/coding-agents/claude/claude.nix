@@ -14,6 +14,9 @@
 
     commandsDir = ./slash-commands;
 
+    # User-level memory (personal preferences across all projects)
+    memory.source = ./context/CLAUDE.md;
+
     settings = {
       env = {
         BASH_DEFAULT_TIMEOUT_MS = "300000";
