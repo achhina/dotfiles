@@ -285,7 +285,7 @@ in
         "elements-of-style@superpowers-marketplace" = true;
         "episodic-memory@superpowers-marketplace" = true;
         "shell-scripting@claude-code-workflows" = true;
-        "python-development@claude-code-workflows" = true;
+        "python-development@claude-code-workflows" = false;
         "javascript-typescript@claude-code-workflows" = true;
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
