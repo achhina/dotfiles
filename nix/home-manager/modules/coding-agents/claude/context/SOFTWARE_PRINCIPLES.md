@@ -1,9 +1,5 @@
 # Software Engineering Principles
 
-## Language-Specific Guides
-
-When working on projects/files written in Python, read ./PYTHON.md for Python-specific best practices and principles.
-
 ## Code Quality
 
 ### DRY (Don't Repeat Yourself)
