@@ -17,8 +17,3 @@
 # Writing Style
 
 - NEVER use emdashes (—) in any writing or documentation
-
-# Software Development Context
-
-When working on creating, refactoring, or architecting software, read
-./SOFTWARE_PRINCIPLES.md for comprehensive software engineering principles.
