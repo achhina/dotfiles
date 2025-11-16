@@ -1,0 +1,433 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = ["click", "structlog", "rich"]
+# ///
+
+"""
+Git worktree manager for multi-project workflows.
+
+Manages git worktrees in a centralized directory structure:
+~/worktrees/<project>/<worktree-name>/
+"""
+
+import logging
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+import click
+import structlog
+from rich.console import Console
+from rich.table import Table
+
+# Constants
+DEFAULT_WORKTREE_BASE = Path.home() / "worktrees"
+DEFAULT_LOG_LEVEL = "info"
+
+# Global logger and console
+logger = structlog.get_logger()
+console = Console()
+console_err = Console(stderr=True)
+
+
+@dataclass(frozen=True)
+class WorktreeInfo:
+    """Represents a git worktree with its metadata."""
+
+    path: Path
+    branch: str
+    project: str
+    is_current_repo: bool
+
+
+@dataclass(frozen=True)
+class GitRepo:
+    """Represents the current git repository context."""
+
+    root: Path
+    project_name: str
+
+
+def get_git_root(cwd: Path = Path.cwd()) -> Optional[Path]:
+    """Find git root using 'git rev-parse --show-toplevel'."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return Path(result.stdout.strip())
+    except subprocess.CalledProcessError:
+        return None
+
+
+def validate_worktree_name(name: str) -> None:
+    """Ensure worktree name is valid (no slashes, not '.', not '..')."""
+    if "/" in name or "\\" in name:
+        raise click.BadParameter("Worktree name cannot contain slashes")
+    if name in (".", ".."):
+        raise click.BadParameter("Worktree name cannot be '.' or '..'")
+    if not name.strip():
+        raise click.BadParameter("Worktree name cannot be empty")
+
+
+def discover_worktrees(
+    base_dir: Path, current_repo: Optional[GitRepo]
+) -> list[WorktreeInfo]:
+    """Scan ~/worktrees/ and parse 'git worktree list' for each project."""
+    worktrees = []
+
+    if not base_dir.exists():
+        return worktrees
+
+    for project_dir in base_dir.iterdir():
+        if not project_dir.is_dir():
+            continue
+
+        project_name = project_dir.name
+
+        # Find the main repo for this project (the one not in ~/worktrees/)
+        main_repo = None
+        for worktree_dir in project_dir.iterdir():
+            if worktree_dir.is_dir():
+                git_root = get_git_root(worktree_dir)
+                if git_root and git_root != worktree_dir:
+                    main_repo = git_root
+                    break
+
+        if not main_repo:
+            # Try to find worktrees from any worktree in this project
+            for worktree_dir in project_dir.iterdir():
+                if worktree_dir.is_dir():
+                    main_repo = worktree_dir
+                    break
+
+        if not main_repo:
+            continue
+
+        # Get worktree list from git
+        try:
+            result = subprocess.run(
+                ["git", "worktree", "list", "--porcelain"],
+                cwd=main_repo,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            # Parse porcelain output
+            current_worktree = {}
+            for line in result.stdout.splitlines():
+                if line.startswith("worktree "):
+                    if current_worktree:
+                        path = Path(current_worktree["worktree"])
+                        if path.parent.parent == base_dir and path.parent.name == project_name:
+                            is_current = (
+                                current_repo is not None
+                                and current_repo.project_name == project_name
+                            )
+                            worktrees.append(
+                                WorktreeInfo(
+                                    path=path,
+                                    branch=current_worktree.get("branch", "HEAD"),
+                                    project=project_name,
+                                    is_current_repo=is_current,
+                                )
+                            )
+                    current_worktree = {"worktree": line.split(" ", 1)[1]}
+                elif line.startswith("branch "):
+                    # Extract branch name (format: "refs/heads/branch-name")
+                    branch_ref = line.split(" ", 1)[1]
+                    current_worktree["branch"] = branch_ref.replace("refs/heads/", "")
+
+            # Handle last worktree
+            if current_worktree:
+                path = Path(current_worktree["worktree"])
+                if path.parent.parent == base_dir and path.parent.name == project_name:
+                    is_current = (
+                        current_repo is not None
+                        and current_repo.project_name == project_name
+                    )
+                    worktrees.append(
+                        WorktreeInfo(
+                            path=path,
+                            branch=current_worktree.get("branch", "HEAD"),
+                            project=project_name,
+                            is_current_repo=is_current,
+                        )
+                    )
+
+        except subprocess.CalledProcessError as e:
+            logger.debug(
+                "failed to list worktrees",
+                project=project_name,
+                error=str(e),
+            )
+            continue
+
+    return worktrees
+
+
+@click.group()
+@click.option(
+    "--log-level",
+    type=click.Choice(["debug", "info", "warning", "error"], case_sensitive=False),
+    default=DEFAULT_LOG_LEVEL,
+    help="Set logging level",
+)
+def cli(log_level: str):
+    """Git worktree manager for multi-project workflows."""
+    # Configure structlog
+    level = log_level.upper()
+    level_int = getattr(logging, level, logging.INFO)
+    structlog.configure(
+        processors=[
+            structlog.processors.add_log_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.dev.ConsoleRenderer(),
+        ],
+        wrapper_class=structlog.make_filtering_bound_logger(level_int),
+        logger_factory=structlog.PrintLoggerFactory(),
+    )
+
+
+@cli.command()
+@click.option(
+    "--all",
+    "show_all",
+    is_flag=True,
+    help="Show worktrees from all projects",
+)
+@click.option(
+    "--format",
+    type=click.Choice(["table", "names"], case_sensitive=False),
+    default="table",
+    hidden=True,
+    help="Output format (names for shell completion)",
+)
+def list(show_all: bool, format: str):
+    """List git worktrees."""
+    current_repo = None
+    if not show_all:
+        git_root = get_git_root()
+        if git_root:
+            current_repo = GitRepo(
+                root=git_root,
+                project_name=git_root.name,
+            )
+
+    worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
+
+    # Filter to current repo if needed
+    if not show_all and current_repo:
+        worktrees = [wt for wt in worktrees if wt.is_current_repo]
+
+    if format == "names":
+        # Output just names for shell completion
+        for wt in worktrees:
+            print(wt.path.name)
+        return
+
+    if not worktrees:
+        if current_repo:
+            console.print(
+                f"[yellow]No worktrees found for project '{current_repo.project_name}'[/yellow]"
+            )
+        else:
+            console.print("[yellow]No worktrees found[/yellow]")
+        return
+
+    # Create table
+    table = Table(title="Git Worktrees")
+    table.add_column("Project", style="cyan")
+    table.add_column("Branch", style="green")
+    table.add_column("Path", style="blue")
+
+    for wt in worktrees:
+        table.add_row(wt.project, wt.branch, str(wt.path))
+
+    console.print(table)
+    logger.info("listed worktrees", count=len(worktrees))
+
+
+@cli.command()
+@click.argument("name")
+def create(name: str):
+    """Create a new git worktree with a new branch."""
+    validate_worktree_name(name)
+
+    # Ensure we're in a git repo
+    git_root = get_git_root()
+    if not git_root:
+        console_err.print(
+            "[red]Error: Not in a git repository. Cannot create worktree.[/red]"
+        )
+        sys.exit(1)
+
+    repo = GitRepo(root=git_root, project_name=git_root.name)
+    worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
+
+    # Check if directory already exists
+    if worktree_path.exists():
+        console_err.print(
+            f"[red]Error: Worktree directory already exists: {worktree_path}[/red]"
+        )
+        console_err.print(
+            f"[yellow]Remove it first with: worktree remove {name}[/yellow]"
+        )
+        sys.exit(1)
+
+    # Create parent directory if needed
+    worktree_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Create worktree with new branch
+    try:
+        logger.debug(
+            "creating worktree",
+            name=name,
+            path=str(worktree_path),
+            project=repo.project_name,
+        )
+
+        subprocess.run(
+            ["git", "worktree", "add", "-b", name, str(worktree_path), "HEAD"],
+            cwd=repo.root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        console.print(f"[green]✓ Created worktree: {worktree_path}[/green]")
+        logger.info(
+            "created worktree",
+            name=name,
+            path=str(worktree_path),
+            branch=name,
+            project=repo.project_name,
+        )
+
+    except subprocess.CalledProcessError as e:
+        console_err.print(f"[red]Error creating worktree: {e.stderr}[/red]")
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("name")
+def remove(name: str):
+    """Remove a git worktree (keeps the branch)."""
+    validate_worktree_name(name)
+
+    # Ensure we're in a git repo
+    git_root = get_git_root()
+    if not git_root:
+        console_err.print(
+            "[red]Error: Not in a git repository. Cannot remove worktree.[/red]"
+        )
+        sys.exit(1)
+
+    repo = GitRepo(root=git_root, project_name=git_root.name)
+    worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
+
+    try:
+        logger.debug(
+            "removing worktree",
+            name=name,
+            path=str(worktree_path),
+            project=repo.project_name,
+        )
+
+        subprocess.run(
+            ["git", "worktree", "remove", str(worktree_path)],
+            cwd=repo.root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        console.print(f"[green]✓ Removed worktree: {worktree_path}[/green]")
+        console.print(f"[yellow]Branch '{name}' was kept (not deleted)[/yellow]")
+        logger.info(
+            "removed worktree",
+            name=name,
+            path=str(worktree_path),
+            project=repo.project_name,
+        )
+
+    except subprocess.CalledProcessError as e:
+        console_err.print(f"[red]Error removing worktree: {e.stderr}[/red]")
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument(
+    "shell",
+    type=click.Choice(["zsh", "bash"], case_sensitive=False),
+)
+def completion(shell: str):
+    """Generate shell completion script."""
+    if shell == "zsh":
+        print(
+            """#compdef worktree
+
+_worktree() {
+    local -a commands
+    commands=(
+        'list:List git worktrees'
+        'create:Create a new git worktree'
+        'remove:Remove a git worktree'
+        'completion:Generate shell completion script'
+    )
+
+    _arguments -C \
+        '1: :->command' \
+        '*::arg:->args'
+
+    case $state in
+        command)
+            _describe 'command' commands
+            ;;
+        args)
+            case $words[1] in
+                remove)
+                    local -a worktrees
+                    worktrees=($(worktree list --format=names 2>/dev/null))
+                    _describe 'worktree' worktrees
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_worktree"""
+        )
+    elif shell == "bash":
+        print(
+            """_worktree_completion() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [ $COMP_CWORD -eq 1 ]; then
+        opts="list create remove completion"
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+
+    if [ "${COMP_WORDS[1]}" = "remove" ] && [ $COMP_CWORD -eq 2 ]; then
+        local worktrees=$(worktree list --format=names 2>/dev/null)
+        COMPREPLY=( $(compgen -W "${worktrees}" -- ${cur}) )
+        return 0
+    fi
+}
+
+complete -F _worktree_completion worktree"""
+        )
+
+
+if __name__ == "__main__":
+    cli()

@@ -346,6 +346,11 @@ in
     executable = true;
   };
 
+  home.file."bin/worktree" = {
+    source = ../files/scripts/worktree;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
