@@ -42,11 +42,19 @@ function M.load_autocmds()
 
 	local dev_group = augroup("DevelopmentWorkflow", { clear = true })
 
-	autocmd({ "FocusGained", "CursorHold" }, {
+	autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI", "TermLeave", "TermClose" }, {
 		group = dev_group,
 		pattern = "*",
 		command = "if mode() != 'c' | checktime | endif",
 	})
+
+	local function checktime_safe()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("checktime")
+		end
+	end
+
+	vim.fn.timer_start(1000, checktime_safe, { ["repeat"] = -1 })
 
 	autocmd("FileChangedShellPost", {
 		group = dev_group,

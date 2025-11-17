@@ -21,6 +21,8 @@ function M.load_options()
 	vim.o.timeout = true
 	vim.o.timeoutlen = 300
 
+	vim.o.autoread = true
+
 	-- Enhanced command-line completion (handled by noice.nvim)
 	vim.o.wildmenu = true
 	vim.o.wildmode = "full"
