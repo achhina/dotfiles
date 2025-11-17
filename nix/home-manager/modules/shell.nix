@@ -460,6 +460,9 @@ in
       # npm configuration - use local prefix for global installs
       export NPM_CONFIG_PREFIX="$HOME/.local/share/npm"
 
+      # less pager: disable terminal bell and screen flash
+      export LESS="-Rq"
+
       # History substring search: disable highlighting
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
