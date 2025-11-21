@@ -29,6 +29,21 @@ return {
 		},
 	},
 	config = function()
+		local function get_python_path()
+			local venv_path = os.getenv("VIRTUAL_ENV")
+			if venv_path then
+				return venv_path .. "/bin/python3"
+			end
+
+			local cwd = vim.fn.getcwd()
+			local local_venv = cwd .. "/.venv/bin/python3"
+			if vim.fn.executable(local_venv) == 1 then
+				return local_venv
+			end
+
+			return vim.fn.exepath("python3") or vim.fn.exepath("python")
+		end
+
 		---@diagnostic disable-next-line: deprecated
 		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers["textDocument/hover"], {
 			border = "rounded",
@@ -52,7 +67,7 @@ return {
 			},
 			float = {
 				border = "rounded",
-				source = true, -- true = always show source
+				source = true,
 				format = function(diagnostic)
 					local message = diagnostic.message
 					if diagnostic.source then
@@ -77,59 +92,50 @@ return {
 		local nix_servers = {
 			clangd = {},
 			gopls = {
-				gofumpt = true,
-				staticcheck = true,
-				usePlaceholders = true,
-				analyses = {
-					unusedparams = true,
-					shadow = true,
-					fieldalignment = false,
-				},
-				hints = {
-					assignVariableTypes = true,
-					compositeLiteralFields = true,
-					constantValues = true,
-					functionTypeParameters = true,
-					parameterNames = true,
-					rangeVariableTypes = true,
+				gopls = {
+					gofumpt = true,
+					staticcheck = true,
+					usePlaceholders = true,
+					analyses = {
+						unusedparams = true,
+						shadow = true,
+						fieldalignment = false,
+					},
+					hints = {
+						assignVariableTypes = true,
+						compositeLiteralFields = true,
+						constantValues = true,
+						functionTypeParameters = true,
+						parameterNames = true,
+						rangeVariableTypes = true,
+					},
 				},
 			},
 			basedpyright = {
 				python = {
-					pythonPath = (function()
-						local venv_path = os.getenv("VIRTUAL_ENV")
-						if venv_path then
-							return venv_path .. "/bin/python3"
-						end
-
-						local cwd = vim.fn.getcwd()
-						local local_venv = cwd .. "/.venv/bin/python3"
-						if vim.fn.executable(local_venv) == 1 then
-							return local_venv
-						end
-
-						return vim.fn.exepath("python3") or vim.fn.exepath("python")
-					end)(),
+					pythonPath = get_python_path(),
 				},
-				analysis = {
-					typeCheckingMode = "recommended",
-					diagnosticMode = "workspace",
-					autoSearchPaths = true,
-					useLibraryCodeForTypes = true,
-					autoImportCompletions = true,
-					extraPaths = { "." },
-					indexing = true,
-					autoFormatStrings = true,
+				basedpyright = {
+					analysis = {
+						typeCheckingMode = "recommended",
+						diagnosticMode = "workspace",
+						autoSearchPaths = true,
+						useLibraryCodeForTypes = true,
+						autoImportCompletions = true,
+						extraPaths = { "." },
+						indexing = true,
+						autoFormatStrings = true,
 
-					inlayHints = {
-						variableTypes = true,
-						callArgumentNames = true,
-						functionReturnTypes = true,
-						genericTypes = false,
-					},
+						inlayHints = {
+							variableTypes = true,
+							callArgumentNames = true,
+							functionReturnTypes = true,
+							genericTypes = false,
+						},
 
-					diagnosticSeverityOverrides = {
-						reportMissingTypeStubs = "none",
+						diagnosticSeverityOverrides = {
+							reportMissingTypeStubs = "none",
+						},
 					},
 				},
 			},
