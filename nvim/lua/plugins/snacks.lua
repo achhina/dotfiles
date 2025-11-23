@@ -38,8 +38,14 @@ return {
 					{
 						icon = " ",
 						key = "c",
-						desc = "Config",
-						action = ":lua require('fzf-lua').files({cwd='" .. vim.fn.stdpath("config") .. "'})",
+						desc = "Claude Code (New)",
+						action = ":lua require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode')",
+					},
+					{
+						icon = " ",
+						key = "C",
+						desc = "Claude Code (Continue)",
+						action = ":lua require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode --continue')",
 					},
 					{
 						icon = " ",
