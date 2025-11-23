@@ -253,6 +253,22 @@ in
 
       theme = "dark";
 
+      # Custom agents
+      agents = [
+        {
+          name = "github-automation";
+          description = "GitHub issue and PR creation with template discovery";
+          tools = [
+            "Read"
+            "Write"
+            "Grep"
+            "Glob"
+            "Bash"
+            "AskUserQuestion"
+          ];
+        }
+      ];
+
       # Plugin configuration
       # Marketplaces contain multiple plugins
       extraKnownMarketplaces = {
