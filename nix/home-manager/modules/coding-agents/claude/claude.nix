@@ -398,4 +398,32 @@ in
       $VERBOSE_ECHO "Claude Code already installed via npm"
     fi
   '';
+
+  # TEMPORARY PATCH: Fix episodic-memory plugin duplicate hooks issue
+  # Reference: https://github.com/obra/episodic-memory/issues/21
+  # Fixed by PR: https://github.com/obra/episodic-memory/pull/20 (not yet merged)
+  #
+  # ISSUE EXPLANATION:
+  # Claude Code automatically loads hooks/hooks.json from plugins by convention.
+  # The episodic-memory plugin incorrectly includes "hooks": "./hooks/hooks.json"
+  # in its plugin.json, causing the same hooks file to be loaded twice, which
+  # triggers the error:
+  #   "Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded
+  #    file /Users/user/.claude/plugins/cache/episodic-memory/hooks/hooks.json"
+  #
+  # This activation script removes the redundant hooks field from plugin.json.
+  # This patch can be removed once PR #20 is merged and released upstream.
+  home.activation.patchEpisodicMemoryHooks = lib.hm.dag.entryAfter [ "installClaude" ] ''
+    PLUGIN_JSON="$HOME/.claude/plugins/cache/episodic-memory/.claude-plugin/plugin.json"
+
+    if [ -f "$PLUGIN_JSON" ]; then
+      # Check if the problematic hooks field exists
+      if ${pkgs.jq}/bin/jq -e '.hooks' "$PLUGIN_JSON" >/dev/null 2>&1; then
+        $VERBOSE_ECHO "Patching episodic-memory plugin.json to remove duplicate hooks field"
+        # Remove the hooks field using jq and preserve formatting
+        $DRY_RUN_CMD ${pkgs.jq}/bin/jq 'del(.hooks)' "$PLUGIN_JSON" > "$PLUGIN_JSON.tmp"
+        $DRY_RUN_CMD mv "$PLUGIN_JSON.tmp" "$PLUGIN_JSON"
+      fi
+    fi
+  '';
 }
