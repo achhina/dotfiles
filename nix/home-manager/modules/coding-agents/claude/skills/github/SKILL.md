@@ -127,9 +127,8 @@ You must be concise. Follow these strict rules:
    ```
 
 2. **Open in IDE (if available):**
-   - Check if IDE is connected
-   - If yes, use MCP IDE tool to open the temp file
-   - If no, display full content in terminal and show temp file path
+   - Use IDE openFile tool if it exists to open the temp file in the connected IDE
+   - If IDE tool is unavailable, display full content in terminal and show temp file path
 
 3. **Ask for Next Action:**
    Use AskUserQuestion with these options:
