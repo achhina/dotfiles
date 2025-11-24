@@ -136,6 +136,13 @@ return {
 						diagnosticSeverityOverrides = {
 							reportMissingTypeStubs = "none",
 						},
+
+						ignore = {
+							"**/.venv",
+							"**/venv",
+							"**/site-packages",
+							"**/__pycache__",
+						},
 					},
 				},
 			},
@@ -176,6 +183,7 @@ return {
 						globals = { "vim" },
 						groupSeverity = { strong = "Warning", strict = "Warning" },
 						disable = { "missing-fields", "undefined-doc-name" },
+						libraryFiles = "Opened",
 					},
 					telemetry = { enable = false },
 					hint = { enable = true },
