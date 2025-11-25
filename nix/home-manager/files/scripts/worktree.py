@@ -32,15 +32,24 @@ console_err = Console(stderr=True)
 logger = structlog.get_logger()
 
 
-class WorktreeInfo(BaseModel):
+class Worktree(BaseModel):
     """Represents a git worktree with its metadata."""
 
     model_config = ConfigDict(frozen=True)
 
     path: Path
     branch: str
-    project: str
-    is_current_repo: bool
+
+
+class Project(BaseModel):
+    """Represents a project with its worktrees."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+    main_repo_path: Path
+    remote_origin_url: Optional[str]
+    worktrees: list[Worktree]
 
 
 class GitRepo(BaseModel):
@@ -52,26 +61,12 @@ class GitRepo(BaseModel):
     project_name: str
 
 
-class WorktreesInfo(BaseModel):
-    """Container for worktree list with metadata."""
-
-    model_config = ConfigDict(frozen=True)
-
-    worktrees: list[WorktreeInfo]
-    is_global_scope: bool
-    current_project: Optional[str] = None
-
-    @property
-    def total_count(self) -> int:
-        """Total number of worktrees."""
-        return len(self.worktrees)
-
-
-def format_worktrees(worktrees_info: WorktreesInfo, format: str) -> None:
-    """Format and display worktrees in the specified format."""
+def format_projects(projects: list[Project], format: str) -> None:
+    """Format and display projects and their worktrees in the specified format."""
     if format == "json":
-        # Use Pydantic's built-in serialization for the entire container
-        print(worktrees_info.model_dump_json(indent=2))
+        # Serialize projects directly
+        import json
+        print(json.dumps([p.model_dump(mode='json') for p in projects], indent=2, default=str))
     elif format == "rich":
         # Create rich table
         table = Table(title="Git Worktrees")
@@ -79,8 +74,9 @@ def format_worktrees(worktrees_info: WorktreesInfo, format: str) -> None:
         table.add_column("Branch", style="green")
         table.add_column("Path", style="blue")
 
-        for wt in worktrees_info.worktrees:
-            table.add_row(wt.project, wt.branch, str(wt.path))
+        for project in projects:
+            for wt in project.worktrees:
+                table.add_row(project.name, wt.branch, str(wt.path))
 
         console.print(table)
 
@@ -178,14 +174,12 @@ def validate_worktree_name(name: str) -> None:
         raise click.BadParameter("Worktree name cannot be empty")
 
 
-def discover_worktrees(
-    base_dir: Path, current_repo: Optional[GitRepo]
-) -> list[WorktreeInfo]:
+def discover_projects(base_dir: Path) -> list[Project]:
     """Scan ~/worktrees/ and parse 'git worktree list' for each project."""
-    worktrees = []
+    projects = []
 
     if not base_dir.exists():
-        return worktrees
+        return projects
 
     for project_dir in base_dir.iterdir():
         if not project_dir.is_dir():
@@ -212,7 +206,22 @@ def discover_worktrees(
         if not main_repo:
             continue
 
+        # Get remote origin URL
+        remote_origin_url = None
+        try:
+            result = subprocess.run(
+                ["git", "config", "--get", "remote.origin.url"],
+                cwd=main_repo,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            remote_origin_url = result.stdout.strip() or None
+        except subprocess.CalledProcessError:
+            pass
+
         # Get worktree list from git
+        worktrees = []
         try:
             result = subprocess.run(
                 ["git", "worktree", "list", "--porcelain"],
@@ -232,16 +241,10 @@ def discover_worktrees(
                             path.parent.parent == base_dir
                             and path.parent.name == project_name
                         ):
-                            is_current = (
-                                current_repo is not None
-                                and current_repo.project_name == project_name
-                            )
                             worktrees.append(
-                                WorktreeInfo(
+                                Worktree(
                                     path=path,
                                     branch=current_worktree.get("branch", "HEAD"),
-                                    project=project_name,
-                                    is_current_repo=is_current,
                                 )
                             )
                     current_worktree = {"worktree": line.split(" ", 1)[1]}
@@ -254,18 +257,22 @@ def discover_worktrees(
             if current_worktree:
                 path = Path(current_worktree["worktree"])
                 if path.parent.parent == base_dir and path.parent.name == project_name:
-                    is_current = (
-                        current_repo is not None
-                        and current_repo.project_name == project_name
-                    )
                     worktrees.append(
-                        WorktreeInfo(
+                        Worktree(
                             path=path,
                             branch=current_worktree.get("branch", "HEAD"),
-                            project=project_name,
-                            is_current_repo=is_current,
                         )
                     )
+
+            if worktrees:
+                projects.append(
+                    Project(
+                        name=project_name,
+                        main_repo_path=main_repo,
+                        remote_origin_url=remote_origin_url,
+                        worktrees=worktrees,
+                    )
+                )
 
         except subprocess.CalledProcessError as e:
             logger.debug(
@@ -275,23 +282,26 @@ def discover_worktrees(
             )
             continue
 
-    return worktrees
+    return projects
 
 
 def complete_worktree_names(ctx, param, incomplete):
     """Provide worktree names for shell completion."""
-    current_repo = None
-    git_root = get_git_root()
-    if git_root:
-        project_name = get_project_name()
-        if project_name:
-            current_repo = GitRepo(root=git_root, project_name=project_name)
+    projects = discover_projects(DEFAULT_WORKTREE_BASE)
 
-    worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
-    if current_repo:
-        worktrees = [wt for wt in worktrees if wt.is_current_repo]
+    # Filter to current project if in a git repo
+    current_project_name = get_project_name()
+    if current_project_name:
+        projects = [p for p in projects if p.name == current_project_name]
 
-    return [wt.path.name for wt in worktrees if wt.path.name.startswith(incomplete)]
+    # Flatten worktrees from all matching projects
+    worktree_names = []
+    for project in projects:
+        for wt in project.worktrees:
+            if wt.path.name.startswith(incomplete):
+                worktree_names.append(wt.path.name)
+
+    return worktree_names
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -342,45 +352,33 @@ def list(ctx: click.Context, format: str):
     """List git worktrees."""
     show_global = ctx.obj["show_global"]
 
-    current_repo = None
+    projects = discover_projects(DEFAULT_WORKTREE_BASE)
+
+    # Filter to current project if not showing global
+    current_project_name = None
     if not show_global:
-        git_root = get_git_root()
-        if git_root:
-            project_name = get_project_name()
-            if project_name:
-                current_repo = GitRepo(
-                    root=git_root,
-                    project_name=project_name,
-                )
+        current_project_name = get_project_name()
+        if current_project_name:
+            projects = [p for p in projects if p.name == current_project_name]
 
-    worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
-
-    # Filter to current repo if needed
-    if not show_global and current_repo:
-        worktrees = [wt for wt in worktrees if wt.is_current_repo]
-
-    # Create container with metadata
-    worktrees_info = WorktreesInfo(
-        worktrees=worktrees,
-        is_global_scope=show_global,
-        current_project=current_repo.project_name if current_repo else None,
-    )
-
-    if not worktrees_info.worktrees:
+    if not projects:
         if format == "json":
-            # Output empty container for consistency
-            print(worktrees_info.model_dump_json(indent=2))
+            # Output empty list for consistency
+            print("[]")
         else:
-            if current_repo:
+            if current_project_name:
                 console.print(
-                    f"[yellow]No worktrees found for project '{current_repo.project_name}'[/yellow]"
+                    f"[yellow]No worktrees found for project '{current_project_name}'[/yellow]"
                 )
             else:
                 console.print("[yellow]No worktrees found[/yellow]")
         return
 
-    format_worktrees(worktrees_info, format)
-    logger.info("listed worktrees", count=worktrees_info.total_count)
+    format_projects(projects, format)
+
+    # Count total worktrees across all projects
+    total_worktrees = sum(len(p.worktrees) for p in projects)
+    logger.info("listed worktrees", count=total_worktrees, projects=len(projects))
 
 
 @cli.command()
