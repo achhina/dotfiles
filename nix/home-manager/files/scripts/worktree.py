@@ -121,6 +121,53 @@ def get_main_worktree(cwd: Path = Path.cwd()) -> Optional[Path]:
         return None
 
 
+def get_project_name(cwd: Path = Path.cwd()) -> Optional[str]:
+    """
+    Get the project name from git remote origin URL.
+
+    Falls back to main worktree directory name if no remote exists.
+    Returns None if not in a git repository.
+    """
+    try:
+        # Try to get remote origin URL
+        result = subprocess.run(
+            ["git", "config", "--get", "remote.origin.url"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        remote_url = result.stdout.strip()
+
+        # Parse project name from various URL formats:
+        # - https://github.com/user/repo.git
+        # - git@github.com:user/repo.git
+        # - /path/to/repo.git
+
+        # Remove .git suffix if present
+        if remote_url.endswith(".git"):
+            remote_url = remote_url[:-4]
+
+        # Extract last component (repo name)
+        # Works for both URL paths and SSH format
+        project_name = remote_url.rstrip("/").split("/")[-1].split(":")[-1]
+
+        if project_name:
+            return project_name
+
+    except subprocess.CalledProcessError:
+        # No remote.origin.url configured, fall back to directory name
+        pass
+
+    # Fallback: use main worktree directory name
+    main_worktree = get_main_worktree(cwd)
+    if main_worktree:
+        return main_worktree.name
+
+    return None
+
+
 def validate_worktree_name(name: str) -> None:
     """Ensure worktree name is valid (no slashes, not '.', not '..')."""
     if "/" in name or "\\" in name:
@@ -236,9 +283,9 @@ def complete_worktree_names(ctx, param, incomplete):
     current_repo = None
     git_root = get_git_root()
     if git_root:
-        main_worktree = get_main_worktree()
-        if main_worktree:
-            current_repo = GitRepo(root=git_root, project_name=main_worktree.name)
+        project_name = get_project_name()
+        if project_name:
+            current_repo = GitRepo(root=git_root, project_name=project_name)
 
     worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
     if current_repo:
@@ -299,11 +346,11 @@ def list(ctx: click.Context, format: str):
     if not show_global:
         git_root = get_git_root()
         if git_root:
-            main_worktree = get_main_worktree()
-            if main_worktree:
+            project_name = get_project_name()
+            if project_name:
                 current_repo = GitRepo(
                     root=git_root,
-                    project_name=main_worktree.name,
+                    project_name=project_name,
                 )
 
     worktrees = discover_worktrees(DEFAULT_WORKTREE_BASE, current_repo)
@@ -350,15 +397,15 @@ def create(name: str):
         )
         sys.exit(1)
 
-    # Get main worktree to determine correct project name
-    main_worktree = get_main_worktree()
-    if not main_worktree:
+    # Get project name from git remote or fallback to directory name
+    project_name = get_project_name()
+    if not project_name:
         console_err.print(
-            "[red]Error: Could not determine main worktree location.[/red]"
+            "[red]Error: Could not determine project name.[/red]"
         )
         sys.exit(1)
 
-    repo = GitRepo(root=git_root, project_name=main_worktree.name)
+    repo = GitRepo(root=git_root, project_name=project_name)
     worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
 
     # Check if directory already exists
@@ -419,15 +466,15 @@ def remove(name: str):
         )
         sys.exit(1)
 
-    # Get main worktree to determine correct project name
-    main_worktree = get_main_worktree()
-    if not main_worktree:
+    # Get project name from git remote or fallback to directory name
+    project_name = get_project_name()
+    if not project_name:
         console_err.print(
-            "[red]Error: Could not determine main worktree location.[/red]"
+            "[red]Error: Could not determine project name.[/red]"
         )
         sys.exit(1)
 
-    repo = GitRepo(root=git_root, project_name=main_worktree.name)
+    repo = GitRepo(root=git_root, project_name=project_name)
     worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
 
     try:
