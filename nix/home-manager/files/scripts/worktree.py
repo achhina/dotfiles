@@ -436,7 +436,7 @@ def create(name: str):
             text=True,
         )
 
-        console.print(f"[green]✓ Created worktree: {worktree_path}[/green]")
+        console_err.print(f"[green]✓ Created worktree: {worktree_path}[/green]")
         logger.info(
             "created worktree",
             name=name,
@@ -444,6 +444,9 @@ def create(name: str):
             branch=name,
             project=repo.project_name,
         )
+
+        # Print path to stdout for shell wrapper consumption
+        print(str(worktree_path))
 
     except subprocess.CalledProcessError as e:
         console_err.print(f"[red]Error creating worktree: {e.stderr}[/red]")
