@@ -463,11 +463,9 @@ def create(name: str):
 
 
 @cli.command()
-@click.argument("name", shell_complete=complete_worktree_names)
-def remove(name: str):
-    """Remove a git worktree (keeps the branch)."""
-    validate_worktree_name(name)
-
+@click.argument("names", nargs=-1, required=True, shell_complete=complete_worktree_names)
+def remove(names: tuple[str, ...]):
+    """Remove one or more git worktrees (keeps the branches)."""
     # Ensure we're in a git repo
     git_root = get_git_root()
     if not git_root:
@@ -485,35 +483,61 @@ def remove(name: str):
         sys.exit(1)
 
     repo = GitRepo(root=git_root, project_name=project_name)
-    worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
 
-    try:
-        logger.debug(
-            "removing worktree",
-            name=name,
-            path=str(worktree_path),
-            project=repo.project_name,
-        )
+    failed = []
+    succeeded = []
 
-        subprocess.run(
-            ["git", "worktree", "remove", str(worktree_path)],
-            cwd=repo.root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+    for name in names:
+        # Validate each name
+        try:
+            validate_worktree_name(name)
+        except click.BadParameter as e:
+            console_err.print(f"[red]✗ {name}: {e.format_message()}[/red]")
+            failed.append(name)
+            continue
 
-        console.print(f"[green]✓ Removed worktree: {worktree_path}[/green]")
-        console.print(f"[yellow]Branch '{name}' was kept (not deleted)[/yellow]")
-        logger.info(
-            "removed worktree",
-            name=name,
-            path=str(worktree_path),
-            project=repo.project_name,
-        )
+        worktree_path = DEFAULT_WORKTREE_BASE / repo.project_name / name
 
-    except subprocess.CalledProcessError as e:
-        console_err.print(f"[red]Error removing worktree: {e.stderr}[/red]")
+        try:
+            logger.debug(
+                "removing worktree",
+                name=name,
+                path=str(worktree_path),
+                project=repo.project_name,
+            )
+
+            subprocess.run(
+                ["git", "worktree", "remove", str(worktree_path)],
+                cwd=repo.root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            console_err.print(f"[green]✓ Removed worktree: {worktree_path}[/green]")
+            logger.info(
+                "removed worktree",
+                name=name,
+                path=str(worktree_path),
+                project=repo.project_name,
+            )
+            succeeded.append(name)
+
+        except subprocess.CalledProcessError as e:
+            console_err.print(f"[red]✗ Error removing {name}: {e.stderr.strip()}[/red]")
+            failed.append(name)
+
+    # Print summary if multiple worktrees
+    if len(names) > 1:
+        console_err.print()
+        if succeeded:
+            console_err.print(f"[green]Successfully removed {len(succeeded)} worktree(s)[/green]")
+            console_err.print(f"[yellow]Branches were kept (not deleted)[/yellow]")
+        if failed:
+            console_err.print(f"[red]Failed to remove {len(failed)} worktree(s)[/red]")
+
+    # Exit with error if any failed
+    if failed:
         sys.exit(1)
 
 
