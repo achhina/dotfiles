@@ -28,7 +28,7 @@ DEFAULT_LOG_LEVEL = "warning"
 
 # Global console (logger configured per-invocation)
 console = Console()
-console_err = Console(stderr=True)
+console_err = Console(file=sys.stderr, stderr=True)
 logger = structlog.get_logger()
 
 
