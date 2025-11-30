@@ -13,6 +13,7 @@ Manages git worktrees in a centralized directory structure:
 import logging
 import subprocess
 import sys
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import Optional
 
@@ -286,7 +287,7 @@ def discover_projects(base_dir: Path) -> list[Project]:
 
 
 def complete_worktree_names(ctx, param, incomplete):
-    """Provide worktree names for shell completion."""
+    """Provide worktree names for shell completion with glob pattern support."""
     projects = discover_projects(DEFAULT_WORKTREE_BASE)
 
     # Filter to current project if in a git repo
@@ -296,10 +297,18 @@ def complete_worktree_names(ctx, param, incomplete):
 
     # Flatten worktrees from all matching projects
     worktree_names = []
+    has_glob = any(c in incomplete for c in ['*', '?', '['])
+
     for project in projects:
         for wt in project.worktrees:
-            if wt.path.name.startswith(incomplete):
-                worktree_names.append(wt.path.name)
+            name = wt.path.name
+            # Use glob matching if pattern contains wildcards, otherwise prefix match
+            if has_glob:
+                if fnmatch(name, incomplete):
+                    worktree_names.append(name)
+            else:
+                if name.startswith(incomplete):
+                    worktree_names.append(name)
 
     return worktree_names
 
