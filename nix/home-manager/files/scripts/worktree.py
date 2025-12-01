@@ -463,8 +463,13 @@ def create(name: str):
 
 
 @cli.command()
-@click.argument("names", nargs=-1, required=True, shell_complete=complete_worktree_names)
-def remove(names: tuple[str, ...]):
+@click.argument("names", nargs=-1, shell_complete=complete_worktree_names)
+@click.option(
+    "--pattern",
+    "-p",
+    help="Glob pattern to match worktree names (e.g., 'test*')",
+)
+def remove(names: tuple[str, ...], pattern: Optional[str]):
     """Remove one or more git worktrees (keeps the branches)."""
     # Ensure we're in a git repo
     git_root = get_git_root()
@@ -483,6 +488,35 @@ def remove(names: tuple[str, ...]):
         sys.exit(1)
 
     repo = GitRepo(root=git_root, project_name=project_name)
+
+    # If pattern provided, expand it to matching worktree names
+    if pattern:
+        projects = discover_projects(DEFAULT_WORKTREE_BASE)
+        current_project = [p for p in projects if p.name == project_name]
+
+        if not current_project:
+            console_err.print(
+                f"[red]Error: No worktrees found for project '{project_name}'[/red]"
+            )
+            sys.exit(1)
+
+        matching_names = [
+            wt.path.name
+            for wt in current_project[0].worktrees
+            if fnmatch(wt.path.name, pattern)
+        ]
+
+        if not matching_names:
+            console_err.print(
+                f"[yellow]No worktrees match pattern '{pattern}'[/yellow]"
+            )
+            sys.exit(0)
+
+        console_err.print(f"[cyan]Pattern '{pattern}' matched {len(matching_names)} worktree(s)[/cyan]")
+        names = tuple(matching_names)
+    elif not names:
+        console_err.print("[red]Error: No worktree names provided[/red]")
+        sys.exit(1)
 
     failed = []
     succeeded = []
