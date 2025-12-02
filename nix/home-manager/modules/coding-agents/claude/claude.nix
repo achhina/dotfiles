@@ -25,6 +25,9 @@ in
     # AGENTS.md is the source file, deployed as CLAUDE.md for Claude Code
     memory.source = ./context/AGENTS.md;
 
+    # Skills directory - all skills symlinked from ./skills/
+    skillsDir = ./skills;
+
     settings = {
       env = {
         BASH_DEFAULT_TIMEOUT_MS = "300000";
@@ -331,38 +334,19 @@ in
   # Ensure Claude Code directories exist for plugin installations
   # These directories will contain both declaratively-managed symlinks (from Home Manager)
   # and dynamically-created files (from plugin installations)
-  # Symlink skills from Home Manager source to runtime directory
-  home.file =
-    let
-      skillsDir = ./skills;
-      skillsExist = builtins.pathExists skillsDir;
-      skills = if skillsExist then builtins.readDir skillsDir else {};
-    in
-    lib.mkMerge [
-      # Force overwrite settings.json to allow reset on hm switch
-      # The activation scripts will convert it from symlink to mutable file with backup
-      {
-        ".claude/settings.json".force = true;
-      }
-      # Create .keep files to ensure directories exist
-      {
-        ".claude/commands/.keep".text = "";
-        ".claude/agents/.keep".text = "";
-        ".claude/skills/.keep".text = "";
-      }
-      # Deploy additional context files for progressive disclosure
-      {
-        ".claude/SOFTWARE_PRINCIPLES.md".source = ./context/SOFTWARE_PRINCIPLES.md;
-        ".claude/PYTHON.md".source = ./context/PYTHON.md;
-      }
-      # Symlink skills from declarative source
-      (lib.mapAttrs' (name: _: {
-        name = ".claude/skills/${name}";
-        value = {
-          source = ./skills/${name};
-        };
-      }) skills)
-    ];
+  home.file = {
+    # Force overwrite settings.json to allow reset on hm switch
+    # The activation scripts will convert it from symlink to mutable file with backup
+    ".claude/settings.json".force = true;
+
+    # Create .keep files to ensure directories exist
+    ".claude/commands/.keep".text = "";
+    ".claude/agents/.keep".text = "";
+
+    # Deploy additional context files for progressive disclosure
+    ".claude/SOFTWARE_PRINCIPLES.md".source = ./context/SOFTWARE_PRINCIPLES.md;
+    ".claude/PYTHON.md".source = ./context/PYTHON.md;
+  };
 
   # Backup existing mutable settings.json before Home Manager regenerates it
   # This runs before writeBoundary to preserve user modifications
