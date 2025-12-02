@@ -8,7 +8,7 @@
   programs.aerospace = lib.mkIf pkgs.stdenv.isDarwin {
     enable = true;
     launchd.enable = true;
-    userSettings = {
+    settings = {
       after-login-command = [ ];
       # Workaround for AeroSpace bug where default-root-container-layout is not
       # reliably applied on startup. Explicitly set accordion horizontal layout
