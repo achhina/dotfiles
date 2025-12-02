@@ -403,7 +403,7 @@ in
                   local -a matches
                   if [[ $PREFIX == *\** ]] || [[ $PREFIX == *\?* ]] || [[ $PREFIX == *\[* ]]; then
                     # Glob pattern detected - expand it (~ flag enables glob expansion)
-                    matches=(''${(M)worktrees:#${~PREFIX}})
+                    matches=(''${(M)worktrees:#''${~PREFIX}})
                     if (( $#matches > 0 )); then
                       compadd -a matches
                     fi
