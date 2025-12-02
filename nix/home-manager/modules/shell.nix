@@ -546,8 +546,8 @@ in
       config = "$XDG_CONFIG_HOME";
       g = "git";
       gcd = "$(git rev-parse --show-toplevel)";
-      hm = "home-manager switch --flake ~/.config/nix#${pkgs.system}";
-      home-manager = "home-manager switch --flake ~/.config/nix#${pkgs.system}";
+      hm = "home-manager switch --flake ~/.config/nix#${pkgs.stdenv.hostPlatform.system}";
+      home-manager = "home-manager switch --flake ~/.config/nix#${pkgs.stdenv.hostPlatform.system}";
       l = "eza";
       ll = "eza --all --long";
       lt = "eza --tree --all --level 3";
