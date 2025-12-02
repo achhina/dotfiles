@@ -402,9 +402,11 @@ in
                   # Support glob patterns by expanding them
                   local -a matches
                   if [[ $PREFIX == *\** ]] || [[ $PREFIX == *\?* ]] || [[ $PREFIX == *\[* ]]; then
-                    # Glob pattern detected - expand it
-                    matches=(''${(M)worktrees:#$PREFIX})
-                    compadd -a matches
+                    # Glob pattern detected - expand it (~ flag enables glob expansion)
+                    matches=(''${(M)worktrees:#${~PREFIX}})
+                    if (( $#matches > 0 )); then
+                      compadd -a matches
+                    fi
                   else
                     # Regular prefix matching
                     _describe 'worktree' worktrees
