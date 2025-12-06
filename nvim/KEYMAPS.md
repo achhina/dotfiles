@@ -20,7 +20,7 @@ The `<leader>q` namespace contains two types of operations:
 After using a population operation, the quickfix list remains available for traditional `:cnext`/`:cprev` navigation even after closing the display.
 
 **Rationale:**
-This is a hybrid approach combining modern UI (Trouble) with traditional Vim workflows. The `q` mnemonic represents "quickfix", and all operations in this namespace interact with the quickfix list storage.
+The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-related operations, whether populating the list with new data or viewing existing data. By maintaining quickfix list persistence, it preserves traditional Vim navigation workflows alongside modern viewing interfaces.
 
 **What other distributions do:**
 - **LazyVim:** Uses only `<leader>qq` for "Quit All", leaving the rest of the `<leader>q` namespace empty. All diagnostics/quickfix operations are under `<leader>x`.
