@@ -26,9 +26,9 @@ The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-
 - **LazyVim:** Uses only `<leader>qq` for "Quit All", leaving the rest of the `<leader>q` namespace empty. All diagnostics/quickfix operations are under `<leader>x`.
 - **Kickstart.nvim:** Uses `<leader>q` for diagnostics to location list, with no other quickfix bindings.
 
-### `<leader>x` - Direct Diagnostic Viewing (LazyVim compatibility)
+### `<leader>x` - Direct Diagnostic Viewing
 
-Maintained for compatibility with LazyVim conventions. These bindings read directly from diagnostic sources without populating quickfix lists.
+Inspired by LazyVim conventions. These bindings read directly from diagnostic sources without populating quickfix lists.
 
 **How it works:**
 Operations in the `<leader>x` namespace read directly from Neovim's diagnostic framework (`vim.diagnostic.get()`) and display results in Trouble. This provides a clean, stateless viewing experience focused on immediate diagnostic inspection.
