@@ -135,6 +135,7 @@ return {
 
 						diagnosticSeverityOverrides = {
 							reportMissingTypeStubs = "none",
+							reportImplicitStringConcatenation = "none",
 						},
 
 						ignore = {
