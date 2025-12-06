@@ -39,7 +39,7 @@ gh search repos 'topic:neovim-configuration' \
 >
 > **LunarVim** is excluded from comparisons. The maintainer [stated](https://github.com/LunarVim/LunarVim/discussions/4518#discussioncomment-8963843): "Since I moved to astronvim, there's no one actively working on lunarvim, so there probably won't be another release for quite a while."
 
-**Current results:**
+**Current results (2025-12-06):**
 - kickstart.nvim - 28,483 stars
 - NvChad - 27,553 stars
 - LazyVim - 24,153 stars
