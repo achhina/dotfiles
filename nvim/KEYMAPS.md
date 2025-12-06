@@ -1,6 +1,7 @@
 # Neovim Keymaps
 
-**Status:** Work in Progress
+> [!WARNING]
+> Work in Progress
 
 This document explains custom keybinding decisions and how they compare to popular Neovim distributions.
 
