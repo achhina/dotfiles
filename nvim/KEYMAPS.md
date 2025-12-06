@@ -35,13 +35,15 @@ gh search repos 'topic:neovim-configuration' \
 ```
 
 > [!NOTE]
-> We also include **kickstart.nvim** despite it lacking the `neovim-configuration` topic, as it's a widely-used starter template.
+> **kickstart.nvim** is manually included despite lacking the `neovim-configuration` topic, as it's a widely-used starter template.
+>
+> **LunarVim** is excluded from comparisons. The maintainer [stated](https://github.com/LunarVim/LunarVim/discussions/4518#discussioncomment-8963843): "Since I moved to astronvim, there's no one actively working on lunarvim, so there probably won't be another release for quite a while."
 
 **Current results:**
-- kickstart.nvim - 28,483 stars (manual inclusion)
+- kickstart.nvim - 28,483 stars
 - NvChad - 27,553 stars
 - LazyVim - 24,153 stars
-- LunarVim - 19,168 stars (excluded due to maintenance concerns)
+- LunarVim - 19,168 stars
 - AstroNvim - 13,937 stars
 
 ## Diagnostics and Quickfix
