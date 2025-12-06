@@ -9,15 +9,15 @@ This document explains custom keybinding decisions and how they compare to popul
 
 ### `<leader>q` - Quickfix-Centric Workflow
 
-This configuration uses `<leader>q` as the **quickfix namespace**. All bindings in this namespace populate the quickfix list, enabling traditional Vim navigation commands (`:cnext`, `:cprev`, etc.) even after closing the Trouble display.
+This configuration uses `<leader>q` as the **quickfix namespace**. Operations here either populate the quickfix list or view/manipulate existing quickfix data, enabling traditional Vim navigation commands (`:cnext`, `:cprev`, etc.).
 
 **How it works:**
-Operations in the `<leader>q` namespace follow this pattern:
-1. Populate the quickfix list with data (`vim.diagnostic.setqflist()` for diagnostics)
-2. Display the quickfix list using Trouble (pretty UI)
-3. Leave the quickfix list populated for traditional navigation
+The `<leader>q` namespace contains two types of operations:
 
-After closing Trouble, you can still use `:cnext`/`:cprev` because the quickfix list remains populated.
+1. **Population operations** (diagnostics) - populate the quickfix list with data, then display via Trouble or traditional quickfix window
+2. **View operations** (open/close) - display or hide the existing quickfix list without modifying it
+
+After using a population operation, the quickfix list remains available for traditional `:cnext`/`:cprev` navigation even after closing the display.
 
 **Rationale:**
 This is a hybrid approach combining modern UI (Trouble) with traditional Vim workflows. The `q` mnemonic represents "quickfix", and all operations in this namespace interact with the quickfix list storage.
