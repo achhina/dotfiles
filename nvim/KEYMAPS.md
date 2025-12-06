@@ -24,7 +24,14 @@ gh search repos 'topic:neovim-configuration' \
   --stars '>=10000' \
   --json name,stargazersCount \
   --sort stars \
-  --jq '.[] | "\(.name) - \(.stargazersCount)"'
+  --jq '.[] | "\(.name) - \(.stargazersCount)"' \
+  | cat
+
+# Output:
+# NvChad - 27553
+# LazyVim - 24154
+# LunarVim - 19168
+# AstroNvim - 13937
 ```
 
 > [!NOTE]
