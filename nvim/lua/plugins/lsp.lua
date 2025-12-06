@@ -125,6 +125,7 @@ return {
 						extraPaths = { "." },
 						indexing = true,
 						autoFormatStrings = true,
+						reportImplicitStringConcatenation = "none",
 
 						inlayHints = {
 							variableTypes = true,
@@ -135,7 +136,6 @@ return {
 
 						diagnosticSeverityOverrides = {
 							reportMissingTypeStubs = "none",
-							reportImplicitStringConcatenation = "none",
 						},
 
 						ignore = {
