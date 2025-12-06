@@ -31,15 +31,10 @@ This is a hybrid approach combining modern UI (Trouble) with traditional Vim wor
 Maintained for compatibility with LazyVim conventions. These bindings read directly from diagnostic sources without populating quickfix lists.
 
 **How it works:**
-Operations in the `<leader>x` namespace follow this pattern:
-1. Open Trouble reading directly from Neovim's diagnostic framework (`vim.diagnostic.get()`)
-2. Does NOT populate the quickfix list
-3. After closing Trouble, `:cnext`/`:cprev` won't work (no quickfix data)
-
-This is a pure viewing mode - no quickfix list persistence.
+Operations in the `<leader>x` namespace read directly from Neovim's diagnostic framework (`vim.diagnostic.get()`) and display results in Trouble. This provides a clean, stateless viewing experience focused on immediate diagnostic inspection.
 
 **Rationale:**
-Provides LazyVim-style keybindings for users familiar with that distribution. The `x` mnemonic represents "problems/diagnostics/issues". Use this when you just want to browse diagnostics without needing traditional quickfix navigation afterward.
+The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ideal for quick diagnostic reviews where you want to inspect issues, navigate between them in Trouble, and then close the view without side effects. No lists are persisted, keeping your session clean. LazyVim and AstroNvim users will find this familiar.
 
 **What other distributions do:**
 - **LazyVim:** This is their primary diagnostic namespace. `<leader>x` is the standard for all diagnostic operations.
@@ -63,12 +58,3 @@ Provides LazyVim-style keybindings for users familiar with that distribution. Th
 **When to use which:**
 - Use `<leader>q` when you want traditional Vim quickfix commands (`:cnext`, `:cprev`) available after viewing
 - Use `<leader>x` for a cleaner, view-only experience with no quickfix side effects
-
-## Configuration Hierarchy
-
-**basedpyright settings precedence:**
-1. `pyrightconfig.json` (project root) - highest priority
-2. `pyproject.toml` with `[tool.basedpyright]` section
-3. LSP settings (Neovim config) - only applies when no config files exist
-
-For projects with `pyproject.toml` or `pyrightconfig.json`, diagnostic settings in the Neovim LSP config are ignored. Editor-specific settings like `inlayHints` still apply regardless.
