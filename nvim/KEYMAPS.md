@@ -6,52 +6,81 @@ This document explains custom keybinding decisions and how they compare to popul
 
 ## Diagnostics and Quickfix
 
-### `<leader>q` - Quickfix and Diagnostics
+### `<leader>q` - Quickfix-Centric Workflow
 
-This configuration uses `<leader>q` as a unified namespace for both quickfix operations and diagnostics, since diagnostics populate quickfix/location lists.
+This configuration uses `<leader>q` as the **quickfix namespace**. All bindings in this namespace populate the quickfix list, enabling traditional Vim navigation commands (`:cnext`, `:cprev`, etc.) even after closing the Trouble display.
 
 **Keybindings:**
-- `<leader>qd` - Workspace diagnostics (Trouble)
-- `<leader>qe` - Workspace errors only (Trouble)
+- `<leader>qd` - Populate quickfix with workspace diagnostics, display in Trouble
+- `<leader>qe` - Populate quickfix with workspace errors only, display in Trouble
 - `<leader>qo` - Open quickfix (Trouble)
 - `<leader>qc` - Close quickfix (Trouble)
-- `<leader>qD` - Diagnostics to traditional quickfix
-- `<leader>qE` - Errors to traditional quickfix
-- `<leader>qO` - Open traditional quickfix
-- `<leader>qC` - Close traditional quickfix
+- `<leader>qD` - Populate quickfix with diagnostics, display in traditional window
+- `<leader>qE` - Populate quickfix with errors, display in traditional window
+- `<leader>qO` - Open traditional quickfix window
+- `<leader>qC` - Close traditional quickfix window
+
+**How it works:**
+When you press `<leader>qd`, it:
+1. Populates the quickfix list with diagnostics (`vim.diagnostic.setqflist()`)
+2. Displays the quickfix list using Trouble (pretty UI)
+3. Leaves the quickfix list populated for traditional navigation
+
+After closing Trouble, you can still use `:cnext`/`:cprev` because the quickfix list remains populated.
 
 **Rationale:**
-The `q` namespace semantically fits both quickfix and diagnostics operations. Since Trouble unifies the quickfix/location list/diagnostics interfaces, grouping them under a single prefix is logical and reduces cognitive overhead.
+This is a hybrid approach combining modern UI (Trouble) with traditional Vim workflows. The `q` mnemonic represents "quickfix", and all operations in this namespace interact with the quickfix list storage.
 
 **What other distributions do:**
 - **LazyVim:** Uses only `<leader>qq` for "Quit All", leaving the rest of the `<leader>q` namespace empty. All diagnostics/quickfix operations are under `<leader>x`.
 - **Kickstart.nvim:** Uses `<leader>q` for diagnostics to location list, with no other quickfix bindings.
 
-### `<leader>x` - Trouble Diagnostics (LazyVim compatibility)
+### `<leader>x` - Direct Diagnostic Viewing (LazyVim compatibility)
 
-Maintained for compatibility with LazyVim conventions and as an alternative access pattern.
+Maintained for compatibility with LazyVim conventions. These bindings read directly from diagnostic sources without populating quickfix lists.
 
 **Keybindings:**
-- `<leader>xx` - Workspace diagnostics (Trouble)
-- `<leader>xX` - Buffer diagnostics (Trouble)
+- `<leader>xx` - Workspace diagnostics (Trouble, direct from `vim.diagnostic.get()`)
+- `<leader>xX` - Buffer diagnostics (Trouble, direct from `vim.diagnostic.get()`)
 - `<leader>xL` - Location list (Trouble)
 - `<leader>xQ` - Quickfix list (Trouble)
 
+**How it differs from `<leader>q`:**
+When you press `<leader>xx`, it:
+1. Opens Trouble reading directly from Neovim's diagnostic framework
+2. Does NOT populate the quickfix list
+3. After closing Trouble, `:cnext`/`:cprev` won't work (no quickfix data)
+
+This is a pure viewing mode - no quickfix list persistence.
+
 **Rationale:**
-Provides LazyVim-style keybindings for users familiar with that distribution. The `x` mnemonic represents "problems/diagnostics/issues".
+Provides LazyVim-style keybindings for users familiar with that distribution. The `x` mnemonic represents "problems/diagnostics/issues". Use this when you just want to browse diagnostics without needing traditional quickfix navigation afterward.
 
 **What other distributions do:**
 - **LazyVim:** This is their primary diagnostic namespace. `<leader>x` is the standard for all diagnostic operations.
 - **AstroNvim:** Similar approach, using `<leader>x` for diagnostics with Trouble integration.
 - **Kickstart.nvim:** Does not use `<leader>x` for diagnostics.
 
-### Overlap
+### Key Difference: Quickfix Persistence
 
-There is intentional overlap between `<leader>q` and `<leader>x`:
-- `<leader>qd` and `<leader>xx` both open workspace diagnostics
-- `<leader>qo` and `<leader>xQ` both open quickfix
+**`<leader>q` (quickfix-centric):**
+- Populates quickfix list
+- Displays via Trouble
+- `:cnext`/`:cprev` work after closing Trouble
+- Traditional Vim workflow preserved
 
-This redundancy supports muscle memory flexibility and accommodates different mental models (quickfix-centric vs diagnostics-centric).
+**`<leader>x` (view-only):**
+- Reads directly from diagnostics
+- Displays via Trouble
+- No quickfix persistence
+- Pure modern workflow
+
+**Overlap:**
+While `<leader>qd` and `<leader>xx` both display workspace diagnostics in Trouble, they differ in persistence:
+- `<leader>qd` - leaves quickfix populated for traditional navigation
+- `<leader>xx` - pure viewing, no quickfix side effects
+
+Choose `<leader>q` when you want traditional Vim quickfix commands available, or `<leader>x` for a cleaner, view-only experience.
 
 ## Configuration Hierarchy
 
