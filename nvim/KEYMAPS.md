@@ -16,22 +16,26 @@ Each namespace section follows this template:
 
 ### Distribution Selection Criteria
 
-Distributions are selected based on GitHub stars (>10k) with the `neovim-configuration` topic. Kickstart.nvim is manually included as a widely-used starter template despite lacking GitHub topics.
+Distributions are selected based on GitHub stars (>=10k) with the `neovim-configuration` topic.
 
-**GitHub API Query:**
+**GitHub Query:**
 ```bash
-# Returns NvChad, LazyVim, LunarVim, AstroNvim (sorted by stars)
-curl "https://api.github.com/search/repositories?q=topic:neovim-configuration+stars:>10000&sort=stars&order=desc"
-
-# Manually add: nvim-lua/kickstart.nvim (28.5k stars, no topics)
+gh search repos 'topic:neovim-configuration' \
+  --stars '>=10000' \
+  --json name,stargazersCount \
+  --sort stars \
+  --jq '.[] | "\(.name) - \(.stargazersCount)"'
 ```
 
-**Current results (validated):**
-- nvim-lua/kickstart.nvim - 28.5k stars (manual addition, no topics)
-- NvChad/NvChad - 27.6k stars
-- LazyVim/LazyVim - 24.2k stars
-- LunarVim/LunarVim - 19.2k stars (excluded due to maintenance concerns)
-- AstroNvim/AstroNvim - 13.9k stars
+> [!NOTE]
+> We also include **kickstart.nvim** despite it lacking the `neovim-configuration` topic, as it's a widely-used starter template.
+
+**Current results:**
+- kickstart.nvim - 28,483 stars (manual inclusion)
+- NvChad - 27,553 stars
+- LazyVim - 24,153 stars
+- LunarVim - 19,168 stars (excluded due to maintenance concerns)
+- AstroNvim - 13,937 stars
 
 ## Diagnostics and Quickfix
 
