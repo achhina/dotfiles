@@ -14,6 +14,25 @@ Each namespace section follows this template:
 3. **Rationale** - Why this namespace exists and when to use it
 4. **Distribution comparison** - How LazyVim, AstroNvim, NvChad, and Kickstart.nvim handle this
 
+### Distribution Selection Criteria
+
+Distributions are selected based on GitHub stars (>10k) with the `neovim-configuration` topic. Kickstart.nvim is manually included as a widely-used starter template despite lacking GitHub topics.
+
+**GitHub API Query:**
+```bash
+# Returns NvChad, LazyVim, LunarVim, AstroNvim (sorted by stars)
+curl "https://api.github.com/search/repositories?q=topic:neovim-configuration+stars:>10000&sort=stars&order=desc"
+
+# Manually add: nvim-lua/kickstart.nvim (28.5k stars, no topics)
+```
+
+**Current results (validated):**
+- nvim-lua/kickstart.nvim - 28.5k stars (manual addition, no topics)
+- NvChad/NvChad - 27.6k stars
+- LazyVim/LazyVim - 24.2k stars
+- LunarVim/LunarVim - 19.2k stars (excluded due to maintenance concerns)
+- AstroNvim/AstroNvim - 13.9k stars
+
 ## Diagnostics and Quickfix
 
 ### `<leader>q` - Quickfix-Centric Workflow
