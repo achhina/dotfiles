@@ -5,6 +5,15 @@
 
 This document explains custom keybinding decisions and how they compare to popular Neovim distributions.
 
+## Documentation Structure
+
+Each namespace section follows this template:
+
+1. **Summary** - One-sentence description of the namespace purpose
+2. **How it works** - Technical explanation of operations in this namespace
+3. **Rationale** - Why this namespace exists and when to use it
+4. **Distribution comparison** - How LazyVim, AstroNvim, NvChad, and Kickstart.nvim handle this
+
 ## Diagnostics and Quickfix
 
 ### `<leader>q` - Quickfix-Centric Workflow
@@ -22,9 +31,11 @@ After using a population operation, the quickfix list remains available for trad
 **Rationale:**
 The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-related operations, whether populating the list with new data or viewing existing data. By maintaining quickfix list persistence, it preserves traditional Vim navigation workflows alongside modern viewing interfaces.
 
-**What other distributions do:**
-- **LazyVim:** Uses only `<leader>qq` for "Quit All", leaving the rest of the `<leader>q` namespace empty. All diagnostics/quickfix operations are under `<leader>x`.
-- **Kickstart.nvim:** Uses `<leader>q` for diagnostics to location list, with no other quickfix bindings.
+**Distribution comparison:**
+- **LazyVim:** Uses only `<leader>qq` for "Quit All", leaving the rest of the `<leader>q` namespace empty
+- **AstroNvim:** Does not use `<leader>q` for diagnostics/quickfix
+- **NvChad:** Uses `<leader>ds` for diagnostic location list (v2.5+), previously used `<leader>q` (v2.0)
+- **Kickstart.nvim:** Uses `<leader>q` for diagnostics to location list
 
 ### `<leader>x` - Direct Diagnostic Viewing
 
@@ -36,10 +47,11 @@ Operations in the `<leader>x` namespace read directly from Neovim's diagnostic f
 **Rationale:**
 The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ideal for quick diagnostic reviews where you want to inspect issues, navigate between them in Trouble, and then close the view without side effects. No lists are persisted, keeping your session clean. LazyVim and AstroNvim users will find this familiar.
 
-**What other distributions do:**
-- **LazyVim:** This is their primary diagnostic namespace. `<leader>x` is the standard for all diagnostic operations.
-- **AstroNvim:** Similar approach, using `<leader>x` for diagnostics with Trouble integration.
-- **Kickstart.nvim:** Does not use `<leader>x` for diagnostics.
+**Distribution comparison:**
+- **LazyVim:** Primary diagnostic namespace, `<leader>x` is the standard for all diagnostic operations
+- **AstroNvim:** Uses `<leader>x` for diagnostics with Trouble integration
+- **NvChad:** Uses `<leader>x` for closing buffers, not for diagnostics
+- **Kickstart.nvim:** Does not use `<leader>x` for diagnostics
 
 ### Key Difference: Quickfix Persistence
 
