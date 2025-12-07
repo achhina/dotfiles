@@ -10,9 +10,8 @@ This document explains custom keybinding decisions and how they compare to popul
 Each namespace section follows this template:
 
 1. **Summary** - One-sentence description of the namespace purpose
-2. **How it works** - Technical explanation of operations in this namespace
-3. **Rationale** - Why this namespace exists and when to use it
-4. **Distribution comparison** - How kickstart.nvim, NvChad, LazyVim, and AstroNvim handle this
+2. **Rationale** - Why this namespace exists and when to use it
+3. **Distribution comparison** - How kickstart.nvim, NvChad, LazyVim, and AstroNvim handle this
 
 ### Distribution Selection Criteria
 
@@ -54,14 +53,6 @@ gh search repos 'topic:neovim-configuration' \
 
 This configuration uses `<leader>q` as the **quickfix namespace**. Operations here either populate the quickfix list or view/manipulate existing quickfix data, enabling traditional Vim navigation commands (`:cnext`, `:cprev`, etc.).
 
-**How it works:**
-The `<leader>q` namespace contains two types of operations:
-
-1. **Population operations** (diagnostics) - populate the quickfix list with data, then display via Trouble or traditional quickfix window
-2. **View operations** (open/close) - display or hide the existing quickfix list without modifying it
-
-After using a population operation, the quickfix list remains available for traditional `:cnext`/`:cprev` navigation even after closing the display.
-
 **Rationale:**
 The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-related operations, whether populating the list with new data or viewing existing data. By maintaining quickfix list persistence, it preserves traditional Vim navigation workflows alongside modern viewing interfaces.
 
@@ -78,11 +69,8 @@ The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-
 
 Inspired by LazyVim conventions. These bindings read directly from diagnostic sources without populating quickfix lists.
 
-**How it works:**
-Operations in the `<leader>x` namespace read directly from Neovim's diagnostic framework (`vim.diagnostic.get()`) and display results in Trouble. This provides a clean, stateless viewing experience focused on immediate diagnostic inspection.
-
 **Rationale:**
-The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ideal for quick diagnostic reviews where you want to inspect issues, navigate between them in Trouble, and then close the view without side effects. No lists are persisted, keeping your session clean. LazyVim and AstroNvim users will find this familiar.
+The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ideal for quick diagnostic reviews where you want to inspect issues, navigate between them, and then close the view without side effects. No lists are persisted, keeping your session clean. LazyVim and AstroNvim users will find this familiar.
 
 **Distribution comparison:**
 
