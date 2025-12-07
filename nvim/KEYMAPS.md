@@ -80,21 +80,3 @@ The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ide
 | NvChad | Closes current buffer (not diagnostic-related) |
 | LazyVim | Primary diagnostic namespace for workspace/buffer diagnostics, quickfix, and location lists |
 | AstroNvim | Diagnostic operations with Trouble integration |
-
-### Key Difference: Quickfix Persistence
-
-**`<leader>q` (quickfix-centric):**
-- Populates quickfix list
-- Displays via Trouble
-- `:cnext`/`:cprev` work after closing Trouble
-- Traditional Vim workflow preserved
-
-**`<leader>x` (view-only):**
-- Reads directly from diagnostics
-- Displays via Trouble
-- No quickfix persistence
-- Pure modern workflow
-
-**When to use which:**
-- Use `<leader>q` when you want traditional Vim quickfix commands (`:cnext`, `:cprev`) available after viewing
-- Use `<leader>x` for a cleaner, view-only experience with no quickfix side effects
