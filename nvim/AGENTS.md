@@ -4,7 +4,7 @@
 
 > 📖 **MANDATORY: Use DEBUG.md for all testing, tracing, and observability. Follow the baseline → fix → verify strategy below.**
 >
-> 📖 **Keymap documentation and design decisions are in KEYMAPS.md.**
+> 📖 **KEYMAPS.md documents keymap namespace design decisions and distribution comparisons. Consult when working with keybindings or explaining keymap choices.**
 
 ## Core Testing Protocol
 
