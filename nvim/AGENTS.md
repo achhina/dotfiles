@@ -3,6 +3,8 @@
 **MANDATORY**: Every Neovim configuration change must be verified with appropriate tests following these standards.
 
 > 📖 **MANDATORY: Use DEBUG.md for all testing, tracing, and observability. Follow the baseline → fix → verify strategy below.**
+>
+> 📖 **Keymap documentation and design decisions are in KEYMAPS.md.**
 
 ## Core Testing Protocol
 
