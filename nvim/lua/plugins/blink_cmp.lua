@@ -14,6 +14,14 @@ return {
 		{ "Saghen/blink.compat", opts = {} },
 		"hrsh7th/cmp-git",
 		"f3fora/cmp-spell",
+		"giuxtaposition/blink-cmp-copilot",
+		{
+			"zbirenbaum/copilot.lua",
+			opts = {
+				suggestion = { enabled = false },
+				panel = { enabled = false },
+			},
+		},
 	},
 	version = "*",
 	opts = {
@@ -25,7 +33,7 @@ return {
 			nerd_font_variant = "mono",
 		},
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
+			default = { "lsp", "path", "snippets", "buffer", "copilot" },
 			per_filetype = {
 				lua = { "lsp", "path", "snippets", "buffer", "lazydev" },
 				-- Enable spell for text files
