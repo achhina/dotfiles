@@ -18,7 +18,18 @@ return {
 		{
 			"zbirenbaum/copilot.lua",
 			opts = {
-				suggestion = { enabled = false },
+				suggestion = {
+					enabled = true,
+					auto_trigger = true,
+					keymap = {
+						accept = false,        -- Handled by custom Tab override
+						accept_word = false,
+						accept_line = false,
+						next = "<M-]>",        -- Alt+] for next suggestion
+						prev = "<M-[>",        -- Alt+[ for previous suggestion
+						dismiss = "<C-]>",     -- Ctrl+] to dismiss
+					},
+				},
 				panel = { enabled = false },
 			},
 		},
@@ -27,6 +38,31 @@ return {
 	opts = {
 		keymap = {
 			preset = "super-tab",
+			["<Tab>"] = {
+				function(cmp)
+					-- Priority 1: Snippet expansion
+					if cmp.snippet_active() then
+						return cmp.accept()
+					end
+
+					-- Priority 2: Completion menu (higher priority than Copilot)
+					if cmp.is_visible() then
+						return cmp.select_and_accept()
+					end
+
+					-- Priority 3: Copilot inline suggestion
+					local copilot_ok, copilot_suggestion = pcall(require, "copilot.suggestion")
+					if copilot_ok and copilot_suggestion.is_visible() then
+						copilot_suggestion.accept()
+						return cmp.hide()
+					end
+
+					-- Priority 4: Show completion menu
+					return cmp.show()
+				end,
+				"snippet_forward",
+				"fallback",
+			},
 		},
 		appearance = {
 			use_nvim_cmp_as_default = true,
@@ -86,6 +122,7 @@ return {
 			},
 			list = {
 				selection = {
+					preselect = true,
 					auto_insert = true,
 				},
 			},
