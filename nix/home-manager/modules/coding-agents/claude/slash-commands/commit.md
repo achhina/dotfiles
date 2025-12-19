@@ -4,68 +4,44 @@ description: Create a well-formatted commit with smart message
 
 # Task
 
-Launch a specialized commit agent to review changes, remove obvious comments, verify code quality, and create a well-formatted commit.
+Launch the commit agent to review changes, remove obvious comments, generate a conventional commit message, and create a well-formatted commit.
 
 # Instructions
 
-Use the Task tool to launch a commit agent that will:
+Use the Task tool with the following parameters:
+- `subagent_type`: "commit"
+- `prompt`: "Create a commit for the current changes"
 
-1. **Review uncommitted changes:**
-   - Run `git status` and `git diff` to identify all changes
-   - Understand what was changed and why
+The commit agent will:
+1. Review uncommitted changes with `git status` and `git diff`
+2. Clean up obvious and redundant comments from changed files
+3. Stage changes with `git add`
+4. Use the commit-message skill to generate a conventional commit message
+5. Verify message quality
+6. Create the commit with `git commit`
+7. Confirm success with `git status` and `git log`
 
-2. **Clean up obvious comments:**
-   - Remove comments that simply restate what the code does
-   - Remove edit history comments ("added", "removed", "changed")
-   - Remove commented-out code blocks
-   - Keep TODO/FIXME markers, "why" comments, and documentation
+## Commit Message Format
 
-3. **Stage changes:**
-   - Stage relevant files with `git add`
-   - Verify staged changes with `git diff --cached`
+The commit-message skill will generate messages in conventional commit format:
 
-4. **Draft commit message:**
-   - **Format:** `<Verb> <what> [optional details]`
-   - **Length:** 60-120 characters for the summary line
-   - **Style rules:**
-     - Start with present-tense verb (Add, Fix, Update, Remove, Refactor, Implement)
-     - Be concise and specific
-     - No praise adjectives (avoid "great", "awesome", "better")
-     - Single line (no body unless necessary)
-     - End with a period
-     - Focus on "what" and "why", not "how"
+```
+<type>: <subject>
 
-5. **Verify message quality:**
-   - Is it clear what changed?
-   - Is it clear why it changed?
-   - Would someone reading the git log understand this?
-   - Does it follow the format rules above?
+[optional body]
+```
 
-6. **Create commit:**
-   - Use `git commit -m "message"` with HEREDOC for proper formatting
-   - Show the commit hash after successful commit
+**Types:** feat, fix, docs, style, refactor, perf, test, chore, ci, build
 
-7. **Verify:**
-   - Run `git status` to confirm commit succeeded
-   - Run `git log -1 --oneline` to show the commit
+**Examples:**
+- `feat: add user authentication with JWT`
+- `fix: prevent race condition in data loader`
+- `docs: update API endpoint documentation`
+- `refactor: extract validation logic to separate module`
 
-# Message Examples
+## Comment Removal Guidelines
 
-**Good:**
-- `Add user authentication with JWT tokens.`
-- `Fix memory leak in data processing pipeline.`
-- `Update API endpoint to support pagination.`
-- `Remove deprecated configuration options.`
-- `Refactor database queries for performance.`
-
-**Bad:**
-- `Fixed stuff` (too vague)
-- `Made the code better` (praise, not specific)
-- `Updates` (incomplete, no details)
-- `WIP` (not descriptive)
-- `asdf` (meaningless)
-
-# Comment Removal Guidelines
+The agent removes redundant comments but keeps important ones:
 
 **Remove:**
 - Comments that restate code: `// Calculate elapsed time` above `elapsed = end - start`
@@ -80,14 +56,9 @@ Use the Task tool to launch a commit agent that will:
 - Documentation comments (JSDoc, docstrings)
 - License headers
 
-# Notes
+## Notes
 
-- The agent will work through changes systematically
-- Comment removal happens before commit creation
-- Each task from `/todo` should result in one atomic commit
+- The commit agent uses the commit-message skill for message generation
+- Each commit should be atomic (one logical change)
 - If changes are complex, consider multiple smaller commits
-- Never commit without understanding what changed
-
-# Agent Invocation
-
-Use the Task tool with subagent_type="general-purpose" to execute this workflow autonomously.
+- The agent will not commit without understanding what changed
