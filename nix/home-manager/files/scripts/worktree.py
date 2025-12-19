@@ -10,6 +10,7 @@ Manages git worktrees in a centralized directory structure:
 ~/worktrees/<project>/<worktree-name>/
 """
 
+import glob
 import logging
 import subprocess
 import sys
@@ -465,7 +466,10 @@ def create(name: str):
 @cli.command()
 @click.argument("names", nargs=-1, required=True, shell_complete=complete_worktree_names)
 def remove(names: tuple[str, ...]):
-    """Remove one or more git worktrees (keeps the branches)."""
+    """Remove one or more git worktrees (keeps the branches).
+
+    Supports glob patterns: worktree remove 'test*' 'feature-*'
+    """
     # Ensure we're in a git repo
     git_root = get_git_root()
     if not git_root:
@@ -484,10 +488,31 @@ def remove(names: tuple[str, ...]):
 
     repo = GitRepo(root=git_root, project_name=project_name)
 
+    # Expand glob patterns to actual worktree names using glob.glob
+    project_worktree_dir = DEFAULT_WORKTREE_BASE / repo.project_name
+
+    expanded_names = []
+    for pattern in names:
+        # Check if pattern contains glob characters
+        if any(c in pattern for c in ['*', '?', '[']):
+            # Use glob.glob to expand the pattern against actual directories
+            matches = glob.glob(str(project_worktree_dir / pattern))
+            if not matches:
+                console_err.print(f"[yellow]Warning: No worktrees match pattern '{pattern}'[/yellow]")
+            # Extract just the worktree names from full paths
+            expanded_names.extend([Path(m).name for m in matches])
+        else:
+            # Literal name
+            expanded_names.append(pattern)
+
+    if not expanded_names:
+        console_err.print("[red]Error: No worktrees to remove[/red]")
+        sys.exit(1)
+
     failed = []
     succeeded = []
 
-    for name in names:
+    for name in expanded_names:
         # Validate each name
         try:
             validate_worktree_name(name)

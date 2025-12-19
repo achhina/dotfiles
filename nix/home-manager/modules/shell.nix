@@ -370,56 +370,8 @@ in
         # The docker completion already includes 'docker compose' completions
       fi
 
-      # Custom worktree completion with glob expansion support
-      if command -v worktree.py &>/dev/null; then
-        _worktree() {
-          local curcontext="$curcontext" state line
-          typeset -A opt_args
-
-          _arguments -C \
-            '(-g --global)'{-g,--global}'[Show worktrees from all projects]' \
-            '--log-level[Set logging level]:level:(debug info warning error)' \
-            '1: :->command' \
-            '*::arg:->args'
-
-          case $state in
-            command)
-              local -a subcommands
-              subcommands=(
-                'create:Create a new git worktree with a new branch'
-                'list:List git worktrees'
-                'remove:Remove one or more git worktrees'
-              )
-              _describe 'worktree command' subcommands
-              ;;
-            args)
-              case $line[1] in
-                remove)
-                  # Get list of worktrees for current project
-                  local -a worktrees
-                  worktrees=(''${(f)"$(worktree.py list --format json 2>/dev/null | python3 -c 'import sys, json; [print(w["path"].split("/")[-1]) for p in json.load(sys.stdin) for w in p.get("worktrees", [])]' 2>/dev/null)"})
-
-                  # Support glob patterns by expanding them
-                  local -a matches
-                  if [[ $PREFIX == *\** ]] || [[ $PREFIX == *\?* ]] || [[ $PREFIX == *\[* ]]; then
-                    # Glob pattern detected - expand it (~ flag enables glob expansion)
-                    matches=(''${(M)worktrees:#''${~PREFIX}})
-                    if (( $#matches > 0 )); then
-                      compadd -a matches
-                    fi
-                  else
-                    # Regular prefix matching
-                    _describe 'worktree' worktrees
-                  fi
-                  ;;
-              esac
-              ;;
-          esac
-        }
-
-        compdef _worktree worktree.py
-        compdef _worktree worktree
-      fi
+      # Add custom completions directory to fpath (XDG data directory)
+      fpath=($XDG_DATA_HOME/zsh/site-functions $fpath)
     '';
 
     setOptions = [
@@ -579,4 +531,16 @@ in
       save = 100000;
     };
   };
+
+  # Generate worktree completion after activation
+  home.activation.generateWorktreeCompletion = lib.hm.dag.entryAfter [ "installPackages" ] ''
+    COMPLETIONS_DIR="$XDG_DATA_HOME/zsh/site-functions"
+    mkdir -p "$COMPLETIONS_DIR"
+    if [ -x $HOME/bin/worktree ]; then
+      $VERBOSE_ECHO "Generating worktree zsh completions..."
+      # Add Nix profile bin to PATH for uv
+      export PATH="$HOME/.nix-profile/bin:$PATH"
+      _WORKTREE_COMPLETE=zsh_source $HOME/bin/worktree > "$COMPLETIONS_DIR/_worktree"
+    fi
+  '';
 }
