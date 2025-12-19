@@ -1,110 +1,61 @@
 ---
 description: Update Claude Code configuration in Home Manager
 argument-hint: [setting description]
-mode: edit
 ---
 
 # Task
 
-Update Claude Code configuration settings in Home Manager modules based on user instructions.
+Launch the update-cc-settings background agent to update Claude Code configuration settings in Home Manager modules.
 
 # Instructions
 
-1. **Parse user instructions:**
-   - Understand what settings need to be changed
-   - Identify the configuration category (permissions, environment, plugins, theme, model, etc.)
-   - Determine which Home Manager module(s) need to be updated
+Use the Task tool with the following parameters:
+- `subagent_type`: "update-cc-settings"
+- `run_in_background`: true
+- `prompt`: Pass the user's request about what settings to update
 
-2. **Locate configuration files:**
-   - First, determine the config directory: `echo "${XDG_CONFIG_HOME:-$HOME/.config}"`
-   - Primary config file: `<config-dir>/nix/home-manager/modules/coding-agents/claude/claude.nix`
-   - Search for other Claude-related Home Manager modules if needed in `<config-dir>/nix/home-manager/modules/`
-   - Read the current configuration to understand existing values
-
-3. **Validate changes:**
-   - Ensure the requested changes are syntactically valid for Nix
-   - Check that permission patterns follow the correct format
-   - Verify environment variables are properly formatted
-   - Confirm plugin names/sources are correct
-
-4. **Apply changes:**
-   - Use the Edit tool to modify the configuration file(s)
-   - Make minimal, targeted changes
-   - Preserve existing formatting and style
-   - Add comments if the change requires explanation
-
-5. **Apply with Home Manager:**
-   - Run `hm switch` to apply the configuration changes
-   - Wait for the command to complete successfully
-   - Check for any errors or warnings in the output
-
-6. **Verify changes:**
-   - Run `git diff` to review the exact changes made
-   - Confirm the changes match the user's request
-   - Check that no unintended modifications occurred
-
-7. **Commit changes:**
-   - Stage only the modified configuration file(s)
-   - Create a clear, descriptive commit message
-   - Follow format: "Update Claude Code [setting category]: [brief description]."
-   - Run `git status` to confirm the commit succeeded
-
-# Common Settings to Update
-
-## Permissions
-- **Allow rules:** `Bash(command:*)`, `Read`, `Write`, etc.
-- **Deny rules:** Block specific commands or patterns
-- **Additional directories:** Paths Claude can access
-
-## Environment Variables
-- **Timeout settings:** `BASH_DEFAULT_TIMEOUT_MS`, `BASH_MAX_TIMEOUT_MS`
-- **Custom environment variables:** Any ENV_VAR needed
-
-## Plugins
-- **Enable/disable plugins:** Add or remove from `enabledPlugins`
-- **Add marketplaces:** Configure `extraKnownMarketplaces`
-- **Plugin settings:** Update plugin-specific configuration
-
-## General Settings
-- **Model:** Change between "sonnet", "opus", etc.
-- **Theme:** Switch between "dark", "light"
-- **Status line:** Update command or type
-- **Auto-updates:** Enable/disable automatic updates
+The agent will:
+1. Parse the user's instructions and identify the required changes
+2. Locate and read the appropriate Home Manager configuration files
+3. Validate and apply the changes using the Edit tool
+4. Run `hm switch` to apply the configuration
+5. Verify the changes with `git diff`
+6. Create a well-formatted commit
 
 # Examples
 
 **Example 1: Add a permission**
-User: "Add permission for curl commands"
-Action: Add `"Bash(curl:*)"` to the `allow` list in `permissions`
+Request: "Add permission for curl commands"
+```
+Use the Task tool with:
+- subagent_type: "update-cc-settings"
+- run_in_background: true
+- prompt: "Add permission for curl commands to the Claude Code configuration"
+```
 
 **Example 2: Update timeout**
-User: "Increase bash timeout to 10 minutes"
-Action: Update `BASH_DEFAULT_TIMEOUT_MS` to `"600000"` in `env`
+Request: "Increase bash timeout to 10 minutes"
+```
+Use the Task tool with:
+- subagent_type: "update-cc-settings"
+- run_in_background: true
+- prompt: "Increase bash timeout to 10 minutes in the Claude Code configuration"
+```
 
 **Example 3: Enable a plugin**
-User: "Enable the new-plugin from the custom marketplace"
-Action: Add `"new-plugin@custom-marketplace" = true;` to `enabledPlugins`
-
-**Example 4: Add additional directory**
-User: "Give Claude access to my projects folder"
-Action: Add `"~/projects"` to `additionalDirectories`
+Request: "Enable the debugging-toolkit plugin"
+```
+Use the Task tool with:
+- subagent_type: "update-cc-settings"
+- run_in_background: true
+- prompt: "Enable the debugging-toolkit@claude-code-workflows plugin"
+```
 
 # Notes
 
-- This command only updates Home Manager configuration, not runtime settings
-- Changes take effect after `hm switch` completes
-- Always verify changes before committing
-- Use atomic commits (one logical change per commit)
-- Never modify generated files directly (they're symlinks to `/nix/store/`)
-- If unsure about Nix syntax, search existing configuration for similar patterns
-
-# Error Handling
-
-If `hm switch` fails:
-1. Review the error message carefully
-2. Check for Nix syntax errors in the modified file
-3. Verify the configuration is valid
-4. Fix the issue and run `hm switch` again
-5. Do not commit until `hm switch` succeeds
+- This command runs asynchronously in the background
+- You can continue working while the agent updates settings
+- The agent will commit changes automatically
+- Check task output with TaskOutput tool to see results
 
 Arguments: $ARGUMENTS (description of what settings to update)

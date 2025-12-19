@@ -28,6 +28,9 @@ in
     # Skills directory - all skills symlinked from ./skills/
     skillsDir = ./skills;
 
+    # Agents directory - custom subagents
+    agentsDir = ./agents;
+
     settings = {
       env = {
         BASH_DEFAULT_TIMEOUT_MS = "300000";
