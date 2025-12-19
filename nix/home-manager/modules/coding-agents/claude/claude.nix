@@ -171,6 +171,7 @@ in
           "Bash(git show:*)"
           "Bash(git blame:*)"
           "Bash(git branch:*)"
+          "Bash(git diff:*)"
           "Bash(git remote:*)"
           "Bash(git config --get:*)"
           "Bash(git config --list:*)"
