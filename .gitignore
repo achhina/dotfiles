@@ -63,3 +63,6 @@ qBittorrent/
 
 # Claude Plugin for conversations
 superpowers/
+
+# Docker local models
+cagent/
