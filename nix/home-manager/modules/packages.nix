@@ -110,6 +110,7 @@ let
   # Cross-platform GUI applications
   guiApps = with pkgs; [
     obsidian                 # Knowledge base on local Markdown files
+    qbittorrent              # Feature-rich BitTorrent client
   ];
 
   # macOS-specific packages
