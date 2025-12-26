@@ -1,8 +1,7 @@
 return {
 	-- Enhanced text objects
-	-- Note: which-key will show overlap warnings for 'i' in visual/operator modes
-	-- ('i' vs ii/il/in). These are expected - 'i' waits for textobject char,
-	-- while ii/il/in are specific next/last variants
+	-- Suffix variants (in/il/an/al) disabled to avoid namespace conflicts with custom text objects
+	-- Use g[ and g] to navigate to text object boundaries instead
 	{
 		"nvim-mini/mini.ai",
 		event = "VeryLazy",
@@ -35,7 +34,7 @@ return {
 					d = { "%f[%d]%d+" },
 
 					-- Entire line
-					L = function(ai_type)
+					l = function(ai_type)
 						local line_num = vim.fn.line(".")
 						local line = vim.fn.getline(line_num)
 						-- For `a` type, include the newline character
@@ -120,11 +119,11 @@ return {
 					around = "a",
 					inside = "i",
 
-					-- Next/last variants
-					around_next = "an",
-					inside_next = "in",
-					around_last = "al",
-					inside_last = "il",
+					-- Disable next/last variants to avoid namespace conflicts
+					around_next = "",
+					inside_next = "",
+					around_last = "",
+					inside_last = "",
 
 					-- Move cursor to corresponding edge of `a` textobject
 					goto_left = "g[",
