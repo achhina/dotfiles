@@ -1,8 +1,8 @@
 return {
 	-- Enhanced text objects
-	-- Note: which-key will show overlap warnings for 'a' and 'i' in visual/operator modes
-	-- (a/ai/al/an and i/ii/il/in). These are expected - 'a'/'i' wait for textobject char,
-	-- while ai/ii/al/il/an/in are specific treesitter textobjects
+	-- Note: which-key will show overlap warnings for 'i' in visual/operator modes
+	-- ('i' vs ii/il/in). These are expected - 'i' waits for textobject char,
+	-- while ii/il/in are specific next/last variants
 	{
 		"nvim-mini/mini.ai",
 		event = "VeryLazy",
@@ -43,10 +43,16 @@ return {
 							return { from = { line = line_num, col = 1 }, to = { line = line_num + 1, col = 0 } }
 						end
 						-- For `i` type, exclude leading/trailing whitespace
-						local first_col, last_col = line:find("^%s*"), line:find("%s*$")
+						local content_start = line:match("^%s*()") or 1
+						local content_end = (line:match("()%s*$") or (#line + 1)) - 1
+						-- Handle edge case where line is all whitespace
+						if content_start > content_end then
+							content_start = 1
+							content_end = 1
+						end
 						return {
-							from = { line = line_num, col = (first_col and last_col and first_col or 1) },
-							to = { line = line_num, col = (last_col and last_col > first_col and last_col or #line) },
+							from = { line = line_num, col = content_start },
+							to = { line = line_num, col = content_end },
 						}
 					end,
 
@@ -93,11 +99,11 @@ return {
 						}
 					end,
 
-					-- URLs
-					u = { "https?://[%w_.~!*:@&+$/?%%#-]+" },
+					-- URLs (RFC 3986 compliant)
+					u = { "https?://[%w%.~:/?#%[%]@!$&'()*+,;=%%-]+" },
 
-					-- Markdown code blocks
-					m = { "```.-```" },
+					-- Markdown code blocks (matches multiline)
+					m = { "```[%s%S]-```" },
 
 					-- Treesitter-based text objects
 					o = ai.gen_spec.treesitter({
@@ -150,14 +156,9 @@ return {
 				-- Add custom surroundings to be used on top of builtin ones. For more
 				-- information with examples, see `:h MiniSurround.config`.
 				custom_surroundings = {
-					-- Lua function call
-					f = {
-						input = { "()%f[%w_]", "%f[%w_]%b()" },
-						output = { left = "function() ", right = " end" },
-					},
 					-- Markdown code block
 					c = {
-						input = { "```.-```" },
+						input = { "```[%s%S]-```" },
 						output = { left = "```\n", right = "\n```" },
 					},
 					-- HTML/XML tags
@@ -237,9 +238,10 @@ return {
 		config = function()
 			require("spider").setup({
 				skipInsignificantPunctuation = true,
-				consistentOperatorPending = false, -- see "Consistent Operator-pending Mode" in the README
+				-- Keep default Vim behavior in operator-pending mode (cw, dw work as expected)
+				consistentOperatorPending = false,
 				subwordMovement = true,
-				customPatterns = {}, -- check "Custom Movement Patterns" in the README for details
+				customPatterns = {},
 			})
 		end,
 	},
@@ -248,72 +250,30 @@ return {
 	{
 		"monaqa/dial.nvim",
 		event = "VeryLazy",
-		keys = {
-			{
-				"<C-a>",
-				function()
-					require("dial.map").manipulate("increment", "normal")
-				end,
-				mode = "n",
-				desc = "Increment",
-			},
-			{
-				"<C-x>",
-				function()
-					require("dial.map").manipulate("decrement", "normal")
-				end,
-				mode = "n",
-				desc = "Decrement",
-			},
-			{
-				"g<C-a>",
-				function()
-					require("dial.map").manipulate("increment", "gnormal")
-				end,
-				mode = "n",
-				desc = "Increment",
-			},
-			{
-				"g<C-x>",
-				function()
-					require("dial.map").manipulate("decrement", "gnormal")
-				end,
-				mode = "n",
-				desc = "Decrement",
-			},
-			{
-				"<C-a>",
-				function()
-					require("dial.map").manipulate("increment", "visual")
-				end,
-				mode = "v",
-				desc = "Increment",
-			},
-			{
-				"<C-x>",
-				function()
-					require("dial.map").manipulate("decrement", "visual")
-				end,
-				mode = "v",
-				desc = "Decrement",
-			},
-			{
-				"g<C-a>",
-				function()
-					require("dial.map").manipulate("increment", "gvisual")
-				end,
-				mode = "v",
-				desc = "Increment",
-			},
-			{
-				"g<C-x>",
-				function()
-					require("dial.map").manipulate("decrement", "gvisual")
-				end,
-				mode = "v",
-				desc = "Decrement",
-			},
-		},
+		keys = (function()
+			local keys = {}
+			local mappings = {
+				{ key = "<C-a>", op = "increment", dial_mode = "normal", vim_mode = "n" },
+				{ key = "<C-x>", op = "decrement", dial_mode = "normal", vim_mode = "n" },
+				{ key = "g<C-a>", op = "increment", dial_mode = "gnormal", vim_mode = "n" },
+				{ key = "g<C-x>", op = "decrement", dial_mode = "gnormal", vim_mode = "n" },
+				{ key = "<C-a>", op = "increment", dial_mode = "visual", vim_mode = "v" },
+				{ key = "<C-x>", op = "decrement", dial_mode = "visual", vim_mode = "v" },
+				{ key = "g<C-a>", op = "increment", dial_mode = "gvisual", vim_mode = "v" },
+				{ key = "g<C-x>", op = "decrement", dial_mode = "gvisual", vim_mode = "v" },
+			}
+			for _, m in ipairs(mappings) do
+				table.insert(keys, {
+					m.key,
+					function()
+						require("dial.map").manipulate(m.op, m.dial_mode)
+					end,
+					mode = m.vim_mode,
+					desc = m.op:sub(1, 1):upper() .. m.op:sub(2),
+				})
+			end
+			return keys
+		end)(),
 		config = function()
 			local augend = require("dial.augend")
 			require("dial.config").augends:register_group({
@@ -326,8 +286,8 @@ return {
 					augend.semver.alias.semver, -- semver (1.2.3)
 					augend.constant.new({
 						elements = { "and", "or" },
-						word = true, -- if false, "sand" is incremented into "sor", "doctor" into "doctand", etc.
-						cyclic = true, -- "or" is incremented into "and".
+						word = true, -- only match whole words (prevents "sand" → "sor")
+						cyclic = true, -- "or" cycles back to "and"
 					}),
 					augend.constant.new({
 						elements = { "&&", "||" },
@@ -354,13 +314,6 @@ return {
 						word = true,
 						cyclic = true,
 					}),
-				},
-				visual = {
-					augend.integer.alias.decimal,
-					augend.integer.alias.hex,
-					augend.date.alias["%Y/%m/%d"],
-					augend.constant.alias.alpha,
-					augend.constant.alias.Alpha,
 				},
 			})
 		end,
