@@ -35,7 +35,7 @@ return {
 					d = { "%f[%d]%d+" },
 
 					-- Entire line
-					l = function(ai_type)
+					L = function(ai_type)
 						local line_num = vim.fn.line(".")
 						local line = vim.fn.getline(line_num)
 						-- For `a` type, include the newline character
