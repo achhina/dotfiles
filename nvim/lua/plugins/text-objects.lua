@@ -106,10 +106,6 @@ return {
 					}),
 					f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }),
 					c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }),
-					t = ai.gen_spec.treesitter({
-						a = "@class.outer",
-						i = "@class.inner",
-					}),
 				},
 
 				-- Module mappings. Use `''` (empty string) to disable one.
