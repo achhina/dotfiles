@@ -110,7 +110,6 @@ return {
 						a = "@class.outer",
 						i = "@class.inner",
 					}),
-					a = ai.gen_spec.treesitter({ a = "@parameter.outer", i = "@parameter.inner" }),
 				},
 
 				-- Module mappings. Use `''` (empty string) to disable one.
