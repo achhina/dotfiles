@@ -1,17 +1,11 @@
 return {
-	-- Enhanced text objects
-	-- Suffix variants (in/il/an/al) disabled to avoid namespace conflicts with custom text objects
-	-- Use g[ and g] to navigate to text object boundaries instead
 	{
 		"nvim-mini/mini.ai",
 		event = "VeryLazy",
 		config = function()
 			local ai = require("mini.ai")
 			ai.setup({
-				-- Table with textobject id as fields, textobject specification as values.
-				-- Also use this to disable builtin textobjects. See |MiniAi.config|.
 				custom_textobjects = {
-					-- Whole buffer
 					e = function()
 						local from = { line = 1, col = 1 }
 						local to = {
@@ -21,19 +15,11 @@ return {
 						return { from = from, to = to }
 					end,
 
-					-- Function calls
 					F = ai.gen_spec.function_call(),
-
-					-- Arguments
 					A = ai.gen_spec.argument(),
-
-					-- Brackets
 					B = { { "%b()", "%b[]", "%b{}" }, "^.%s*().-()%s*.$" },
-
-					-- Digits
 					d = { "%f[%d]%d+" },
 
-					-- Entire line
 					l = function(ai_type)
 						local line_num = vim.fn.line(".")
 						local line = vim.fn.getline(line_num)
@@ -55,7 +41,6 @@ return {
 						}
 					end,
 
-					-- Indentation
 					I = function(ai_type)
 						local indent_line = vim.fn.line(".")
 						local indent_level = vim.fn.indent(indent_line)
@@ -98,13 +83,9 @@ return {
 						}
 					end,
 
-					-- URLs (RFC 3986 compliant)
 					u = { "https?://[%w%.~:/?#%[%]@!$&'()*+,;=%%-]+" },
-
-					-- Markdown code blocks (matches multiline)
 					m = { "```[%s%S]-```" },
 
-					-- Treesitter-based text objects
 					o = ai.gen_spec.treesitter({
 						a = { "@block.outer", "@conditional.outer", "@loop.outer" },
 						i = { "@block.inner", "@conditional.inner", "@loop.inner" },
@@ -113,54 +94,34 @@ return {
 					c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }),
 				},
 
-				-- Module mappings. Use `''` (empty string) to disable one.
 				mappings = {
-					-- Main textobject prefixes
 					around = "a",
 					inside = "i",
-
-					-- Disable next/last variants to avoid namespace conflicts
 					around_next = "",
 					inside_next = "",
 					around_last = "",
 					inside_last = "",
-
-					-- Move cursor to corresponding edge of `a` textobject
 					goto_left = "g[",
 					goto_right = "g]",
 				},
 
-				-- Number of lines within which textobject is searched
 				n_lines = 50,
-
-				-- How to search for object (first inside current line, then inside
-				-- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
-				-- 'cover_or_nearest', 'next', 'prev', 'nearest'.
 				search_method = "cover_or_next",
-
-				-- Whether to disable showing non-error feedback
 				silent = false,
 			})
 		end,
 	},
 
-	-- Enhanced surround operations
-	-- Note: which-key will show overlap warnings for gs* mappings (gsd/gsdl/gsdn, etc.)
-	-- These are expected - base mapping waits for input, l/n suffixes are for prev/next
 	{
 		"nvim-mini/mini.surround",
 		event = "VeryLazy",
 		config = function()
 			require("mini.surround").setup({
-				-- Add custom surroundings to be used on top of builtin ones. For more
-				-- information with examples, see `:h MiniSurround.config`.
 				custom_surroundings = {
-					-- Markdown code block
 					c = {
 						input = { "```[%s%S]-```" },
 						output = { left = "```\n", right = "\n```" },
 					},
-					-- HTML/XML tags
 					t = {
 						input = { "<(%w+)[^>]*>.*</%1>", "^<.->().*()</.*>$" },
 						output = function()
@@ -173,44 +134,28 @@ return {
 					},
 				},
 
-				-- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
 				highlight_duration = 500,
 
-				-- Module mappings. Use `''` (empty string) to disable one.
 				mappings = {
-					add = "gsa", -- Add surrounding in Normal and Visual modes
-					delete = "gsd", -- Delete surrounding
-					find = "gsf", -- Find surrounding (to the right)
-					find_left = "gsF", -- Find surrounding (to the left)
-					highlight = "gsh", -- Highlight surrounding
-					replace = "gsr", -- Replace surrounding
-					update_n_lines = "gsn", -- Update `n_lines`
-
-					suffix_last = "l", -- Suffix to search with "prev" method
-					suffix_next = "n", -- Suffix to search with "next" method
+					add = "gsa",
+					delete = "gsd",
+					find = "gsf",
+					find_left = "gsF",
+					highlight = "gsh",
+					replace = "gsr",
+					update_n_lines = "gsn",
+					suffix_last = "l",
+					suffix_next = "n",
 				},
 
-				-- Number of lines within which surrounding is searched
 				n_lines = 20,
-
-				-- Whether to respect selection type:
-				-- - Place surroundings on separate lines in linewise mode.
-				-- - Place surroundings on each line in blockwise mode.
 				respect_selection_type = false,
-
-				-- How to search for surrounding (first inside current line, then inside
-				-- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
-				-- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more info, see
-				-- `:h MiniSurround.config`.
 				search_method = "cover",
-
-				-- Whether to disable showing non-error feedback
 				silent = false,
 			})
 		end,
 	},
 
-	-- Better word motions
 	{
 		"chrisgrieser/nvim-spider",
 		event = "VeryLazy",
@@ -237,7 +182,6 @@ return {
 		config = function()
 			require("spider").setup({
 				skipInsignificantPunctuation = true,
-				-- Keep default Vim behavior in operator-pending mode (cw, dw work as expected)
 				consistentOperatorPending = false,
 				subwordMovement = true,
 				customPatterns = {},
@@ -245,7 +189,6 @@ return {
 		end,
 	},
 
-	-- Enhanced increment/decrement
 	{
 		"monaqa/dial.nvim",
 		event = "VeryLazy",
@@ -276,17 +219,16 @@ return {
 		config = function()
 			local augend = require("dial.augend")
 			require("dial.config").augends:register_group({
-				-- default augments used when no group name is specified
 				default = {
-					augend.integer.alias.decimal, -- nonnegative decimal number (0, 1, 2, 3, ...)
-					augend.integer.alias.hex, -- nonnegative hex number  (0x01, 0x1a1f, etc.)
-					augend.date.alias["%Y/%m/%d"], -- date (2022/02/19, etc.)
-					augend.constant.alias.bool, -- boolean value (true <-> false)
-					augend.semver.alias.semver, -- semver (1.2.3)
+					augend.integer.alias.decimal,
+					augend.integer.alias.hex,
+					augend.date.alias["%Y/%m/%d"],
+					augend.constant.alias.bool,
+					augend.semver.alias.semver,
 					augend.constant.new({
 						elements = { "and", "or" },
-						word = true, -- only match whole words (prevents "sand" → "sor")
-						cyclic = true, -- "or" cycles back to "and"
+						word = true,
+						cyclic = true,
 					}),
 					augend.constant.new({
 						elements = { "&&", "||" },
@@ -318,7 +260,6 @@ return {
 		end,
 	},
 
-	-- Multiple cursors
 	{
 		"mg979/vim-visual-multi",
 		event = "VeryLazy",
