@@ -111,6 +111,7 @@ function M.setup()
 	safe_keymap("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlighting" })
 	safe_keymap("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
 	safe_keymap("i", "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save file from insert mode" })
+	safe_keymap("i", "jk", "<Esc>", { desc = "Exit insert mode" })
 
 	safe_keymap("n", "<leader>v", "<cmd>vsplit<CR>", { desc = "Vertical split" })
 	safe_keymap("n", "<leader>h", "<cmd>split<CR>", { desc = "Horizontal split" })
@@ -146,7 +147,7 @@ function M.setup()
 	safe_keymap("n", "<leader>fx", "<cmd>source %<CR>", { desc = "Source current file" })
 	safe_keymap("n", "<leader>Q", "<cmd>qa<CR>", { desc = "Quit all" })
 
-	safe_keymap("t", "<leader><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+	safe_keymap("t", "jk", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
 
 	safe_keymap("n", "<leader>ow", "<cmd>set wrap!<CR>", { desc = "Toggle word wrap" })
 	safe_keymap("n", "<leader>on", "<cmd>set number!<CR>", { desc = "Toggle line numbers" })
