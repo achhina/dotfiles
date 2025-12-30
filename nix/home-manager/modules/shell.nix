@@ -361,7 +361,9 @@ in
     syntaxHighlighting.enable = true;
     defaultKeymap = "emacs";
 
-    # initContent runs before oh-my-zsh initialization and compinit
+    # initContent: Custom ZSH initialization code
+    # Runs before oh-my-zsh initialization for early setup (PATH, fpath)
+    # Note: oh-my-zsh plugin config (zstyle) must go elsewhere since completions load after oh-my-zsh
     initContent = ''
       # ============================================================================
       # Early initialization - PATH and tool setup
@@ -404,7 +406,7 @@ in
       #
       # When oh-my-zsh is enabled:
       # - compinit is handled by oh-my-zsh.sh with metadata-based cache invalidation
-      # - Plugin configuration (zstyle) goes in initExtra instead (runs after oh-my-zsh)
+      # - Plugin configuration (zstyle) goes in oh-my-zsh.extraConfig instead
       #
       # This section only matters if you disable oh-my-zsh in the future.
     '';
@@ -431,33 +433,28 @@ in
       ] ++ lib.optionals pkgs.stdenv.isDarwin [
         "macos"   # macOS Finder integration and utilities
       ];
+
+      # Extra settings for plugins (runs after oh-my-zsh initialization)
+      extraConfig = ''
+        # fzf-tab configuration
+        # https://github.com/Aloxaf/fzf-tab
+        zstyle ':completion:*:git-checkout:*' sort false
+        zstyle ':completion:*:descriptions' format '[%d]'
+        zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+        zstyle ':completion:*' menu no
+        zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
+        zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
+        zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
+        zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
+        # Disable FZF_DEFAULT_OPTS to prevent nested popups (--height/--border from defaults)
+        zstyle ':fzf-tab:*' use-fzf-default-opts no
+        zstyle ':fzf-tab:*' switch-group '<' '>'
+        zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+        zstyle ':fzf-tab:*' popup-min-size 65 12
+        zstyle ':fzf-tab:*' popup-pad 8 3
+      '';
     };
-
-    # initExtra runs AFTER oh-my-zsh initialization
-    # Use this for plugin configuration that needs to run after oh-my-zsh loads
-    initExtra = ''
-      # ============================================================================
-      # Post oh-my-zsh initialization - Plugin configuration
-      # ============================================================================
-
-      # fzf-tab configuration
-      # https://github.com/Aloxaf/fzf-tab
-      zstyle ':completion:*:git-checkout:*' sort false
-      zstyle ':completion:*:descriptions' format '[%d]'
-      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' menu no
-      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
-      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
-      zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
-      # Disable FZF_DEFAULT_OPTS to prevent nested popups (--height/--border from defaults)
-      zstyle ':fzf-tab:*' use-fzf-default-opts no
-      zstyle ':fzf-tab:*' switch-group '<' '>'
-      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-      zstyle ':fzf-tab:*' popup-min-size 65 12
-      zstyle ':fzf-tab:*' popup-pad 8 3
-    '';
 
     historySubstringSearch.enable = true;
 
