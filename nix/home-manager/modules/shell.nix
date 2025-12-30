@@ -363,12 +363,25 @@ in
 
     # initContent runs before oh-my-zsh initialization and compinit
     initContent = ''
-      # Load Docker completions directly from docker command
-      if command -v docker &>/dev/null; then
-        eval "$(docker completion zsh)"
-        # Note: docker-compose is now 'docker compose' subcommand
-        # The docker completion already includes 'docker compose' completions
-      fi
+      # ============================================================================
+      # Early initialization - PATH and tool setup
+      # With tmux configured for non-login shells, this runs in all interactive shells
+      # ============================================================================
+
+      ${lib.optionalString pkgs.stdenv.isDarwin ''
+        # Initialize Homebrew (macOS)
+        # This is idempotent and safe to run in every interactive shell
+        if [[ -x /opt/homebrew/bin/brew ]]; then
+          eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+      ''}
+
+      # Setup PATH
+      # Since tmux spawns non-login shells, macOS path_helper won't run in panes
+      # This is fine - we explicitly set the PATH we want here
+      export PATH="$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+
+      # Docker completion now handled by oh-my-zsh docker plugin
 
       # Add custom completions directory to fpath (XDG data directory)
       fpath=($XDG_DATA_HOME/zsh/site-functions $fpath)
@@ -386,6 +399,11 @@ in
     ];
 
     completionInit = ''
+      # Note: compinit is handled by oh-my-zsh.sh automatically
+      # Home Manager skips this section when oh-my-zsh.enable = true
+      # See: https://github.com/nix-community/home-manager/issues/3965
+      # Oh-my-zsh uses metadata-based cache invalidation (smarter than time-based)
+
       # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
       # disable sort when completing `git checkout`
       zstyle ':completion:*:git-checkout:*' sort false
@@ -417,9 +435,6 @@ in
       # configure popup size to prevent small menus
       zstyle ':fzf-tab:*' popup-min-size 65 12
       zstyle ':fzf-tab:*' popup-pad 8 3
-
-      autoload -Uz compinit
-      compinit
     '';
 
     # Simple autoloadable functions
@@ -440,58 +455,47 @@ in
       custom = "$HOME/.oh-my-zsh/custom";
       plugins = [
         "fzf-tab"
+        "docker"  # Handles docker completion caching automatically
       ];
     };
 
     historySubstringSearch.enable = true;
 
     envExtra = ''
+      # ============================================================================
+      # .zshenv - Sourced for ALL shells (interactive, non-interactive, scripts)
+      # Keep minimal: only environment variables needed by ALL invocations
+      # Following expert consensus (romkatv, ZSH manual)
+      # ============================================================================
+
       ${lib.optionalString pkgs.stdenv.isDarwin ''
-        # Fallback for macOS: ensure Nix daemon is sourced
-        # macOS updates wipe /etc/zshrc, breaking system-wide Nix initialization
+        # macOS Nix daemon fallback (only if nix command not found)
+        # macOS updates can wipe /etc/zshrc breaking system-wide Nix init
         # See: https://github.com/NixOS/nix/issues/6117
-        [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+        [[ ! $(command -v nix) && -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]] && \
+          source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
       ''}
 
+      # Secrets (consider: do scripts actually need these?)
       [[ -f $XDG_CONFIG_HOME/secrets/.secrets ]] && source $XDG_CONFIG_HOME/secrets/.secrets
 
-      # npm configuration - use local prefix for global installs
+      # Application-specific environment variables
       export NPM_CONFIG_PREFIX="$HOME/.local/share/npm"
-
-      # less pager: disable terminal bell and screen flash
       export LESS="-Rq"
 
-      # History substring search: disable highlighting
+      # ZSH plugin configuration
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='none'
       export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='none'
     '';
 
-    # Ensure ~/bin takes precedence over system and Nix paths
-    #
-    # We prepend ~/bin in ~/.zprofile instead of ~/.zshenv because of macOS's
-    # path_helper utility (in /etc/zprofile) which reorganizes PATH and would
-    # move ~/bin to the end.
-    # See: https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
-    #
-    # Shell loading order (login shells):
-    #   1. /etc/zshenv
-    #   2. ~/.zshenv
-    #   3. /etc/zprofile      <- macOS: path_helper runs here, reorganizes PATH
-    #   4. ~/.zprofile        <- We prepend ~/bin here (after path_helper)
-    #   5. /etc/zshrc
-    #   6. ~/.zshrc
-    #
-    # This works on all platforms:
-    #   - macOS: Runs after path_helper, ensuring ~/bin stays first
-    #   - Linux: No path_helper exists, simple prepend in .zprofile works fine
+    # .zprofile - Login shells only
+    # Following romkatv's recommendation: avoid unless absolutely necessary
+    # With tmux configured for non-login shells, this file won't run for tmux panes
+    # Only runs for initial terminal login (which is fine - does nothing)
+    # PATH and Homebrew initialization moved to .zshrc (initContent)
     profileExtra = ''
-      # Initialize Homebrew (Apple Silicon)
-      if [ -f /opt/homebrew/bin/brew ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-      fi
-
-      # npm global bin directory (before ~/bin to allow overrides)
-      export PATH="$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+      # Left empty intentionally - all interactive setup moved to .zshrc
+      # This follows expert consensus (romkatv, Nick Janetakis)
     '';
 
     shellAliases = {

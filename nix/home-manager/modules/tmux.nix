@@ -126,6 +126,7 @@ in
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
+    shell = "${pkgs.zsh}/bin/zsh";
     prefix = "C-a";
     mouse = true;
     escapeTime = 10;
@@ -135,6 +136,11 @@ in
     tmuxinator.enable = true;
 
     extraConfig = ''
+      # Spawn interactive non-login shells (prevents .zprofile from running)
+      # Follows expert consensus: romkatv, Nick Janetakis
+      # See: https://nickjanetakis.com/blog/prevent-tmux-from-starting-a-login-shell-by-default
+      set -g default-command "${pkgs.zsh}/bin/zsh"
+
       # Override Home Manager's tmux prefix binding to restore standard behavior
       # Home Manager PR #7549 added the `-n` flag to the send-prefix binding,
       # which changed the behavior from the tmux default. We want prefix-prefix

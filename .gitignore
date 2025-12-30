@@ -66,3 +66,6 @@ superpowers/
 
 # Docker local models
 cagent/
+
+# Sonarr
+sonarr/
