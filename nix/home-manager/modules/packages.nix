@@ -47,6 +47,7 @@ let
     gopls                            # Go LSP (used with go tools)
     rust-analyzer                    # Rust LSP (used with cargo)
     nil                              # Nix LSP (used for nix evaluation)
+    just-lsp                         # Just LSP (justfile language server)
     docker-credential-helpers        # Docker credential helpers
   ];
 
