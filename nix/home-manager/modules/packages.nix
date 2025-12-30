@@ -13,6 +13,7 @@ let
     dust                   # Modern du alternative
     cloc                   # Count lines of code
     pre-commit             # Git pre-commit hooks
+    wireguard-tools        # WireGuard VPN client
   ];
 
 
