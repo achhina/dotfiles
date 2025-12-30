@@ -428,6 +428,8 @@ in
       plugins = [
         "fzf-tab"
         "docker"  # Handles docker completion caching automatically
+      ] ++ lib.optionals pkgs.stdenv.isDarwin [
+        "macos"   # macOS Finder integration and utilities
       ];
     };
 
