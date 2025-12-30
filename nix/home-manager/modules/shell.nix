@@ -399,42 +399,14 @@ in
     ];
 
     completionInit = ''
-      # Note: compinit is handled by oh-my-zsh.sh automatically
-      # Home Manager skips this section when oh-my-zsh.enable = true
+      # Note: This entire section is SKIPPED by Home Manager when oh-my-zsh.enable = true
       # See: https://github.com/nix-community/home-manager/issues/3965
-      # Oh-my-zsh uses metadata-based cache invalidation (smarter than time-based)
-
-      # https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file
-      # disable sort when completing `git checkout`
-      zstyle ':completion:*:git-checkout:*' sort false
-      # set descriptions format to enable group support
-      # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
-      zstyle ':completion:*:descriptions' format '[%d]'
-      # set list-colors to enable filename colorizing
-      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-      zstyle ':completion:*' menu no
-      # include hidden files in completion
-      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
-      # configure cd completion to show directory stack when using cd -
-      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
-      # case insensitive completion
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
-      # preview directory's content with eza when completing cd (include hidden files)
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
-      # custom fzf flags - use tab for cycling, ctrl-space for accept
-      # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
-      zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
-      # To make fzf-tab follow FZF_DEFAULT_OPTS.
-      # NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
-      zstyle ':fzf-tab:*' use-fzf-default-opts yes
-      # switch group using `<` and `>`
-      zstyle ':fzf-tab:*' switch-group '<' '>'
-      # use tmux floating pane
-      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-      # configure popup size to prevent small menus
-      zstyle ':fzf-tab:*' popup-min-size 65 12
-      zstyle ':fzf-tab:*' popup-pad 8 3
+      #
+      # When oh-my-zsh is enabled:
+      # - compinit is handled by oh-my-zsh.sh with metadata-based cache invalidation
+      # - Plugin configuration (zstyle) goes in initExtra instead (runs after oh-my-zsh)
+      #
+      # This section only matters if you disable oh-my-zsh in the future.
     '';
 
     # Simple autoloadable functions
@@ -458,6 +430,32 @@ in
         "docker"  # Handles docker completion caching automatically
       ];
     };
+
+    # initExtra runs AFTER oh-my-zsh initialization
+    # Use this for plugin configuration that needs to run after oh-my-zsh loads
+    initExtra = ''
+      # ============================================================================
+      # Post oh-my-zsh initialization - Plugin configuration
+      # ============================================================================
+
+      # fzf-tab configuration
+      # https://github.com/Aloxaf/fzf-tab
+      zstyle ':completion:*:git-checkout:*' sort false
+      zstyle ':completion:*:descriptions' format '[%d]'
+      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+      zstyle ':completion:*' menu no
+      zstyle ':completion:*' file-patterns '%p(D):globbed-files' '*:all-files'
+      zstyle ':completion:*:directory-stack' list-colors ''${(s.:.)LS_COLORS}
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --all $realpath'
+      zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:down,shift-tab:up,ctrl-space:accept
+      # Disable FZF_DEFAULT_OPTS to prevent nested popups (--height/--border from defaults)
+      zstyle ':fzf-tab:*' use-fzf-default-opts no
+      zstyle ':fzf-tab:*' switch-group '<' '>'
+      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+      zstyle ':fzf-tab:*' popup-min-size 65 12
+      zstyle ':fzf-tab:*' popup-pad 8 3
+    '';
 
     historySubstringSearch.enable = true;
 
