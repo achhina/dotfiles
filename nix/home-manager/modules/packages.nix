@@ -50,6 +50,7 @@ let
     rust-analyzer                    # Rust LSP (used with cargo)
     nil                              # Nix LSP (used for nix evaluation)
     just-lsp                         # Just LSP (justfile language server)
+    nginx-language-server            # Nginx configuration LSP
     docker-credential-helpers        # Docker credential helpers
   ];
 

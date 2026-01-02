@@ -111,6 +111,7 @@ return {
 					},
 				},
 			},
+			nginx_language_server = {},
 			basedpyright = {
 				python = {
 					pythonPath = get_python_path(),
