@@ -22,6 +22,13 @@ return {
 	---@type snacks.Config
 	opts = {
 		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
+		terminal = {
+			win = {
+				keys = {
+					term_normal = false, -- Disable double-escape, using jk instead
+				},
+			},
+		},
 		dashboard = {
 			enabled = true,
 			preset = {
