@@ -304,7 +304,6 @@ in
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
-        "elements-of-style@superpowers-marketplace" = true;
         "episodic-memory@superpowers-marketplace" = true;
         "shell-scripting@claude-code-workflows" = true;
         "python-development@claude-code-workflows" = false;
