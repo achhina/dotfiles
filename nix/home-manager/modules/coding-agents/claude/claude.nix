@@ -283,12 +283,14 @@ in
             source = "github";
             repo = "obra/superpowers-marketplace";
           };
+          autoUpdate = true;
         };
         claude-code-workflows = {
           source = {
             source = "github";
             repo = "wshobson/agents";
           };
+          autoUpdate = true;
         };
       };
 
