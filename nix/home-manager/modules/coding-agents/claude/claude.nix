@@ -309,8 +309,8 @@ in
         "episodic-memory@superpowers-marketplace" = true;
         "shell-scripting@claude-code-workflows" = true;
         "python-development@claude-code-workflows" = false;
-        "javascript-typescript@claude-code-workflows" = false;  # Removed from marketplace
-        "debugging-toolkit@claude-code-workflows" = false;      # Removed from marketplace
+        "javascript-typescript@claude-code-workflows" = true;
+        "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
       };
