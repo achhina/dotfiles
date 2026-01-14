@@ -27,6 +27,7 @@ in
     ./modules/ipython.nix
     ./modules/uv.nix
     ./modules/uvx.nix
+    ./modules/zotero.nix
     ./modules/coding-agents/claude/claude.nix
   ];
 
