@@ -54,6 +54,7 @@ ripgrep/
 tmux/
 tmuxinator/
 tridactyl/
+uv/
 nix/nix.conf
 result
 /home-manager/
