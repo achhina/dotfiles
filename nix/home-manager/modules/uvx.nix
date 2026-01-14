@@ -19,6 +19,10 @@ let
 in
 {
   # Install Python versions
+  # Note: UV automatically selects the latest patch version for each minor release.
+  # On Apple Silicon (ARM64), UV prefers native builds when available.
+  # Warnings about "failed to patch install name" are normal and harmless - UV attempts
+  # to optimize Python installations but gracefully continues if patching fails.
   home.activation.installPythonVersions = lib.hm.dag.entryAfter [
     "writeBoundary"
     "linkGeneration"

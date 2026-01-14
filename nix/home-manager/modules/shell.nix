@@ -381,7 +381,7 @@ in
       # Setup PATH
       # Since tmux spawns non-login shells, macOS path_helper won't run in panes
       # This is fine - we explicitly set the PATH we want here
-      export PATH="$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+      export PATH="$HOME/.local/bin:$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
 
       # Docker completion now handled by oh-my-zsh docker plugin
 
