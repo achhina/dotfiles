@@ -115,6 +115,7 @@ let
   guiApps = with pkgs; [
     obsidian                 # Knowledge base on local Markdown files
     qbittorrent              # Feature-rich BitTorrent client
+    zotero                   # Research paper and reference manager
   ];
 
   # macOS-specific packages

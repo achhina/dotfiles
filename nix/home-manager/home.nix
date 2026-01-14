@@ -25,6 +25,8 @@ in
     ./modules/tridactyl.nix
     ./modules/jupyter.nix
     ./modules/ipython.nix
+    ./modules/uv.nix
+    ./modules/uvx.nix
     ./modules/coding-agents/claude/claude.nix
   ];
 
