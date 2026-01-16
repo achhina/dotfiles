@@ -539,8 +539,8 @@ in
     mkdir -p "$COMPLETIONS_DIR"
     if [ -x $HOME/bin/worktree ]; then
       $VERBOSE_ECHO "Generating worktree zsh completions..."
-      # Add Nix profile bin to PATH for uv
-      export PATH="$HOME/.nix-profile/bin:$PATH"
+      # Add Nix profile and local bin to PATH for uv
+      export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
       _WORKTREE_COMPLETE=zsh_source $HOME/bin/worktree > "$COMPLETIONS_DIR/_worktree"
     fi
   '';
