@@ -419,12 +419,11 @@ def create(name: str):
     # Check if directory already exists
     if worktree_path.exists():
         console_err.print(
-            f"[red]Error: Worktree directory already exists: {worktree_path}[/red]"
+            f"[yellow]Worktree already exists: {worktree_path}[/yellow]"
         )
-        console_err.print(
-            f"[yellow]Remove it first with: worktree remove {name}[/yellow]"
-        )
-        sys.exit(1)
+        # Print path to stdout so shell wrapper can cd to it
+        print(str(worktree_path))
+        sys.exit(0)
 
     # Create parent directory if needed
     worktree_path.parent.mkdir(parents=True, exist_ok=True)
@@ -465,8 +464,14 @@ def create(name: str):
 
 @cli.command()
 @click.argument("names", nargs=-1, required=True, shell_complete=complete_worktree_names)
-def remove(names: tuple[str, ...]):
-    """Remove one or more git worktrees (keeps the branches).
+@click.option(
+    "--delete-branch",
+    "-d",
+    is_flag=True,
+    help="Also delete the git branch when removing the worktree",
+)
+def remove(names: tuple[str, ...], delete_branch: bool):
+    """Remove one or more git worktrees (keeps the branches by default).
 
     Supports glob patterns: worktree remove 'test*' 'feature-*'
     """
@@ -511,6 +516,7 @@ def remove(names: tuple[str, ...]):
 
     failed = []
     succeeded = []
+    branches_deleted = []
 
     for name in expanded_names:
         # Validate each name
@@ -548,6 +554,26 @@ def remove(names: tuple[str, ...]):
             )
             succeeded.append(name)
 
+            # Delete branch if requested
+            if delete_branch:
+                try:
+                    subprocess.run(
+                        ["git", "branch", "-D", name],
+                        cwd=repo.root,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                    )
+                    console_err.print(f"[green]✓ Deleted branch: {name}[/green]")
+                    logger.info(
+                        "deleted branch",
+                        branch=name,
+                        project=repo.project_name,
+                    )
+                    branches_deleted.append(name)
+                except subprocess.CalledProcessError as e:
+                    console_err.print(f"[yellow]⚠ Could not delete branch {name}: {e.stderr.strip()}[/yellow]")
+
         except subprocess.CalledProcessError as e:
             console_err.print(f"[red]✗ Error removing {name}: {e.stderr.strip()}[/red]")
             failed.append(name)
@@ -557,7 +583,11 @@ def remove(names: tuple[str, ...]):
         console_err.print()
         if succeeded:
             console_err.print(f"[green]Successfully removed {len(succeeded)} worktree(s)[/green]")
-            console_err.print(f"[yellow]Branches were kept (not deleted)[/yellow]")
+            if delete_branch:
+                if branches_deleted:
+                    console_err.print(f"[green]Deleted {len(branches_deleted)} branch(es)[/green]")
+            else:
+                console_err.print(f"[yellow]Branches were kept (not deleted)[/yellow]")
         if failed:
             console_err.print(f"[red]Failed to remove {len(failed)} worktree(s)[/red]")
 
