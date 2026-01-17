@@ -162,6 +162,7 @@
 
       # Claude Code local settings
       "**/.claude/settings.local.json"
+      ".llm/"
     ];
   };
 
