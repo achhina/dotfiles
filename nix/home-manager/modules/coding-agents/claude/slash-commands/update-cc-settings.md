@@ -3,27 +3,21 @@ description: Update Claude Code configuration in Home Manager
 argument-hint: [setting description]
 allowed-tools:
   - Bash(worktree:*)
-  - Bash(claude:*)
 ---
 
 # Task
 
-Create an isolated worktree for updating Claude Code configuration and launch a new Claude session within it to perform the updates.
+Create an isolated worktree and launch an async background agent to update Claude Code configuration.
 
 # Instructions
 
 Follow these steps:
 
-## 1. Synthesize Worktree Name and Prompt
+## 1. Synthesize Worktree Name
 
-Based on the user's request (`$ARGUMENTS`), create:
-- A short, descriptive worktree name (lowercase, hyphens, max 30 chars)
-  - Example: "add-curl-permissions", "increase-bash-timeout", "enable-debugging-plugin"
-- A detailed prompt for the spawned Claude session that includes:
-  - The specific configuration change requested
-  - Which file(s) in `nix/home-manager/modules/coding-agents/claude/` need updates
-  - Instructions to run `hm switch` to apply changes
-  - Instructions to verify and commit the changes
+Based on the user's request (`$ARGUMENTS`), create a short, descriptive worktree name:
+- Lowercase, hyphens, max 30 chars
+- Examples: "add-curl-permissions", "increase-bash-timeout", "enable-debugging-plugin"
 
 ## 2. Create Worktree
 
@@ -34,27 +28,33 @@ worktree create <synthesized-name>
 
 This creates the worktree at `~/worktrees/.config/<synthesized-name>/`
 
-## 3. Launch Claude in Worktree
+## 3. Launch Background Task Agent
 
-Execute a new Claude session in the worktree:
-```bash
-cd ~/worktrees/.config/<synthesized-name> && claude -p "<detailed-prompt>"
+Use the Task tool to spawn an async update-cc-settings agent:
+
+```
+Task tool parameters:
+- subagent_type: "update-cc-settings"
+- run_in_background: true
+- prompt: "<detailed-prompt>"
 ```
 
-The spawned Claude session will:
-- Have full access to the worktree directory (it's the working directory)
-- Make the requested configuration changes
-- Run `hm switch` to apply the configuration
-- Verify the changes with `git diff` and `git status`
-- Create a well-formatted commit
-- Exit when complete
+The prompt should include:
+- The worktree path: `~/worktrees/.config/<synthesized-name>`
+- Instruction to cd into the worktree first
+- The specific configuration change requested
+- Which file(s) in `nix/home-manager/modules/coding-agents/claude/` need updates
+- Instructions to run `hm switch` to apply changes
+- Instructions to verify with `git diff` and `git status`
+- Instructions to create a commit
+- Instruction to return to original directory when done
 
 ## 4. Inform User
 
 Tell the user:
 - The worktree name and location
-- That a new Claude session has been launched to handle the update
-- How to check on progress: `cd ~/worktrees/.config/<name> && claude`
+- That a background agent has been launched to handle the update
+- How to check task output: Use TaskOutput tool with the task_id
 - How to clean up when done: `worktree remove <name>`
 
 # Example
@@ -63,31 +63,34 @@ Tell the user:
 
 **You synthesize:**
 - Worktree name: `add-curl-permissions`
-- Prompt: `Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add "Bash(curl:*)" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff', and create a commit with an appropriate message.`
 
 **You execute:**
 ```bash
 worktree create add-curl-permissions
-cd ~/worktrees/.config/add-curl-permissions && claude -p "Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add \"Bash(curl:*)\" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff', and create a commit with an appropriate message."
+```
+
+**Then launch Task:**
+```
+subagent_type: "update-cc-settings"
+run_in_background: true
+prompt: "Change to the worktree directory at ~/worktrees/.config/add-curl-permissions. Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add \"Bash(curl:*)\" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff' and 'git status', and create a commit with an appropriate message. When done, return to the original directory."
 ```
 
 **You respond:**
 ```
 Created worktree 'add-curl-permissions' at ~/worktrees/.config/add-curl-permissions/
-Launched new Claude session to add curl permissions.
+Launched background agent to add curl permissions.
 
-The spawned session will update the configuration, apply it, and commit the changes.
-
-To check progress: cd ~/worktrees/.config/add-curl-permissions && claude
-To clean up when done: worktree remove add-curl-permissions
+The agent is working in the isolated worktree. Use TaskOutput to check progress.
+When complete, clean up with: worktree remove add-curl-permissions
 ```
 
 # Benefits
 
-- **True Isolation**: Separate Claude session, separate directory, no permission issues
-- **Run From Anywhere**: No directory access permissions needed in main session
-- **Parallel Work**: Continue your current work while updates happen
-- **Clean State**: Worktree has isolated git state
-- **Simple Cleanup**: One command to remove worktree
+- **Isolation**: Work happens in separate worktree, main workspace untouched
+- **Official Pattern**: Uses Task tool (official subagent approach)
+- **Run From Anywhere**: Main session just orchestrates
+- **Async Execution**: Doesn't block current work
+- **Clean Cleanup**: One command to remove worktree
 
 Arguments: $ARGUMENTS (description of what settings to update)
