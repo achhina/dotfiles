@@ -12,6 +12,8 @@ Manages git worktrees in a centralized directory structure:
 
 import glob
 import logging
+import os
+import re
 import subprocess
 import sys
 from fnmatch import fnmatch
@@ -20,9 +22,29 @@ from typing import Optional
 
 import click
 import structlog
+from click.shell_completion import ZshComplete, add_completion_class
 from pydantic import BaseModel, ConfigDict
 from rich.console import Console
 from rich.table import Table
+
+
+# Custom ZshComplete that generates function names compatible with zsh autoload
+@add_completion_class
+class AutoloadZshComplete(ZshComplete):
+    """ZshComplete subclass that generates function names matching filename convention.
+
+    This enables zsh autoload from fpath by ensuring the function name (_worktree)
+    matches the completion filename (_worktree), rather than Click's default
+    (_worktree_completion).
+    """
+    name = "zsh"
+
+    @property
+    def func_name(self) -> str:
+        """Generate function name without _completion suffix for zsh autoload."""
+        safe_name = re.sub(r"\W*", "", self.prog_name.replace("-", "_"), flags=re.ASCII)
+        return f"_{safe_name}"
+
 
 # Constants
 DEFAULT_WORKTREE_BASE = Path.home() / "worktrees"
@@ -31,6 +53,23 @@ DEFAULT_LOG_LEVEL = "warning"
 # Global console (logger configured per-invocation)
 console = Console()
 console_err = Console(file=sys.stderr, stderr=True)
+
+# Configure logging early - disable during shell completion to avoid interfering with completion widgets
+if any(key.endswith("_COMPLETE") for key in os.environ.keys()):
+    log_level_int = logging.CRITICAL  # Effectively disable logging during completion
+else:
+    log_level_int = getattr(logging, DEFAULT_LOG_LEVEL.upper())
+
+structlog.configure(
+    processors=[
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.dev.ConsoleRenderer(),
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(log_level_int),
+    logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
+)
+
 logger = structlog.get_logger()
 
 
@@ -277,8 +316,10 @@ def discover_projects(base_dir: Path) -> list[Project]:
                 )
 
         except subprocess.CalledProcessError as e:
+            # Silently skip orphaned/broken worktrees
+            # (main repo deleted but worktree directory remains)
             logger.debug(
-                "failed to list worktrees",
+                "skipping broken worktree project",
                 project=project_name,
                 error=str(e),
             )
@@ -335,18 +376,18 @@ def cli(ctx: click.Context, show_global: bool, log_level: str):
     ctx.ensure_object(dict)
     ctx.obj["show_global"] = show_global
 
-    # Configure structlog to output to stderr
-    level = log_level.upper()
-    level_int = getattr(logging, level, logging.INFO)
-    structlog.configure(
-        processors=[
-            structlog.processors.add_log_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.dev.ConsoleRenderer(),
-        ],
-        wrapper_class=structlog.make_filtering_bound_logger(level_int),
-        logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
-    )
+    # Reconfigure log level if not in completion mode and user specified a level
+    if not any(key.endswith("_COMPLETE") for key in os.environ.keys()):
+        level_int = getattr(logging, log_level.upper())
+        structlog.configure(
+            processors=[
+                structlog.processors.add_log_level,
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.dev.ConsoleRenderer(),
+            ],
+            wrapper_class=structlog.make_filtering_bound_logger(level_int),
+            logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
+        )
 
 
 @cli.command()
@@ -593,6 +634,100 @@ def remove(names: tuple[str, ...], delete_branch: bool):
 
     # Exit with error if any failed
     if failed:
+        sys.exit(1)
+
+
+@cli.command()
+@click.option(
+    "--dry-run",
+    "-n",
+    is_flag=True,
+    help="Show what would be removed without actually removing it",
+)
+def prune(dry_run: bool):
+    """Remove orphaned worktree directories (main repo no longer exists).
+
+    Scans ~/worktrees/ for directories that reference deleted git repositories
+    and removes them. This is useful for cleaning up after main repositories
+    have been deleted.
+    """
+    # Scan all projects in worktrees directory
+    if not DEFAULT_WORKTREE_BASE.exists():
+        console.print("[yellow]No worktrees directory found[/yellow]")
+        return
+
+    orphaned = []
+
+    for project_dir in DEFAULT_WORKTREE_BASE.iterdir():
+        if not project_dir.is_dir():
+            continue
+
+        project_name = project_dir.name
+
+        # Get all subdirectories (potential worktrees)
+        subdirs = [d for d in project_dir.iterdir() if d.is_dir()]
+
+        # Skip empty parent directories - they're fine, just unused
+        if not subdirs:
+            continue
+
+        # Try to find any valid worktree in this project
+        found_valid = False
+        for worktree_dir in subdirs:
+            try:
+                # Try to run git command to verify this is a valid worktree
+                subprocess.run(
+                    ["git", "worktree", "list", "--porcelain"],
+                    cwd=worktree_dir,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                found_valid = True
+                break
+            except subprocess.CalledProcessError:
+                # This worktree is broken, but keep checking others
+                continue
+
+        # If has subdirectories but NO valid worktrees, this project is orphaned
+        if not found_valid:
+            orphaned.append(project_dir)
+
+    if not orphaned:
+        console.print("[green]No orphaned worktrees found[/green]")
+        return
+
+    # Display what will be removed
+    console.print(f"[yellow]Found {len(orphaned)} orphaned worktree project(s):[/yellow]")
+    for path in orphaned:
+        console.print(f"  • {path}")
+
+    if dry_run:
+        console.print("\n[blue]Dry run - nothing was removed[/blue]")
+        console.print("[dim]Run without --dry-run to remove these directories[/dim]")
+        return
+
+    # Remove orphaned directories
+    removed_count = 0
+    failed_count = 0
+
+    for path in orphaned:
+        try:
+            import shutil
+            shutil.rmtree(path)
+            console_err.print(f"[green]✓ Removed {path}[/green]")
+            logger.info("removed orphaned worktree project", path=str(path))
+            removed_count += 1
+        except Exception as e:
+            console_err.print(f"[red]✗ Failed to remove {path}: {e}[/red]")
+            failed_count += 1
+
+    # Print summary
+    console_err.print()
+    if removed_count:
+        console_err.print(f"[green]Successfully removed {removed_count} orphaned project(s)[/green]")
+    if failed_count:
+        console_err.print(f"[red]Failed to remove {failed_count} project(s)[/red]")
         sys.exit(1)
 
 
