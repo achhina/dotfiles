@@ -10,6 +10,9 @@ allowed-tools:
   - Bash(git commit:*)
   - Bash(hm:*)
   - Bash(home-manager:*)
+allowed-directories:
+  - ~/.config
+  - ~/worktrees/.config
 ---
 
 # Task
@@ -28,6 +31,7 @@ The slash command has pre-configured permissions in its frontmatter for:
 - Running home manager commands (hm switch)
 - Git operations (status, diff, add, commit)
 - Directory navigation
+- Access to ~/.config and ~/worktrees/.config directories
 
 ## Agent Workflow
 
