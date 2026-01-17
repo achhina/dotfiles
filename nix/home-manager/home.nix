@@ -15,6 +15,7 @@ in
     ./modules/neovim.nix
     ./modules/git.nix
     ./modules/shell.nix
+    ./modules/tealdeer.nix
     ./modules/fzf.nix
     ./modules/bat.nix
     ./modules/btop.nix

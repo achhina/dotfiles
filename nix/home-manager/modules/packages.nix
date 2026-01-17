@@ -25,7 +25,6 @@ let
     fd                     # Modern find replacement
     ripgrep                # Fast grep replacement
     fzf                    # Fuzzy finder
-    tldr                   # Simplified man pages
     jq                     # JSON processor
     delta                  # Enhanced diff viewer
   ];
