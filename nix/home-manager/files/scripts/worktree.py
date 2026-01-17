@@ -14,6 +14,7 @@ import glob
 import logging
 import os
 import re
+import shutil
 import subprocess
 import sys
 from fnmatch import fnmatch
@@ -42,7 +43,7 @@ class AutoloadZshComplete(ZshComplete):
     @property
     def func_name(self) -> str:
         """Generate function name without _completion suffix for zsh autoload."""
-        safe_name = re.sub(r"\W*", "", self.prog_name.replace("-", "_"), flags=re.ASCII)
+        safe_name = re.sub(r"\W+", "", self.prog_name.replace("-", "_"), flags=re.ASCII)
         return f"_{safe_name}"
 
 
@@ -713,7 +714,6 @@ def prune(dry_run: bool):
 
     for path in orphaned:
         try:
-            import shutil
             shutil.rmtree(path)
             console_err.print(f"[green]✓ Removed {path}[/green]")
             logger.info("removed orphaned worktree project", path=str(path))
