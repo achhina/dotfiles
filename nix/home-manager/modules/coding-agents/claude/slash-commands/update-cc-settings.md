@@ -3,88 +3,91 @@ description: Update Claude Code configuration in Home Manager
 argument-hint: [setting description]
 allowed-tools:
   - Bash(worktree:*)
-  - Bash(cd:*)
-  - Bash(git status:*)
-  - Bash(git diff:*)
-  - Bash(git add:*)
-  - Bash(git commit:*)
-  - Bash(hm:*)
-  - Bash(home-manager:*)
-allowed-directories:
-  - ~/.config
-  - ~/worktrees/.config
+  - Bash(claude:*)
 ---
 
 # Task
 
-Launch the update-cc-settings background agent to update Claude Code configuration settings in Home Manager modules in an isolated worktree.
+Create an isolated worktree for updating Claude Code configuration and launch a new Claude session within it to perform the updates.
 
 # Instructions
 
-Use the Task tool with the following parameters:
-- `subagent_type`: "update-cc-settings"
-- `run_in_background`: true
-- `prompt`: Pass the user's request about what settings to update
+Follow these steps:
 
-The slash command has pre-configured permissions in its frontmatter for:
-- Creating and removing git worktrees
-- Running home manager commands (hm switch)
-- Git operations (status, diff, add, commit)
-- Directory navigation
-- Access to ~/.config and ~/worktrees/.config directories
+## 1. Synthesize Worktree Name and Prompt
 
-## Agent Workflow
+Based on the user's request (`$ARGUMENTS`), create:
+- A short, descriptive worktree name (lowercase, hyphens, max 30 chars)
+  - Example: "add-curl-permissions", "increase-bash-timeout", "enable-debugging-plugin"
+- A detailed prompt for the spawned Claude session that includes:
+  - The specific configuration change requested
+  - Which file(s) in `nix/home-manager/modules/coding-agents/claude/` need updates
+  - Instructions to run `hm switch` to apply changes
+  - Instructions to verify and commit the changes
 
-The agent will:
-1. Create an isolated worktree using `worktree create update-cc-settings-<timestamp>`
-2. Change to the worktree directory
-3. Parse the user's instructions and identify required changes
-4. Locate and read the appropriate Home Manager configuration files
-5. Validate and apply changes using the Edit tool
-6. Run `hm switch` to apply the configuration
-7. Verify changes with `git diff` and `git status`
-8. Create a well-formatted commit
-9. Return to original directory
-10. Optionally remove the worktree with `worktree remove`
+## 2. Create Worktree
 
-# Usage
-
-Simply invoke the slash command with a description of what to update:
-
-```
-/update-cc-settings Add permission for curl commands
+Use the `worktree` CLI to create the worktree:
+```bash
+worktree create <synthesized-name>
 ```
 
+This creates the worktree at `~/worktrees/.config/<synthesized-name>/`
+
+## 3. Launch Claude in Worktree
+
+Execute a new Claude session in the worktree:
+```bash
+cd ~/worktrees/.config/<synthesized-name> && claude -p "<detailed-prompt>"
 ```
-/update-cc-settings Increase bash timeout to 10 minutes
+
+The spawned Claude session will:
+- Have full access to the worktree directory (it's the working directory)
+- Make the requested configuration changes
+- Run `hm switch` to apply the configuration
+- Verify the changes with `git diff` and `git status`
+- Create a well-formatted commit
+- Exit when complete
+
+## 4. Inform User
+
+Tell the user:
+- The worktree name and location
+- That a new Claude session has been launched to handle the update
+- How to check on progress: `cd ~/worktrees/.config/<name> && claude`
+- How to clean up when done: `worktree remove <name>`
+
+# Example
+
+**User runs:** `/update-cc-settings Add permission for curl commands`
+
+**You synthesize:**
+- Worktree name: `add-curl-permissions`
+- Prompt: `Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add "Bash(curl:*)" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff', and create a commit with an appropriate message.`
+
+**You execute:**
+```bash
+worktree create add-curl-permissions
+cd ~/worktrees/.config/add-curl-permissions && claude -p "Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add \"Bash(curl:*)\" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff', and create a commit with an appropriate message."
 ```
 
+**You respond:**
 ```
-/update-cc-settings Enable the debugging-toolkit plugin
+Created worktree 'add-curl-permissions' at ~/worktrees/.config/add-curl-permissions/
+Launched new Claude session to add curl permissions.
+
+The spawned session will update the configuration, apply it, and commit the changes.
+
+To check progress: cd ~/worktrees/.config/add-curl-permissions && claude
+To clean up when done: worktree remove add-curl-permissions
 ```
 
-The agent will automatically:
-1. Create an isolated worktree
-2. Make the requested changes
-3. Apply configuration with hm switch
-4. Commit the changes
-5. Clean up the worktree
+# Benefits
 
-# Notes
-
-- This command runs asynchronously in the background
-- Uses an isolated worktree so your main working directory is unaffected
-- You can continue working while the agent updates settings
-- The agent will commit changes automatically
-- Worktree is cleaned up after the agent completes
-- Check task output with TaskOutput tool to see results
-- All file changes happen in `~/.config` (the dotfiles repository)
-
-# Benefits of Worktree Approach
-
-- **Isolation**: Changes happen in a separate directory, main workspace untouched
-- **Safety**: Failed updates don't leave your working directory dirty
-- **Parallel Work**: Continue working on other tasks while settings update
-- **Clean Commits**: Dedicated branch for the configuration update
+- **True Isolation**: Separate Claude session, separate directory, no permission issues
+- **Run From Anywhere**: No directory access permissions needed in main session
+- **Parallel Work**: Continue your current work while updates happen
+- **Clean State**: Worktree has isolated git state
+- **Simple Cleanup**: One command to remove worktree
 
 Arguments: $ARGUMENTS (description of what settings to update)
