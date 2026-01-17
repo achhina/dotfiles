@@ -387,10 +387,6 @@ in
 
       # Add custom completions directory to fpath (XDG data directory)
       fpath=($XDG_DATA_HOME/zsh/site-functions $fpath)
-
-      # Source worktree completion (Click's documented approach)
-      # The #compdef directive alone doesn't trigger autoload, must source explicitly
-      [[ -f $XDG_DATA_HOME/zsh/site-functions/_worktree ]] && . $XDG_DATA_HOME/zsh/site-functions/_worktree
     '';
 
     setOptions = [
@@ -545,9 +541,12 @@ in
       $VERBOSE_ECHO "Generating worktree zsh completions..."
       # Add Nix profile and local bin to PATH for uv
       export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
-      _WORKTREE_COMPLETE=zsh_source $HOME/bin/worktree > "$COMPLETIONS_DIR/_worktree"
-      # Touch directory to trigger oh-my-zsh cache invalidation
-      touch "$COMPLETIONS_DIR"
+      if _WORKTREE_COMPLETE=zsh_source $HOME/bin/worktree > "$COMPLETIONS_DIR/_worktree"; then
+        # Touch directory to trigger oh-my-zsh cache invalidation on success
+        touch "$COMPLETIONS_DIR"
+      else
+        echo "Warning: Failed to generate worktree completions (exit code: $?)" >&2
+      fi
     fi
   '';
 }
