@@ -76,21 +76,4 @@ run_in_background: true
 prompt: "Change to the worktree directory at ~/worktrees/.config/add-curl-permissions. Update the Claude Code configuration in nix/home-manager/modules/coding-agents/claude/claude.nix to add \"Bash(curl:*)\" to the allowedTools list. After making the change, run 'hm switch' to apply it, verify with 'git diff' and 'git status', and create a commit with an appropriate message. When done, return to the original directory."
 ```
 
-**You respond:**
-```
-Created worktree 'add-curl-permissions' at ~/worktrees/.config/add-curl-permissions/
-Launched background agent to add curl permissions.
-
-The agent is working in the isolated worktree. Use TaskOutput to check progress.
-When complete, clean up with: worktree remove add-curl-permissions
-```
-
-# Benefits
-
-- **Isolation**: Work happens in separate worktree, main workspace untouched
-- **Official Pattern**: Uses Task tool (official subagent approach)
-- **Run From Anywhere**: Main session just orchestrates
-- **Async Execution**: Doesn't block current work
-- **Clean Cleanup**: One command to remove worktree
-
 Arguments: $ARGUMENTS (description of what settings to update)
