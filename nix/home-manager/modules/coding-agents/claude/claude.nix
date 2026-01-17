@@ -116,6 +116,7 @@ in
           "Bash(ty:*)"
           "Bash(unzip:*)"
           "Bash(uv:*)"
+          "Bash(worktree:*)"
           "Bash(yarn:*)"
           "Bash(zip:*)"
           "Bash(/usr/bin/man:*)"
