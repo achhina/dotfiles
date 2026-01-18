@@ -10,6 +10,9 @@ let
 
   # Python project detector hook script (Python-specific practices)
   pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (builtins.readFile ./hooks/python-project-detector.sh);
+
+  # Neovim session binder hook script (binds Claude sessions to Neovim persistence sessions)
+  neovimSessionBinder = pkgs.writeShellScript "neovim-session-binder.sh" (builtins.readFile ./hooks/neovim-session-binder.sh);
 in
 {
   # Claude Code settings configuration
@@ -328,6 +331,10 @@ in
               {
                 type = "command";
                 command = "${pythonProjectDetector}";
+              }
+              {
+                type = "command";
+                command = "${neovimSessionBinder}";
               }
             ];
           }

@@ -104,17 +104,9 @@ return {
 				desc = "Don't save current session",
 			},
 		},
-		config = function()
-			require("persistence").setup({
-				dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"), -- directory where session files are saved
-				-- minimum number of file buffers that need to be open to save
-				-- Set to 0 to always save
-				need = 1,
-				branch = true, -- use git branch in session name
-				options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
-			})
-
+		init = function()
 			-- Auto-save sessions
+			-- Using init instead of config ensures autocmds are registered before VimEnter fires
 			local persistence_group = vim.api.nvim_create_augroup("Persistence", { clear = true })
 
 			-- Save session on exit
@@ -136,10 +128,20 @@ return {
 					if vim.fn.argc(-1) == 0 then
 						vim.defer_fn(function()
 							require("persistence").load()
+							-- Emit event after persistence loads to coordinate with other plugins
+							vim.api.nvim_exec_autocmds("User", { pattern = "PersistenceLoadPost" })
 						end, 100)
 					end
 				end,
 				nested = true,
+			})
+		end,
+		config = function()
+			require("persistence").setup({
+				dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+				need = 1,
+				branch = true,
+				options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
 			})
 		end,
 	},
