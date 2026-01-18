@@ -5,6 +5,8 @@ let
   uvxTools = [
     "pyzotero"
     "claude-code-transcripts"
+    "scalene"
+    "memray"
   ];
 
   # Python versions to install and manage with uv
@@ -51,6 +53,19 @@ in
       echo "uv tools installation complete"
     else
       echo "uv not found, skipping uv tool installs"
+    fi
+  '';
+
+  # Upgrade all uv tools to latest versions
+  home.activation.upgradeUvTools = lib.hm.dag.entryAfter [
+    "installUvTools"
+  ] ''
+    if [ -f "${config.home.homeDirectory}/.nix-profile/bin/uv" ]; then
+      echo "Upgrading all uv tools..."
+      "${config.home.homeDirectory}/.nix-profile/bin/uv" tool upgrade --all
+      echo "uv tools upgrade complete"
+    else
+      echo "uv not found, skipping uv tool upgrades"
     fi
   '';
 }
