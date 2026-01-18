@@ -38,6 +38,7 @@ class AutoloadZshComplete(ZshComplete):
     matches the completion filename (_worktree), rather than Click's default
     (_worktree_completion).
     """
+
     name = "zsh"
 
     @property
@@ -108,7 +109,12 @@ def format_projects(projects: list[Project], format: str) -> None:
     if format == "json":
         # Serialize projects directly
         import json
-        print(json.dumps([p.model_dump(mode='json') for p in projects], indent=2, default=str))
+
+        print(
+            json.dumps(
+                [p.model_dump(mode="json") for p in projects], indent=2, default=str
+            )
+        )
     elif format == "rich":
         # Create rich table
         table = Table(title="Git Worktrees")
@@ -340,7 +346,7 @@ def complete_worktree_names(ctx, param, incomplete):
 
     # Flatten worktrees from all matching projects
     worktree_names = []
-    has_glob = any(c in incomplete for c in ['*', '?', '['])
+    has_glob = any(c in incomplete for c in ["*", "?", "["])
 
     for project in projects:
         for wt in project.worktrees:
@@ -450,9 +456,7 @@ def create(name: str):
     # Get project name from git remote or fallback to directory name
     project_name = get_project_name()
     if not project_name:
-        console_err.print(
-            "[red]Error: Could not determine project name.[/red]"
-        )
+        console_err.print("[red]Error: Could not determine project name.[/red]")
         sys.exit(1)
 
     repo = GitRepo(root=git_root, project_name=project_name)
@@ -460,9 +464,7 @@ def create(name: str):
 
     # Check if directory already exists
     if worktree_path.exists():
-        console_err.print(
-            f"[yellow]Worktree already exists: {worktree_path}[/yellow]"
-        )
+        console_err.print(f"[yellow]Worktree already exists: {worktree_path}[/yellow]")
         # Print path to stdout so shell wrapper can cd to it
         print(str(worktree_path))
         sys.exit(0)
@@ -505,7 +507,9 @@ def create(name: str):
 
 
 @cli.command()
-@click.argument("names", nargs=-1, required=True, shell_complete=complete_worktree_names)
+@click.argument(
+    "names", nargs=-1, required=True, shell_complete=complete_worktree_names
+)
 @click.option(
     "--delete-branch",
     "-d",
@@ -528,9 +532,7 @@ def remove(names: tuple[str, ...], delete_branch: bool):
     # Get project name from git remote or fallback to directory name
     project_name = get_project_name()
     if not project_name:
-        console_err.print(
-            "[red]Error: Could not determine project name.[/red]"
-        )
+        console_err.print("[red]Error: Could not determine project name.[/red]")
         sys.exit(1)
 
     repo = GitRepo(root=git_root, project_name=project_name)
@@ -541,11 +543,13 @@ def remove(names: tuple[str, ...], delete_branch: bool):
     expanded_names = []
     for pattern in names:
         # Check if pattern contains glob characters
-        if any(c in pattern for c in ['*', '?', '[']):
+        if any(c in pattern for c in ["*", "?", "["]):
             # Use glob.glob to expand the pattern against actual directories
             matches = glob.glob(str(project_worktree_dir / pattern))
             if not matches:
-                console_err.print(f"[yellow]Warning: No worktrees match pattern '{pattern}'[/yellow]")
+                console_err.print(
+                    f"[yellow]Warning: No worktrees match pattern '{pattern}'[/yellow]"
+                )
             # Extract just the worktree names from full paths
             expanded_names.extend([Path(m).name for m in matches])
         else:
@@ -614,7 +618,9 @@ def remove(names: tuple[str, ...], delete_branch: bool):
                     )
                     branches_deleted.append(name)
                 except subprocess.CalledProcessError as e:
-                    console_err.print(f"[yellow]⚠ Could not delete branch {name}: {e.stderr.strip()}[/yellow]")
+                    console_err.print(
+                        f"[yellow]⚠ Could not delete branch {name}: {e.stderr.strip()}[/yellow]"
+                    )
 
         except subprocess.CalledProcessError as e:
             console_err.print(f"[red]✗ Error removing {name}: {e.stderr.strip()}[/red]")
@@ -624,12 +630,16 @@ def remove(names: tuple[str, ...], delete_branch: bool):
     if len(names) > 1:
         console_err.print()
         if succeeded:
-            console_err.print(f"[green]Successfully removed {len(succeeded)} worktree(s)[/green]")
+            console_err.print(
+                f"[green]Successfully removed {len(succeeded)} worktree(s)[/green]"
+            )
             if delete_branch:
                 if branches_deleted:
-                    console_err.print(f"[green]Deleted {len(branches_deleted)} branch(es)[/green]")
+                    console_err.print(
+                        f"[green]Deleted {len(branches_deleted)} branch(es)[/green]"
+                    )
             else:
-                console_err.print(f"[yellow]Branches were kept (not deleted)[/yellow]")
+                console_err.print("[yellow]Branches were kept (not deleted)[/yellow]")
         if failed:
             console_err.print(f"[red]Failed to remove {len(failed)} worktree(s)[/red]")
 
@@ -662,8 +672,6 @@ def prune(dry_run: bool):
     for project_dir in DEFAULT_WORKTREE_BASE.iterdir():
         if not project_dir.is_dir():
             continue
-
-        project_name = project_dir.name
 
         # Get all subdirectories (potential worktrees)
         subdirs = [d for d in project_dir.iterdir() if d.is_dir()]
@@ -699,7 +707,9 @@ def prune(dry_run: bool):
         return
 
     # Display what will be removed
-    console.print(f"[yellow]Found {len(orphaned)} orphaned worktree project(s):[/yellow]")
+    console.print(
+        f"[yellow]Found {len(orphaned)} orphaned worktree project(s):[/yellow]"
+    )
     for path in orphaned:
         console.print(f"  • {path}")
 
@@ -725,7 +735,9 @@ def prune(dry_run: bool):
     # Print summary
     console_err.print()
     if removed_count:
-        console_err.print(f"[green]Successfully removed {removed_count} orphaned project(s)[/green]")
+        console_err.print(
+            f"[green]Successfully removed {removed_count} orphaned project(s)[/green]"
+        )
     if failed_count:
         console_err.print(f"[red]Failed to remove {failed_count} project(s)[/red]")
         sys.exit(1)
