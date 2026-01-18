@@ -50,7 +50,7 @@ return {
 			},
 
 			-- Set to "debug" to see latency/throughput metrics, "warn" for normal use
-			notify = "debug",
+			notify = "warn",
 		})
 	end,
 }
