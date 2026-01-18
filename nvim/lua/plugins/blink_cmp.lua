@@ -13,7 +13,6 @@ return {
 				},
 			},
 		},
-		{ "Saghen/blink.compat", opts = {} },
 		"milanglacier/minuet-ai.nvim",
 	},
 	version = "*",
