@@ -2,33 +2,55 @@ return {
 	"milanglacier/minuet-ai.nvim",
 	config = function()
 		require("minuet").setup({
-			-- Provider configuration
-			provider = "openrouter",
+			provider = "gemini",
 
-			-- Cost-saving settings
-			throttle = 2000, -- Wait 2s between requests (reduces API calls)
-			debounce = 800, -- Wait 800ms after typing stops
-			request_timeout = 5, -- Timeout after 5 seconds
-
-			-- Context settings to reduce token usage
-			context_window = 8192, -- Reasonable context size
-
-			-- Provider-specific options
 			provider_options = {
-				openrouter = {
-					model = "deepseek/deepseek-coder", -- Cheap and effective ($0.14/$0.28 per 1M tokens)
-					api_key = os.getenv("OPENROUTER_API_KEY"),
+				gemini = {
+					model = "gemini-2.0-flash",
 					optional = {
-						max_tokens = 512, -- Limit response length to control costs
+						generationConfig = {
+							maxOutputTokens = 256,
+							-- When using `gemini-2.5-flash`, it is recommended to entirely
+							-- disable thinking for faster completion retrieval.
+							thinkingConfig = {
+								thinkingBudget = 0,
+							},
+						},
+						safetySettings = {
+							{
+								-- HARM_CATEGORY_HATE_SPEECH,
+								-- HARM_CATEGORY_HARASSMENT
+								-- HARM_CATEGORY_SEXUALLY_EXPLICIT
+								category = "HARM_CATEGORY_DANGEROUS_CONTENT",
+								-- BLOCK_NONE
+								threshold = "BLOCK_ONLY_HIGH",
+							},
+						},
 					},
 				},
+
+				-- OpenRouter (defaults handle endpoint/API key automatically)
+				openai_compatible = {
+					model = "mistralai/codestral-2501", -- or "google/gemini-2.0-flash-exp", "deepseek/deepseek-chat"
+					optional = {
+						max_tokens = 256,
+						headers = {
+							["HTTP-Referer"] = "https://neovim.io",
+							["X-Title"] = "Neovim",
+						},
+					},
+				},
+
 			},
 
-			-- Enable auto-completion (set to false for manual-only mode)
 			auto_complete = true,
 
-			-- Notify on errors (helpful for debugging)
-			notify = "error",
+			blink = {
+				enable_auto_complete = true,
+			},
+
+			-- Set to "debug" to see latency/throughput metrics, "warn" for normal use
+			notify = "debug",
 		})
 	end,
 }

@@ -1,6 +1,7 @@
 return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
+		"saghen/blink.cmp", -- Ensure blink is set up before LSP uses it
 		{
 			"j-hui/fidget.nvim",
 			opts = {
@@ -29,6 +30,16 @@ return {
 		},
 	},
 	config = function()
+		-- Ensure blink.cmp is set up before LSP tries to use it
+		local blink = require("blink.cmp")
+		if not blink.config then
+			local lazy_config = require("lazy.core.config")
+			local blink_plugin = lazy_config.plugins["blink.cmp"]
+			if blink_plugin and blink_plugin.opts then
+				blink.setup(blink_plugin.opts)
+			end
+		end
+
 		local function get_python_path()
 			local venv_path = os.getenv("VIRTUAL_ENV")
 			if venv_path then

@@ -14,8 +14,12 @@ return {
 		{ "Saghen/blink.compat", opts = {} },
 		"hrsh7th/cmp-git",
 		"f3fora/cmp-spell",
+		"milanglacier/minuet-ai.nvim",
 	},
 	version = "*",
+	config = function(_, opts)
+		require("blink.cmp").setup(opts)
+	end,
 	opts = {
 		keymap = {
 			preset = "super-tab",
@@ -45,7 +49,7 @@ return {
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer", "minuet" },
 			per_filetype = {
-				lua = { "lsp", "path", "snippets", "buffer", "lazydev" },
+				lua = { "lsp", "path", "snippets", "buffer", "lazydev", "minuet" },
 				-- Enable spell for text files
 				markdown = { "lsp", "path", "snippets", "buffer", "spell" },
 				text = { "lsp", "path", "snippets", "buffer", "spell" },
@@ -60,6 +64,7 @@ return {
 					module = "minuet.blink",
 					score_offset = 8, -- Lower than LSP, higher than buffer
 					async = true,
+					timeout_ms = 3000,
 				},
 				buffer = {
 					min_keyword_length = 4,
@@ -107,6 +112,9 @@ return {
 			},
 			ghost_text = {
 				enabled = true,
+			},
+			trigger = {
+				prefetch_on_insert = false,
 			},
 		},
 		signature = {
