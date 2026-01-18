@@ -1,3 +1,5 @@
+local default_sources = { "lsp", "path", "snippets", "buffer", "minuet" }
+
 return {
 	"saghen/blink.cmp",
 	dependencies = {
@@ -12,8 +14,6 @@ return {
 			},
 		},
 		{ "Saghen/blink.compat", opts = {} },
-		"hrsh7th/cmp-git",
-		"f3fora/cmp-spell",
 		"milanglacier/minuet-ai.nvim",
 	},
 	version = "*",
@@ -47,16 +47,9 @@ return {
 			nerd_font_variant = "mono",
 		},
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer", "minuet" },
+			default = default_sources,
 			per_filetype = {
-				lua = { "lsp", "path", "snippets", "buffer", "lazydev", "minuet" },
-				-- Enable spell for text files
-				markdown = { "lsp", "path", "snippets", "buffer", "spell" },
-				text = { "lsp", "path", "snippets", "buffer", "spell" },
-				gitcommit = { "lsp", "path", "snippets", "buffer", "git" },
-				-- Git-related files
-				gitrebase = { "git" },
-				gitconfig = { "git" },
+				lua = vim.list_extend(vim.deepcopy(default_sources), { "lazydev" }),
 			},
 			providers = {
 				minuet = {
@@ -74,16 +67,6 @@ return {
 					name = "LazyDev",
 					module = "lazydev.integrations.blink",
 					score_offset = 100,
-				},
-				git = {
-					name = "git",
-					module = "blink.compat.source",
-					opts = {},
-				},
-				spell = {
-					name = "spell",
-					module = "blink.compat.source",
-					opts = {},
 				},
 			},
 		},
