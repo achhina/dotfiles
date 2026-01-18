@@ -108,7 +108,6 @@ let
   # GitHub CLI extensions
   githubExtensions = with pkgs; [
     gh-dash                  # Interactive PR/issue dashboard
-    gh-copilot               # AI-powered command suggestions
   ];
 
   # Cross-platform GUI applications

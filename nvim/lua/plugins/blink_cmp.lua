@@ -14,25 +14,6 @@ return {
 		{ "Saghen/blink.compat", opts = {} },
 		"hrsh7th/cmp-git",
 		"f3fora/cmp-spell",
-		"giuxtaposition/blink-cmp-copilot",
-		{
-			"zbirenbaum/copilot.lua",
-			opts = {
-				suggestion = {
-					enabled = true,
-					auto_trigger = true,
-					keymap = {
-						accept = false,        -- Handled by custom Tab override
-						accept_word = false,
-						accept_line = false,
-						next = "<M-]>",        -- Alt+] for next suggestion
-						prev = "<M-[>",        -- Alt+[ for previous suggestion
-						dismiss = "<C-]>",     -- Ctrl+] to dismiss
-					},
-				},
-				panel = { enabled = false },
-			},
-		},
 	},
 	version = "*",
 	opts = {
@@ -45,19 +26,12 @@ return {
 						return cmp.accept()
 					end
 
-					-- Priority 2: Completion menu (higher priority than Copilot)
+					-- Priority 2: Completion menu
 					if cmp.is_visible() then
 						return cmp.select_and_accept()
 					end
 
-					-- Priority 3: Copilot inline suggestion
-					local copilot_ok, copilot_suggestion = pcall(require, "copilot.suggestion")
-					if copilot_ok and copilot_suggestion.is_visible() then
-						copilot_suggestion.accept()
-						return cmp.hide()
-					end
-
-					-- Priority 4: Show completion menu
+					-- Priority 3: Show completion menu
 					return cmp.show()
 				end,
 				"snippet_forward",
@@ -69,7 +43,7 @@ return {
 			nerd_font_variant = "mono",
 		},
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer", "copilot" },
+			default = { "lsp", "path", "snippets", "buffer", "minuet" },
 			per_filetype = {
 				lua = { "lsp", "path", "snippets", "buffer", "lazydev" },
 				-- Enable spell for text files
@@ -81,10 +55,10 @@ return {
 				gitconfig = { "git" },
 			},
 			providers = {
-				copilot = {
-					name = "copilot",
-					module = "blink-cmp-copilot",
-					score_offset = 100,
+				minuet = {
+					name = "minuet",
+					module = "minuet.blink",
+					score_offset = 8, -- Lower than LSP, higher than buffer
 					async = true,
 				},
 				buffer = {
