@@ -152,6 +152,9 @@ in
       # Automatically renumber windows when one is closed
       set-option -g renumber-windows on
 
+      # Layout configuration
+      set -g main-pane-width 67%
+
       # Update environment variables when attaching to sessions
       set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH LANG LC_ALL LC_CTYPE"
 
