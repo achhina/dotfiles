@@ -150,37 +150,21 @@ return {
 				callback = function()
 					log("PersistenceSavePre fired!")
 
-					-- Log all buffers first
-					log("Total buffers: " .. #vim.api.nvim_list_bufs())
-
-					-- Find Claude terminal buffer by checking all terminals
+					-- Check all windows for terminal buffers
 					local claude_bufnr = nil
-					local terminal_count = 0
-					for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-						if vim.api.nvim_buf_is_valid(bufnr) then
-							local buftype = vim.bo[bufnr].buftype
-							log("Buffer " .. bufnr .. " type: " .. buftype)
-							if buftype == "terminal" then
-								terminal_count = terminal_count + 1
-								local bufname = vim.api.nvim_buf_get_name(bufnr)
-								log("Found terminal buffer " .. bufnr .. ": " .. bufname)
-								-- Check if it's Claude by name or if it's the only terminal
-								if bufname:match("[Cc]laude") or bufname == "" then
-									-- Get buffer contents to verify it's Claude
-									local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 5, false)
-									local content = table.concat(lines, "\n")
-									log("Terminal buffer " .. bufnr .. " first lines: " .. content:sub(1, 100))
-									if content:match("[Cc]laude") then
-										claude_bufnr = bufnr
-										log("Found Claude terminal buffer: " .. bufnr)
-										break
-									end
-								end
-							end
+					for _, winid in ipairs(vim.api.nvim_list_wins()) do
+						local bufnr = vim.api.nvim_win_get_buf(winid)
+						local buftype = vim.bo[bufnr].buftype
+						local bufname = vim.api.nvim_buf_get_name(bufnr)
+						local buflisted = vim.bo[bufnr].buflisted
+						log("Window " .. winid .. " -> buf " .. bufnr .. " type=" .. buftype .. " listed=" .. tostring(buflisted) .. " name=" .. bufname)
+
+						if buftype == "terminal" or bufname:match("[Cc]laude") or bufname:match("term://") then
+							log("FOUND POTENTIAL CLAUDE WINDOW: " .. winid .. " buf=" .. bufnr)
+							claude_bufnr = bufnr
+							break
 						end
 					end
-
-					log("Terminal count: " .. terminal_count)
 
 					local state_file = get_state_file_path()
 					log("state_file = " .. state_file)
