@@ -60,6 +60,12 @@ return {
 				},
 			})
 
+			-- Statusline (snacks doesn't have statusline)
+			require("mini.statusline").setup({
+				use_icons = true,
+				set_vim_settings = true,
+			})
+
 			-- Session management handled by auto-session plugin
 		end,
 	},
