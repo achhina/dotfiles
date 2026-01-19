@@ -142,22 +142,28 @@ return {
 				pattern = "PersistenceSavePre",
 				group = claude_autostart_group,
 				callback = function()
-					-- Check all windows for Claude (terminal or .claude files)
-					local claude_bufnr = nil
-					for _, winid in ipairs(vim.api.nvim_list_wins()) do
-						local bufnr = vim.api.nvim_win_get_buf(winid)
-						local buftype = vim.bo[bufnr].buftype
-						local bufname = vim.api.nvim_buf_get_name(bufnr)
-
-						if buftype == "terminal" or bufname:match("[Cc]laude") or bufname:match("term://") then
-							claude_bufnr = bufnr
-							break
+					-- Check if any Snacks terminals with 'claude' are open
+					local claude_open = false
+					local ok, snacks_terminal = pcall(require, "snacks.terminal")
+					if ok then
+						for _, term in ipairs(snacks_terminal.list()) do
+							-- Check if terminal command contains 'claude'
+							if term.cmd and type(term.cmd) == "table" then
+								local cmd_str = table.concat(term.cmd, " ")
+								if cmd_str:match("[Cc]laude") then
+									claude_open = true
+									break
+								end
+							elseif term.cmd and type(term.cmd) == "string" and term.cmd:match("[Cc]laude") then
+								claude_open = true
+								break
+							end
 						end
 					end
 
 					local state_file = get_state_file_path()
 
-					if claude_bufnr then
+					if claude_open then
 						vim.fn.writefile({ "1" }, state_file)
 					else
 						vim.fn.delete(state_file)
