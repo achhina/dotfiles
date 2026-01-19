@@ -102,8 +102,14 @@ function M.load_autocmds()
 	autocmd("VimResized", {
 		group = ui_group,
 		callback = function()
+			-- Save current tab before tabdo
+			local current_tab = vim.api.nvim_get_current_tabpage()
+
 			-- Equalize all windows first
 			vim.cmd("tabdo wincmd =")
+
+			-- Restore current tab
+			vim.api.nvim_set_current_tabpage(current_tab)
 
 			-- Then resize Claude Code terminal to maintain its configured width percentage
 			local ok, claudecode = pcall(require, "claudecode")
