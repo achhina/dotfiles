@@ -61,9 +61,37 @@ return {
 			})
 
 			-- Statusline (snacks doesn't have statusline)
-			require("mini.statusline").setup({
+			local statusline = require("mini.statusline")
+			statusline.setup({
 				use_icons = true,
 				set_vim_settings = true,
+				content = {
+					active = function()
+						-- Hide statusline for terminal buffers
+						if vim.bo.buftype == "terminal" then
+							return ""
+						end
+						-- Use default content for other buffers
+						return statusline.section_mode({ trunc_width = 120 })
+							.. statusline.section_git({ trunc_width = 40 })
+							.. statusline.section_diff({ trunc_width = 75 })
+							.. statusline.section_diagnostics({ trunc_width = 75 })
+							.. "%<"
+							.. statusline.section_filename({ trunc_width = 140 })
+							.. "%="
+							.. statusline.section_fileinfo({ trunc_width = 120 })
+							.. statusline.section_location({ trunc_width = 75 })
+							.. statusline.section_searchcount({ trunc_width = 75 })
+					end,
+					inactive = function()
+						-- Hide statusline for terminal buffers
+						if vim.bo.buftype == "terminal" then
+							return ""
+						end
+						-- Use simple content for inactive windows
+						return "%#MiniStatuslineFilename#%F%="
+					end,
+				},
 			})
 
 			-- Session management handled by auto-session plugin

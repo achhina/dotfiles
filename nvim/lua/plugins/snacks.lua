@@ -27,9 +27,6 @@ return {
 				keys = {
 					term_normal = false, -- Disable double-escape, using jk instead
 				},
-				wo = {
-					winbar = "", -- Hide the winbar showing terminal command
-				},
 			},
 		},
 		dashboard = {
