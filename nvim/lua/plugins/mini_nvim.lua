@@ -69,8 +69,15 @@ return {
 					active = function()
 						-- Show terminal info for terminal buffers
 						if vim.bo.buftype == "terminal" then
+							-- Get terminal info: buffer name has format "term://path//pid:shell"
+							local bufname = vim.api.nvim_buf_get_name(0)
+							local shell = bufname:match(":([^/]+)$") or "shell"
 							local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
-							return "%#MiniStatuslineModeNormal# TERMINAL %#MiniStatuslineFilename# " .. cwd .. " %="
+							return "%#MiniStatuslineModeNormal# TERMINAL %#MiniStatuslineDevinfo# "
+								.. shell
+								.. " %#MiniStatuslineFilename# "
+								.. cwd
+								.. " %="
 						end
 						-- Use default content for other buffers
 						return statusline.section_mode({ trunc_width = 120 })
@@ -89,8 +96,8 @@ return {
 						if vim.bo.buftype == "terminal" then
 							return "%#MiniStatuslineInactive# TERMINAL %="
 						end
-						-- Use simple content for inactive windows
-						return "%#MiniStatuslineFilename#%F%="
+						-- Show filename and modified indicator for inactive windows
+						return statusline.section_filename({ trunc_width = 140 })
 					end,
 				},
 			})

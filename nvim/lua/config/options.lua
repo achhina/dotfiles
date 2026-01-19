@@ -31,6 +31,9 @@ function M.load_options()
 	-- NOTE: You should make sure your terminal supports this
 	vim.o.termguicolors = true
 
+	-- Global statusline (single statusline for entire editor, not per window)
+	vim.o.laststatus = 3
+
 	-- Neovim 0.10+ supports OSC8 hyperlinks automatically when termguicolors is enabled
 
 	vim.opt.tabstop = 4
