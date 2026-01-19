@@ -86,13 +86,16 @@ return {
 			callback = function()
 				local terminal = require("claudecode.terminal")
 				local claude_bufnr = terminal.get_active_terminal_bufnr()
+				local state_file = get_state_file_path()
 
 				if claude_bufnr then
 					-- Claude is open, save marker
-					vim.fn.writefile({ "1" }, get_state_file_path())
+					vim.fn.writefile({ "1" }, state_file)
+					print("DEBUG: Saved Claude state to " .. state_file)
 				else
 					-- Claude is closed, remove marker
-					vim.fn.delete(get_state_file_path())
+					vim.fn.delete(state_file)
+					print("DEBUG: Deleted Claude state (Claude not open)")
 				end
 			end,
 		})
@@ -115,15 +118,23 @@ return {
 			pattern = "PersistenceLoadPost",
 			group = claude_autostart_group,
 			callback = function()
+				print("DEBUG: PersistenceLoadPost fired")
+
 				if vim.fn.argc(-1) > 0 then
+					print("DEBUG: Skipping (started with arguments)")
 					return
 				end
 
 				-- Check if state file exists
 				local state_file = get_state_file_path()
+				print("DEBUG: Checking for state file: " .. state_file)
+
 				if vim.fn.filereadable(state_file) == 0 then
+					print("DEBUG: State file not found, not restoring Claude")
 					return
 				end
+
+				print("DEBUG: State file found, restoring Claude")
 
 				-- Go to tab 1
 				vim.cmd("tabnext 1")
@@ -137,6 +148,7 @@ return {
 						local raw_id = lines[1]
 						if raw_id and raw_id:match("^[%w_-]+$") then
 							session_id = raw_id
+							print("DEBUG: Found session ID: " .. session_id)
 						end
 					end
 				end
@@ -144,8 +156,10 @@ return {
 				-- Start Claude
 				local terminal = require("claudecode.terminal")
 				if session_id then
+					print("DEBUG: Starting Claude with session: " .. session_id)
 					terminal.open({}, "--resume " .. vim.fn.shellescape(session_id))
 				else
+					print("DEBUG: Starting Claude with default resume")
 					terminal.open({}, "--resume")
 				end
 			end,
