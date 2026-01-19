@@ -112,6 +112,12 @@ return {
 			-- Claude Code state tracking (must be in init to run before lazy-loading)
 			local claude_autostart_group = vim.api.nvim_create_augroup("ClaudeCodeAutoStart", { clear = true })
 			local session_dir = vim.fn.stdpath("state") .. "/sessions"
+			local log_file = session_dir .. "/.claude-debug.log"
+
+			local function log(msg)
+				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+				vim.fn.writefile({ timestamp .. " " .. msg }, log_file, "a")
+			end
 
 			local function get_state_file_path()
 				local cwd = vim.fn.getcwd()
@@ -142,29 +148,29 @@ return {
 				pattern = "PersistenceSavePre",
 				group = claude_autostart_group,
 				callback = function()
-					print("DEBUG: PersistenceSavePre fired!")
+					log("PersistenceSavePre fired!")
 
 					-- Check if claudecode is loaded
 					local ok, terminal = pcall(require, "claudecode.terminal")
 					if not ok then
-						print("DEBUG: claudecode.terminal not loaded (pcall failed)")
+						log("claudecode.terminal not loaded (pcall failed)")
 						return
 					end
 
-					print("DEBUG: claudecode.terminal loaded successfully")
+					log("claudecode.terminal loaded successfully")
 
 					local claude_bufnr = terminal.get_active_terminal_bufnr()
-					print("DEBUG: claude_bufnr = " .. tostring(claude_bufnr))
+					log("claude_bufnr = " .. tostring(claude_bufnr))
 
 					local state_file = get_state_file_path()
-					print("DEBUG: state_file = " .. state_file)
+					log("state_file = " .. state_file)
 
 					if claude_bufnr then
 						vim.fn.writefile({ "1" }, state_file)
-						print("DEBUG: Saved Claude state to " .. state_file)
+						log("Saved Claude state to " .. state_file)
 					else
 						vim.fn.delete(state_file)
-						print("DEBUG: Deleted Claude state (Claude not open)")
+						log("Deleted Claude state (Claude not open)")
 					end
 				end,
 			})
@@ -187,22 +193,22 @@ return {
 				pattern = "PersistenceLoadPost",
 				group = claude_autostart_group,
 				callback = function()
-					print("DEBUG: PersistenceLoadPost fired")
+					log("PersistenceLoadPost fired")
 
 					if vim.fn.argc(-1) > 0 then
-						print("DEBUG: Skipping (started with arguments)")
+						log("Skipping (started with arguments)")
 						return
 					end
 
 					local state_file = get_state_file_path()
-					print("DEBUG: Checking for state file: " .. state_file)
+					log("Checking for state file: " .. state_file)
 
 					if vim.fn.filereadable(state_file) == 0 then
-						print("DEBUG: State file not found, not restoring Claude")
+						log("State file not found, not restoring Claude")
 						return
 					end
 
-					print("DEBUG: State file found, restoring Claude")
+					log("State file found, restoring Claude")
 
 					vim.cmd("tabnext 1")
 
@@ -214,22 +220,22 @@ return {
 							local raw_id = lines[1]
 							if raw_id and raw_id:match("^[%w_-]+$") then
 								session_id = raw_id
-								print("DEBUG: Found session ID: " .. session_id)
+								log("Found session ID: " .. session_id)
 							end
 						end
 					end
 
 					local ok, terminal = pcall(require, "claudecode.terminal")
 					if not ok then
-						print("DEBUG: claudecode.terminal not available")
+						log("claudecode.terminal not available")
 						return
 					end
 
 					if session_id then
-						print("DEBUG: Starting Claude with session: " .. session_id)
+						log("Starting Claude with session: " .. session_id)
 						terminal.open({}, "--resume " .. vim.fn.shellescape(session_id))
 					else
-						print("DEBUG: Starting Claude with default resume")
+						log("Starting Claude with default resume")
 						terminal.open({}, "--resume")
 					end
 				end,
