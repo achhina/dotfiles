@@ -112,12 +112,6 @@ return {
 			-- Claude Code state tracking (must be in init to run before lazy-loading)
 			local claude_autostart_group = vim.api.nvim_create_augroup("ClaudeCodeAutoStart", { clear = true })
 			local session_dir = vim.fn.stdpath("state") .. "/sessions"
-			local log_file = session_dir .. "/.claude-debug.log"
-
-			local function log(msg)
-				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-				vim.fn.writefile({ timestamp .. " [v2] " .. msg }, log_file, "a")
-			end
 
 			local function get_state_file_path()
 				local cwd = vim.fn.getcwd()
@@ -143,40 +137,14 @@ return {
 				end
 			end
 
-			-- Save Claude state before session saves
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "PersistenceSavePre",
+			-- Create state file when Claude terminal opens
+			vim.api.nvim_create_autocmd("TermOpen", {
 				group = claude_autostart_group,
-				callback = function()
-					log("PersistenceSavePre fired")
-
-					-- Check if claudecode terminal is open
-					local claude_open = false
-					local ok, terminal = pcall(require, "claudecode.terminal")
-
-					if ok then
-						local bufnr = terminal.get_active_terminal_bufnr()
-						log("Claude terminal bufnr: " .. tostring(bufnr))
-
-						if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
-							claude_open = true
-							log("Claude terminal is open")
-						else
-							log("Claude terminal not open")
-						end
-					else
-						log("Failed to load claudecode.terminal")
-					end
-
-					local state_file = get_state_file_path()
-					log("state_file: " .. state_file)
-
-					if claude_open then
+				callback = function(args)
+					local bufname = vim.api.nvim_buf_get_name(args.buf)
+					if bufname:match("[Cc]laude") or bufname:match("term://.*claude") then
+						local state_file = get_state_file_path()
 						vim.fn.writefile({ "1" }, state_file)
-						log("Saved Claude state")
-					else
-						vim.fn.delete(state_file)
-						log("Deleted Claude state (not open)")
 					end
 				end,
 			})
