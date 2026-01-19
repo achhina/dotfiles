@@ -109,17 +109,6 @@ return {
 			-- Using init instead of config ensures autocmds are registered before VimEnter fires
 			local persistence_group = vim.api.nvim_create_augroup("Persistence", { clear = true })
 
-			-- Save session on exit
-			vim.api.nvim_create_autocmd("VimLeavePre", {
-				group = persistence_group,
-				callback = function()
-					-- Only save session if we have buffers and we're in a project
-					if #vim.fn.getbufinfo({ buflisted = 1 }) > 0 then
-						require("persistence").save()
-					end
-				end,
-			})
-
 			-- Auto-restore session when opening nvim without arguments
 			vim.api.nvim_create_autocmd("VimEnter", {
 				group = persistence_group,
