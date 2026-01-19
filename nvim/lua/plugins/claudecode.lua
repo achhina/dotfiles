@@ -64,6 +64,15 @@ return {
 			callback = function()
 				-- Only auto-start if nvim was started without arguments (same condition as persistence)
 				if vim.fn.argc(-1) == 0 then
+					-- Check if Claude Code terminal exists in restored session
+					local terminal = require("claudecode.terminal")
+					local claude_bufnr = terminal.get_active_terminal_bufnr()
+
+					-- Only auto-start if Claude was open in the saved session
+					if not claude_bufnr then
+						return
+					end
+
 					local cwd = vim.fn.getcwd()
 					local session_dir = vim.fn.stdpath("state") .. "/sessions"
 
@@ -99,7 +108,6 @@ return {
 					end
 
 					-- Auto-start Claude with bound session or resume default.
-					local terminal = require("claudecode.terminal")
 					if session_id then
 						-- Resume specific session bound to this Neovim session.
 						-- Use shellescape to prevent command injection.
