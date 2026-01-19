@@ -205,7 +205,7 @@ function M.load_autocmds()
 
 		-- Find first test file to load for parsing
 		local test_file = vim.fn.system(
-			"find " .. vim.fn.shellescape(git_root) .. " -name 'test_*.py' -o -name '*_test.py' | head -1"
+			"fd -t f -e py '(^test_|_test\\.py$)' " .. vim.fn.shellescape(git_root) .. " | head -1"
 		):gsub("\n", "")
 
 		-- Create test tab after a short delay
