@@ -218,8 +218,6 @@ function M.load_autocmds()
 			end
 
 			vim.cmd("Neotest summary")
-			vim.cmd("vsplit")
-			vim.cmd("wincmd l")
 			vim.cmd("Neotest output-panel")
 			vim.cmd("tabnext 1")
 		end, 100)
