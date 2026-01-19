@@ -69,15 +69,8 @@ return {
 					active = function()
 						-- Show terminal info for terminal buffers
 						if vim.bo.buftype == "terminal" then
-							-- Get terminal info: buffer name has format "term://path//pid:shell"
-							local bufname = vim.api.nvim_buf_get_name(0)
-							local shell = bufname:match(":([^/]+)$") or "shell"
 							local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
-							return "%#MiniStatuslineModeNormal# TERMINAL %#MiniStatuslineDevinfo# "
-								.. shell
-								.. " %#MiniStatuslineFilename# "
-								.. cwd
-								.. " %="
+							return "%#MiniStatuslineModeNormal# TERMINAL %#MiniStatuslineFilename# " .. cwd .. " %="
 						end
 						-- Use default content for other buffers
 						return statusline.section_mode({ trunc_width = 120 })
