@@ -67,9 +67,10 @@ return {
 				set_vim_settings = true,
 				content = {
 					active = function()
-						-- Hide statusline for terminal buffers
+						-- Show terminal info for terminal buffers
 						if vim.bo.buftype == "terminal" then
-							return ""
+							local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
+							return "%#MiniStatuslineModeNormal# TERMINAL %#MiniStatuslineFilename# " .. cwd .. " %="
 						end
 						-- Use default content for other buffers
 						return statusline.section_mode({ trunc_width = 120 })
@@ -84,9 +85,9 @@ return {
 							.. statusline.section_searchcount({ trunc_width = 75 })
 					end,
 					inactive = function()
-						-- Hide statusline for terminal buffers
+						-- Show minimal terminal info for inactive terminal buffers
 						if vim.bo.buftype == "terminal" then
-							return ""
+							return "%#MiniStatuslineInactive# TERMINAL %="
 						end
 						-- Use simple content for inactive windows
 						return "%#MiniStatuslineFilename#%F%="
