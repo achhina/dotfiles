@@ -142,7 +142,7 @@ return {
 				group = claude_autostart_group,
 				callback = function(args)
 					local bufname = vim.api.nvim_buf_get_name(args.buf)
-					if bufname:match("[Cc]laude") or bufname:match("term://.*claude") then
+					if bufname:match("^term://.*[Cc]laude") then
 						local state_file = get_state_file_path()
 						vim.fn.writefile({ "1" }, state_file)
 					end
@@ -154,7 +154,7 @@ return {
 				group = claude_autostart_group,
 				callback = function(args)
 					local bufname = vim.api.nvim_buf_get_name(args.buf)
-					if bufname:match("[Cc]laude") or bufname:match("term://.*claude") then
+					if bufname:match("^term://.*[Cc]laude") then
 						vim.fn.delete(get_state_file_path())
 					end
 				end,
