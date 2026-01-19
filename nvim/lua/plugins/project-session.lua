@@ -112,6 +112,12 @@ return {
 			-- Claude Code state tracking (must be in init to run before lazy-loading)
 			local claude_autostart_group = vim.api.nvim_create_augroup("ClaudeCodeAutoStart", { clear = true })
 			local session_dir = vim.fn.stdpath("state") .. "/sessions"
+			local log_file = session_dir .. "/.claude-debug.log"
+
+			local function log(msg)
+				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+				vim.fn.writefile({ timestamp .. " " .. msg }, log_file, "a")
+			end
 
 			local function get_state_file_path()
 				local cwd = vim.fn.getcwd()
@@ -142,31 +148,48 @@ return {
 				pattern = "PersistenceSavePre",
 				group = claude_autostart_group,
 				callback = function()
+					log("PersistenceSavePre fired")
+
 					-- Check if any Snacks terminals with 'claude' are open
 					local claude_open = false
 					local ok, snacks_terminal = pcall(require, "snacks.terminal")
+
 					if ok then
-						for _, term in ipairs(snacks_terminal.list()) do
+						local terminals = snacks_terminal.list()
+						log("Found " .. #terminals .. " snacks terminals")
+
+						for i, term in ipairs(terminals) do
+							log("Terminal " .. i .. " cmd type: " .. type(term.cmd))
+							log("Terminal " .. i .. " cmd: " .. vim.inspect(term.cmd))
+
 							-- Check if terminal command contains 'claude'
 							if term.cmd and type(term.cmd) == "table" then
 								local cmd_str = table.concat(term.cmd, " ")
+								log("Terminal " .. i .. " cmd_str: " .. cmd_str)
 								if cmd_str:match("[Cc]laude") then
 									claude_open = true
+									log("FOUND CLAUDE in terminal " .. i)
 									break
 								end
 							elseif term.cmd and type(term.cmd) == "string" and term.cmd:match("[Cc]laude") then
 								claude_open = true
+								log("FOUND CLAUDE in terminal " .. i)
 								break
 							end
 						end
+					else
+						log("Failed to load snacks.terminal")
 					end
 
 					local state_file = get_state_file_path()
+					log("state_file: " .. state_file)
 
 					if claude_open then
 						vim.fn.writefile({ "1" }, state_file)
+						log("Saved Claude state")
 					else
 						vim.fn.delete(state_file)
+						log("Deleted Claude state (not open)")
 					end
 				end,
 			})
