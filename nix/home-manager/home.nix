@@ -11,6 +11,7 @@ let
 in
 {
   imports = [
+    ./modules/theme.nix
     ./modules/packages.nix
     ./modules/neovim.nix
     ./modules/git.nix

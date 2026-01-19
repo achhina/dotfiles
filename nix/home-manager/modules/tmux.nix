@@ -3,6 +3,27 @@
 let
   cfg = config.programs.tmux;
   prefix = if cfg.prefix != null then cfg.prefix else "C-${cfg.shortcut}";
+  theme = config.theme.colors;
+  icons = config.theme.icons;
+  separators = config.theme.separators;
+
+  # Separator definitions
+  sep_bar = "#[fg=${theme.grey},bg=${theme.bg0}]${separators.bar}";
+
+  # Double separator effect at edges
+  sep_left_end1 = "#[fg=${theme.bg0},bg=${theme.bg2}]${separators.right}";
+  sep_left_end2 = "#[fg=${theme.bg2},bg=${theme.bg0}]${separators.right}";
+
+  sep_right_edge1 = "#[fg=${theme.bg2},bg=${theme.bg0}]${separators.left}";
+  sep_right_edge2 = "#[fg=${theme.bg0},bg=${theme.bg2}]${separators.left}";
+
+  # Widget definitions
+  widget_host = "#[fg=${theme.purple},bg=${theme.bg0}]${icons.host} #[fg=${theme.fg}]#H ";
+  widget_session = "#[fg=${theme.blue},bg=${theme.bg0}]${icons.session} #S ";
+  widget_network = "#[fg=${theme.green},bg=${theme.bg0}]${icons.network} #[fg=${theme.fg}]#(~/.config/tmux/scripts/network.sh) ";
+  widget_cpu = "#[fg=${theme.red},bg=${theme.bg0}]${icons.cpu} #[fg=${theme.fg}]#(tmux-mem-cpu-load -v) ";
+  widget_battery = "#[fg=${theme.green},bg=${theme.bg0}]#{battery_icon_status} #[fg=${theme.fg}]#{battery_percentage} ";
+  widget_clock = "#[fg=${theme.blue},bg=${theme.bg0}]${icons.clock} #[fg=${theme.fg}]%H:%M ";
 in
 {
   # Tmuxinator project templates
@@ -116,6 +137,7 @@ in
     '';
     executable = true;
   };
+
 
 
   programs.tmux = {
@@ -240,22 +262,22 @@ in
       # Enhanced choose-tree with better formatting
       bind s choose-tree -Zs -O time -f '#{?pane_format,#{pane_current_command},#{?window_format,#{window_name},#{session_name}}}'
 
-      # Configure statusline after catppuccin is loaded
+      set -g status-style "bg=${theme.bg0},fg=${theme.fg}"
+      set -g window-status-style "fg=${theme.fg},bg=${theme.bg0}"
+      set -g window-status-current-style "fg=${theme.purple},bg=${theme.bg2},bold"
+      set -g pane-border-style "fg=${theme.bg3}"
+      set -g pane-active-border-style "fg=${theme.purple}"
+      set -g message-style "fg=${theme.fg},bg=${theme.bg2}"
+      set -g message-command-style "fg=${theme.fg},bg=${theme.bg2}"
+
       set -g status-left-length 150
+      set -g status-right-length 150
 
-      # Configure statusline using proper catppuccin modules
-      set -g status-left "#{E:@catppuccin_status_host}"
-      set -ag status-left "#{E:@catppuccin_status_session}"
+      set -g status-left "${widget_host}${sep_bar}${widget_session}${sep_bar}${widget_network}${sep_left_end1}${sep_left_end2}"
 
-      # Custom network module (manual styling since catppuccin doesn't have network module)
-      set -ag status-left "#[fg=#{@thm_teal}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_teal}]󰖩 #[fg=#{@thm_teal},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#(~/.config/tmux/scripts/network.sh) #[fg=#{@thm_surface_0}]"
-
-
-
-      # Center windows - show only number for inactive, number and title for active (override catppuccin)
       set -g status-justify centre
-      set -g window-status-format "#[fg=#11111b,bg=#{@thm_overlay_2}]#[fg=#181825,reverse]#[none] #I #[fg=#181825,reverse]#[none]"
-      set -g window-status-current-format "#[fg=#11111b,bg=#{@thm_mauve}]#[fg=#181825,reverse]#[none] #I:#W #[fg=#181825,reverse]#[none]"
+      set -g window-status-format " #[fg=${theme.fg}]${icons.window} #I "
+      set -g window-status-current-format " #[fg=${theme.purple},bold]${icons.window} #I#[fg=${theme.bg3}]:#[fg=${theme.purple},bold]#W "
 
     '';
 
@@ -283,46 +305,14 @@ in
         extraConfig = "";
       }
       {
-        plugin = catppuccin;
-        extraConfig = ''
-          set -g @catppuccin_flavour 'mocha'
-          set -g @catppuccin_window_status_style "rounded"
-
-          # Use catppuccin CPU module (it exists) with custom colors
-          set -g @catppuccin_cpu_text " #(tmux-mem-cpu-load --interval 2 --graph-lines 5 --mem-mode 0)"
-          set -g @catppuccin_status_cpu_color "#{@thm_blue}"
-
-          # Fix CPU icon background to use blue instead of yellow
-          set -g @catppuccin_cpu_color "#{@thm_blue}"
-          set -g @catppuccin_status_cpu_icon_bg "#{@thm_blue}"
-          set -g @catppuccin_status_cpu_icon_fg "#{@thm_crust}"
-
-          # Customize CPU data background to match other modules
-          set -g @catppuccin_status_cpu_text_bg "#{@thm_surface_0}"
-          set -g @catppuccin_status_cpu_text_fg "#{@thm_fg}"
-
-          # Customize CPU load colors to match statusline
-          set -g @cpu_low_bg_color "#{@thm_surface_0}"
-          set -g @cpu_low_fg_color "#{@thm_fg}"
-          set -g @cpu_medium_bg_color "#{@thm_surface_0}"
-          set -g @cpu_medium_fg_color "#{@thm_yellow}"
-          set -g @cpu_high_bg_color "#{@thm_surface_0}"
-          set -g @cpu_high_fg_color "#{@thm_red}"
-        '';
-      }
-      # Functional plugins (after theme, before session management)
-      {
         plugin = pkgs.tmuxPlugins.battery;
         extraConfig = ''
-          # tmux-battery configuration with nerd font icons
-          set -g @batt_icon_status_charging '󰂄'
-          set -g @batt_icon_status_discharging '󰁹'
-          set -g @batt_icon_status_attached '󰚥'
-          set -g @batt_icon_status_unknown '󰂑'
+          set -g @batt_icon_status_charging '${icons.battery_charging}'
+          set -g @batt_icon_status_discharging '${icons.battery_discharging}'
+          set -g @batt_icon_status_attached '${icons.battery_full}'
+          set -g @batt_icon_status_unknown '${icons.battery_unknown}'
 
-          # Set status-right with battery variables BEFORE plugin runs so it can interpolate them
-          set -g status-right "#{E:@catppuccin_status_cpu}"
-          set -ag status-right "#[fg=#{@thm_lavender}]#{@catppuccin_status_left_separator}#[fg=#{@thm_crust},bg=#{@thm_lavender}]#{battery_icon_status} #[fg=#{@thm_lavender},bg=#{@thm_surface_0}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}]#{battery_percentage} #[fg=#{@thm_surface_0}]"
+          set -g status-right "${sep_right_edge1}${sep_right_edge2}${widget_cpu}${sep_bar}${widget_battery}${sep_bar}${widget_clock}"
         '';
       }
       {
