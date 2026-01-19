@@ -203,9 +203,20 @@ function M.load_autocmds()
 			return
 		end
 
+		-- Find first test file
+		local test_file = vim.fn.system(
+			"fd -t f -e py '(^test_|_test\\.py$)' " .. vim.fn.shellescape(git_root) .. " | head -1"
+		):gsub("\n", "")
+
 		-- Create test tab after a short delay
 		vim.defer_fn(function()
 			vim.cmd("tabnew")
+
+			-- Open test file if found
+			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
+				vim.cmd("edit " .. vim.fn.fnameescape(test_file))
+			end
+
 			vim.cmd("Neotest summary")
 			vim.cmd("vsplit")
 			vim.cmd("wincmd l")
