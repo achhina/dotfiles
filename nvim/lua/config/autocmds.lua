@@ -203,11 +203,25 @@ function M.load_autocmds()
 			return
 		end
 
+		-- Find first test file to load for parsing
+		local test_file = vim.fn.system(
+			"find " .. vim.fn.shellescape(git_root) .. " -name 'test_*.py' -o -name '*_test.py' | head -1"
+		):gsub("\n", "")
+
 		-- Create test tab after a short delay
 		vim.defer_fn(function()
 			vim.cmd("tabnew")
-			vim.cmd("Neotest summary")
+
+			-- Load a test file if found to trigger Neotest parsing
+			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
+				vim.cmd("edit " .. vim.fn.fnameescape(test_file))
+			end
+
+			-- Create split first, then populate with Neotest windows
 			vim.cmd("vsplit")
+			vim.cmd("wincmd h")
+			vim.cmd("Neotest summary")
+			vim.cmd("wincmd l")
 			vim.cmd("Neotest output-panel")
 			vim.cmd("tabnext 1")
 		end, 100)
