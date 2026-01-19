@@ -113,13 +113,40 @@ return {
 			local claude_autostart_group = vim.api.nvim_create_augroup("ClaudeCodeAutoStart", { clear = true })
 			local session_dir = vim.fn.stdpath("state") .. "/sessions"
 
+			-- Cache branch to avoid repeated git calls
+			local _cached_branch = nil
+			local _cached_cwd = nil
+
+			local function encode_path(path)
+				-- URL-style encoding for safe filesystem names
+				return path:gsub("([^A-Za-z0-9_-])", function(c)
+					return string.format("%%%02X", string.byte(c))
+				end)
+			end
+
+			local function get_current_branch()
+				local cwd = vim.fn.getcwd()
+				if _cached_cwd == cwd and _cached_branch then
+					return _cached_branch
+				end
+
+				_cached_cwd = cwd
+				local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD 2>/dev/null"):gsub("\n", "")
+				if vim.v.shell_error == 0 and branch ~= "" then
+					_cached_branch = branch
+					return branch
+				end
+				_cached_branch = nil
+				return nil
+			end
+
 			local function get_state_file_path()
 				local cwd = vim.fn.getcwd()
-				local cwd_encoded = cwd:gsub("/", "%%")
-				local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD 2>/dev/null"):gsub("\n", "")
+				local cwd_encoded = encode_path(cwd)
+				local branch = get_current_branch()
 
-				if branch ~= "" and vim.v.shell_error == 0 then
-					return session_dir .. "/.claude-state-" .. cwd_encoded .. "%%" .. branch
+				if branch then
+					return session_dir .. "/.claude-state-" .. cwd_encoded .. "--" .. encode_path(branch)
 				else
 					return session_dir .. "/.claude-state-" .. cwd_encoded
 				end
@@ -127,11 +154,11 @@ return {
 
 			local function get_session_id_path()
 				local cwd = vim.fn.getcwd()
-				local cwd_encoded = cwd:gsub("/", "%%")
-				local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD 2>/dev/null"):gsub("\n", "")
+				local cwd_encoded = encode_path(cwd)
+				local branch = get_current_branch()
 
-				if branch ~= "" and vim.v.shell_error == 0 then
-					return session_dir .. "/.claude-session-" .. cwd_encoded .. "%%" .. branch
+				if branch then
+					return session_dir .. "/.claude-session-" .. cwd_encoded .. "--" .. encode_path(branch)
 				else
 					return session_dir .. "/.claude-session-" .. cwd_encoded
 				end
@@ -157,6 +184,15 @@ return {
 					if bufname:match("^term://.*[Cc]laude") then
 						vim.fn.delete(get_state_file_path())
 					end
+				end,
+			})
+
+			-- Invalidate branch cache when directory changes
+			vim.api.nvim_create_autocmd("DirChanged", {
+				group = claude_autostart_group,
+				callback = function()
+					_cached_branch = nil
+					_cached_cwd = nil
 				end,
 			})
 
