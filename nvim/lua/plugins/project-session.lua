@@ -150,17 +150,19 @@ return {
 				callback = function()
 					log("PersistenceSavePre fired!")
 
-					-- Check if claudecode is loaded
-					local ok, terminal = pcall(require, "claudecode.terminal")
-					if not ok then
-						log("claudecode.terminal not loaded (pcall failed)")
-						return
+					-- Find Claude terminal buffer by name (more reliable than API)
+					local claude_bufnr = nil
+					for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+						if vim.api.nvim_buf_is_valid(bufnr) then
+							local bufname = vim.api.nvim_buf_get_name(bufnr)
+							log("Checking buffer " .. bufnr .. ": " .. bufname)
+							if bufname:match("[Cc]laude") and vim.bo[bufnr].buftype == "terminal" then
+								claude_bufnr = bufnr
+								log("Found Claude terminal buffer: " .. bufnr)
+								break
+							end
+						end
 					end
-
-					log("claudecode.terminal loaded successfully")
-
-					local claude_bufnr = terminal.get_active_terminal_bufnr()
-					log("claude_bufnr = " .. tostring(claude_bufnr))
 
 					local state_file = get_state_file_path()
 					log("state_file = " .. state_file)
