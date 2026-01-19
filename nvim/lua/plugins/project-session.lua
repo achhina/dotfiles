@@ -142,14 +142,22 @@ return {
 				pattern = "PersistenceSavePre",
 				group = claude_autostart_group,
 				callback = function()
+					print("DEBUG: PersistenceSavePre fired!")
+
 					-- Check if claudecode is loaded
 					local ok, terminal = pcall(require, "claudecode.terminal")
 					if not ok then
+						print("DEBUG: claudecode.terminal not loaded (pcall failed)")
 						return
 					end
 
+					print("DEBUG: claudecode.terminal loaded successfully")
+
 					local claude_bufnr = terminal.get_active_terminal_bufnr()
+					print("DEBUG: claude_bufnr = " .. tostring(claude_bufnr))
+
 					local state_file = get_state_file_path()
+					print("DEBUG: state_file = " .. state_file)
 
 					if claude_bufnr then
 						vim.fn.writefile({ "1" }, state_file)
