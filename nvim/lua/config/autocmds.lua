@@ -194,7 +194,7 @@ function M.load_autocmds()
 	local function setup_test_tab()
 		-- Check if auto-created test tab already exists
 		for i = 1, vim.fn.tabpagenr("$") do
-			local tab_var = vim.fn.gettabvar(i, "auto_created_test_tab", 0)
+			local tab_var = vim.fn.gettabvar(i, "auto_test_tab", 0)
 			if tab_var == 1 then
 				return
 			end
@@ -221,7 +221,7 @@ function M.load_autocmds()
 			vim.cmd("tabnew")
 
 			-- Mark this tab as auto-created
-			vim.t.auto_created_test_tab = 1
+			vim.t.auto_test_tab = 1
 
 			-- Open test file if found
 			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
