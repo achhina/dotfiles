@@ -211,23 +211,44 @@ function M.load_autocmds()
 			return
 		end
 
-		-- Find first test file
-		local test_file = vim.fn.system(
-			"fd -t f -e py '(^test_|_test\\.py$)' " .. vim.fn.shellescape(git_root) .. " | head -1"
-		):gsub("\n", "")
-
 		-- Create test tab after a short delay
 		vim.defer_fn(function()
 			vim.cmd("tabnew")
-
-			-- Mark this tab as auto-created
 			vim.t.auto_test_tab = 1
 
-			-- Open test file if found
-			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
-				vim.cmd("edit " .. vim.fn.fnameescape(test_file))
+			-- Check if Neotest has already discovered tests
+			local neotest_ok, neotest = pcall(require, "neotest")
+			local has_tests = false
+
+			if neotest_ok then
+				local adapter_ids = neotest.state.adapter_ids()
+				for _, adapter_id in ipairs(adapter_ids) do
+					local counts = neotest.state.status_counts(adapter_id)
+					if counts and counts.total > 0 then
+						has_tests = true
+						break
+					end
+				end
 			end
 
+			-- Only open a test file if no tests discovered yet
+			if not has_tests then
+				local test_file = vim.fn.system({
+					"fd",
+					"-t",
+					"f",
+					"-e",
+					"py",
+					"(^test_|_test\\.py$)",
+					git_root,
+				}):match("^[^\n]*")
+
+				if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
+					vim.cmd("edit " .. vim.fn.fnameescape(test_file))
+				end
+			end
+
+			-- Always open Neotest windows
 			vim.cmd("Neotest summary")
 			vim.cmd("Neotest output-panel")
 			vim.cmd("tabnext 1")
