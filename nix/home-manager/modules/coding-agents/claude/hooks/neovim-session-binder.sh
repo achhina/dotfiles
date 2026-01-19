@@ -46,7 +46,7 @@ url_encode() {
     for (( pos=0 ; pos<strlen ; pos++ )); do
         c=${string:$pos:1}
         case "$c" in
-            [-_.a-zA-Z0-9] ) o="$c" ;;
+            [-_a-zA-Z0-9] ) o="$c" ;;
             * ) printf -v o '%%%02X' "'$c" ;;
         esac
         encoded+="$o"
