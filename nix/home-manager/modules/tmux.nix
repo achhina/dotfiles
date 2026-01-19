@@ -262,11 +262,11 @@ in
       # Enhanced choose-tree with better formatting
       bind s choose-tree -Zs -O time -f '#{?pane_format,#{pane_current_command},#{?window_format,#{window_name},#{session_name}}}'
 
-      set -g status-style "bg=${theme.bg0},fg=${theme.fg}"
-      set -g window-status-style "fg=${theme.fg},bg=${theme.bg0}"
-      set -g window-status-current-style "fg=${theme.purple},bg=${theme.bg2},bold"
+      set -g status-style "bg=${theme.ui.fill.bg},fg=${theme.ui.fill.fg}"
+      set -g window-status-style "fg=${theme.ui.inactive.fg},bg=${theme.ui.fill.bg}"
+      set -g window-status-current-style "fg=${theme.ui.active.fg},bg=${theme.ui.active.bg}"
       set -g pane-border-style "fg=${theme.bg3}"
-      set -g pane-active-border-style "fg=${theme.purple}"
+      set -g pane-active-border-style "fg=${theme.ui.active.bg}"
       set -g message-style "fg=${theme.fg},bg=${theme.bg2}"
       set -g message-command-style "fg=${theme.fg},bg=${theme.bg2}"
 
@@ -276,8 +276,8 @@ in
       set -g status-left "${widget_host}${sep_bar}${widget_session}${sep_bar}${widget_network}${sep_left_end1}${sep_left_end2}"
 
       set -g status-justify centre
-      set -g window-status-format " #[fg=${theme.fg}]${icons.window} #I "
-      set -g window-status-current-format " #[fg=${theme.purple},bold]${icons.window} #I#[fg=${theme.bg3}]:#[fg=${theme.purple},bold]#W "
+      set -g window-status-format " #[fg=${theme.ui.inactive.fg}]${icons.window} #I "
+      set -g window-status-current-format " #[fg=${theme.ui.active.fg}]${icons.window} #I#[fg=${theme.bg3}]:#[fg=${theme.ui.active.fg}]#W "
 
     '';
 

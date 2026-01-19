@@ -42,7 +42,7 @@ let
 
   # Define all available themes
   themes = {
-    tokyodark = {
+    tokyodark = rec {
       # Background shades (darkest to lightest)
       bg0 = "#11121D";
       bg1 = "#1A1B2A";
@@ -72,9 +72,33 @@ let
       diff_change = "#262B3D";
       diff_delete = "#281B27";
       diff_text = "#1C4474";
+
+      # UI semantic groupings (similar to Neovim highlight groups)
+      ui = {
+        # Active/selected elements (like TabLineSel)
+        active = {
+          fg = bg0;
+          bg = red;
+        };
+        # Inactive elements (like TabLine)
+        inactive = {
+          fg = fg;
+          bg = bg1;
+        };
+        # Background fill (like TabLineFill)
+        fill = {
+          fg = fg;
+          bg = bg0;
+        };
+        # Accent/emphasized (used for head/tail sections)
+        accent = {
+          fg = bg0;
+          bg = red;
+        };
+      };
     };
 
-    catppuccin-mocha = {
+    catppuccin-mocha = rec {
       # Background shades
       bg0 = "#11111b";
       bg1 = "#181825";
@@ -104,6 +128,30 @@ let
       diff_change = "#262B3D";
       diff_delete = "#281B27";
       diff_text = "#1C4474";
+
+      # UI semantic groupings (similar to Neovim highlight groups)
+      ui = {
+        # Active/selected elements
+        active = {
+          fg = bg0;
+          bg = red;
+        };
+        # Inactive elements
+        inactive = {
+          fg = fg;
+          bg = bg1;
+        };
+        # Background fill
+        fill = {
+          fg = fg;
+          bg = bg0;
+        };
+        # Accent/emphasized
+        accent = {
+          fg = bg0;
+          bg = red;
+        };
+      };
     };
   };
 in
