@@ -121,7 +121,10 @@ return {
 		vim.keymap.set("n", "<leader>q", "", { desc = "+quickfix" })
 
 		vim.keymap.set("n", "<leader>sf", function()
-			fzf.combine({ pickers = "oldfiles;files" })
+			fzf.combine({
+				pickers = "oldfiles;files",
+				cwd_only = true,
+			})
 		end, { desc = "Search Files (recent first)" })
 		vim.keymap.set("n", "<leader>fr", fzf.oldfiles, { desc = "Find recently opened files" })
 		vim.keymap.set("n", "<leader><space>", fzf.buffers, { desc = "Find existing buffers" })
