@@ -82,7 +82,6 @@ let
     python312Packages.ipython                    # Enhanced Python REPL
     uv                                           # Fast Python package manager
     python312Packages.copier                     # Project templating tool
-    python312Packages.copier-template-extensions # Copier template extensions
   ];
 
   # Document processing and generation tools
