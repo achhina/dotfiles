@@ -36,9 +36,27 @@ if ! mkdir -p "$nvim_sessions_dir"; then
     exit 1
 fi
 
+# URL-style encoding function to match Neovim's encoding
+url_encode() {
+    local string="$1"
+    local strlen=${#string}
+    local encoded=""
+    local pos c o
+
+    for (( pos=0 ; pos<strlen ; pos++ )); do
+        c=${string:$pos:1}
+        case "$c" in
+            [-_.a-zA-Z0-9] ) o="$c" ;;
+            * ) printf -v o '%%%02X' "'$c" ;;
+        esac
+        encoded+="$o"
+    done
+    echo "$encoded"
+}
+
 # Compute session file name matching persistence.nvim's naming convention.
-# Format: %encoded%path or %encoded%path%%branch for git repos.
-cwd_encoded="${cwd//\//%}"
+# Format: %2Fencoded%2Fpath or %2Fencoded%2Fpath--branch for git repos.
+cwd_encoded=$(url_encode "$cwd")
 
 # Validate encoding succeeded
 if [[ -z "$cwd_encoded" ]]; then
@@ -55,8 +73,9 @@ fi
 
 # Construct session file path
 if [[ -n "$branch" ]]; then
-    # Include branch in session file name
-    session_file="${nvim_sessions_dir}/.claude-session-${cwd_encoded}%%${branch}"
+    # Include branch in session file name with -- separator
+    branch_encoded=$(url_encode "$branch")
+    session_file="${nvim_sessions_dir}/.claude-session-${cwd_encoded}--${branch_encoded}"
 else
     session_file="${nvim_sessions_dir}/.claude-session-${cwd_encoded}"
 fi
