@@ -81,6 +81,7 @@ let
     python312Packages.black    # Code formatter for IPython (see https://github.com/ipython/ipython/issues/14532 for ruff workaround)
     python312Packages.ipython  # Enhanced Python REPL
     uv                         # Fast Python package manager
+    python312Packages.copier   # Project templating tool
   ];
 
   # Document processing and generation tools
