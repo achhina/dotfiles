@@ -116,7 +116,7 @@ return {
 
 			local function log(msg)
 				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-				vim.fn.writefile({ timestamp .. " " .. msg }, log_file, "a")
+				vim.fn.writefile({ timestamp .. " [v2] " .. msg }, log_file, "a")
 			end
 
 			local function get_state_file_path()
@@ -150,35 +150,22 @@ return {
 				callback = function()
 					log("PersistenceSavePre fired")
 
-					-- Check if any Snacks terminals with 'claude' are open
+					-- Check if claudecode terminal is open
 					local claude_open = false
-					local ok, snacks_terminal = pcall(require, "snacks.terminal")
+					local ok, terminal = pcall(require, "claudecode.terminal")
 
 					if ok then
-						local terminals = snacks_terminal.list()
-						log("Found " .. #terminals .. " snacks terminals")
+						local bufnr = terminal.get_active_terminal_bufnr()
+						log("Claude terminal bufnr: " .. tostring(bufnr))
 
-						for i, term in ipairs(terminals) do
-							log("Terminal " .. i .. " cmd type: " .. type(term.cmd))
-							log("Terminal " .. i .. " cmd: " .. vim.inspect(term.cmd))
-
-							-- Check if terminal command contains 'claude'
-							if term.cmd and type(term.cmd) == "table" then
-								local cmd_str = table.concat(term.cmd, " ")
-								log("Terminal " .. i .. " cmd_str: " .. cmd_str)
-								if cmd_str:match("[Cc]laude") then
-									claude_open = true
-									log("FOUND CLAUDE in terminal " .. i)
-									break
-								end
-							elseif term.cmd and type(term.cmd) == "string" and term.cmd:match("[Cc]laude") then
-								claude_open = true
-								log("FOUND CLAUDE in terminal " .. i)
-								break
-							end
+						if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+							claude_open = true
+							log("Claude terminal is open")
+						else
+							log("Claude terminal not open")
 						end
 					else
-						log("Failed to load snacks.terminal")
+						log("Failed to load claudecode.terminal")
 					end
 
 					local state_file = get_state_file_path()
