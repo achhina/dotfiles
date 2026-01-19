@@ -153,11 +153,9 @@ return {
 			vim.api.nvim_create_autocmd("BufDelete", {
 				group = claude_autostart_group,
 				callback = function(args)
-					if vim.bo[args.buf].buftype == "terminal" then
-						local bufname = vim.api.nvim_buf_get_name(args.buf)
-						if bufname:match("[Cc]laude") then
-							vim.fn.delete(get_state_file_path())
-						end
+					local bufname = vim.api.nvim_buf_get_name(args.buf)
+					if bufname:match("[Cc]laude") or bufname:match("term://.*claude") then
+						vim.fn.delete(get_state_file_path())
 					end
 				end,
 			})
