@@ -212,17 +212,19 @@ function M.load_autocmds()
 		vim.defer_fn(function()
 			vim.cmd("tabnew")
 
-			-- Load a test file if found to trigger Neotest parsing
-			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
-				vim.cmd("edit " .. vim.fn.fnameescape(test_file))
-			end
-
-			-- Create split first, then populate with Neotest windows
-			vim.cmd("vsplit")
-			vim.cmd("wincmd h")
+			-- Open Neotest summary in left window
 			vim.cmd("Neotest summary")
+
+			-- Create split and open output-panel in right window
+			vim.cmd("vsplit")
 			vim.cmd("wincmd l")
 			vim.cmd("Neotest output-panel")
+
+			-- Load test file as hidden buffer to trigger parsing
+			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
+				vim.cmd("badd " .. vim.fn.fnameescape(test_file))
+			end
+
 			vim.cmd("tabnext 1")
 		end, 100)
 	end
