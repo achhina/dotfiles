@@ -192,6 +192,11 @@ function M.load_autocmds()
 	local session_loaded = false
 
 	local function setup_test_tab()
+		-- Check if test tab already exists
+		if vim.fn.tabpagenr("$") > 1 then
+			return
+		end
+
 		-- Check if we're in a git repo with pyproject.toml
 		local git_root = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null"):gsub("\n", "")
 		if vim.v.shell_error ~= 0 or git_root == "" then

@@ -14,7 +14,7 @@ in
       - editor:
           layout: main-vertical
           panes:
-            - nvim
+            - nvim +'SetupTestTab'
             - # terminal for commands
   '';
 
