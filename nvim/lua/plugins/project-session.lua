@@ -150,12 +150,18 @@ return {
 				callback = function()
 					log("PersistenceSavePre fired!")
 
+					-- Log all buffers first
+					log("Total buffers: " .. #vim.api.nvim_list_bufs())
+
 					-- Find Claude terminal buffer by checking all terminals
 					local claude_bufnr = nil
+					local terminal_count = 0
 					for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 						if vim.api.nvim_buf_is_valid(bufnr) then
 							local buftype = vim.bo[bufnr].buftype
+							log("Buffer " .. bufnr .. " type: " .. buftype)
 							if buftype == "terminal" then
+								terminal_count = terminal_count + 1
 								local bufname = vim.api.nvim_buf_get_name(bufnr)
 								log("Found terminal buffer " .. bufnr .. ": " .. bufname)
 								-- Check if it's Claude by name or if it's the only terminal
@@ -173,6 +179,8 @@ return {
 							end
 						end
 					end
+
+					log("Terminal count: " .. terminal_count)
 
 					local state_file = get_state_file_path()
 					log("state_file = " .. state_file)
