@@ -150,7 +150,7 @@ return {
 			})
 
 			-- Delete state file when Claude buffer is closed
-			vim.api.nvim_create_autocmd("BufDelete", {
+			vim.api.nvim_create_autocmd({ "BufDelete", "BufWipeout" }, {
 				group = claude_autostart_group,
 				callback = function(args)
 					local bufname = vim.api.nvim_buf_get_name(args.buf)
