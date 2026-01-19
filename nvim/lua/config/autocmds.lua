@@ -239,6 +239,11 @@ function M.load_autocmds()
 			end, 100)
 		end,
 	})
+
+	-- User command to force layout setup
+	vim.api.nvim_create_user_command("SetupTestTab", setup_test_tab, {
+		desc = "Force create test tab layout for Python projects",
+	})
 end
 
 return M
