@@ -150,16 +150,26 @@ return {
 				callback = function()
 					log("PersistenceSavePre fired!")
 
-					-- Find Claude terminal buffer by name (more reliable than API)
+					-- Find Claude terminal buffer by checking all terminals
 					local claude_bufnr = nil
 					for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 						if vim.api.nvim_buf_is_valid(bufnr) then
-							local bufname = vim.api.nvim_buf_get_name(bufnr)
-							log("Checking buffer " .. bufnr .. ": " .. bufname)
-							if bufname:match("[Cc]laude") and vim.bo[bufnr].buftype == "terminal" then
-								claude_bufnr = bufnr
-								log("Found Claude terminal buffer: " .. bufnr)
-								break
+							local buftype = vim.bo[bufnr].buftype
+							if buftype == "terminal" then
+								local bufname = vim.api.nvim_buf_get_name(bufnr)
+								log("Found terminal buffer " .. bufnr .. ": " .. bufname)
+								-- Check if it's Claude by name or if it's the only terminal
+								if bufname:match("[Cc]laude") or bufname == "" then
+									-- Get buffer contents to verify it's Claude
+									local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 5, false)
+									local content = table.concat(lines, "\n")
+									log("Terminal buffer " .. bufnr .. " first lines: " .. content:sub(1, 100))
+									if content:match("[Cc]laude") then
+										claude_bufnr = bufnr
+										log("Found Claude terminal buffer: " .. bufnr)
+										break
+									end
+								end
 							end
 						end
 					end
