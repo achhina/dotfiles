@@ -187,6 +187,58 @@ function M.load_autocmds()
 			vim.cmd("startinsert")
 		end,
 	})
+
+	local project_group = augroup("ProjectSetup", { clear = true })
+	local session_loaded = false
+
+	local function setup_test_tab()
+		-- Check if we're in a git repo with pyproject.toml
+		local git_root = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null"):gsub("\n", "")
+		if vim.v.shell_error ~= 0 or git_root == "" then
+			return
+		end
+
+		local pyproject_path = git_root .. "/pyproject.toml"
+		if vim.fn.filereadable(pyproject_path) == 0 then
+			return
+		end
+
+		-- Create test tab after a short delay
+		vim.defer_fn(function()
+			vim.cmd("tabnew")
+			vim.cmd("Neotest summary")
+			vim.cmd("vsplit")
+			vim.cmd("Neotest output-panel")
+			vim.cmd("tabnext 1")
+		end, 100)
+	end
+
+	-- Track when session is loaded
+	autocmd("User", {
+		group = project_group,
+		pattern = "PersistenceLoadPost",
+		callback = function()
+			session_loaded = true
+		end,
+	})
+
+	-- Run on VimEnter only if no session was loaded
+	autocmd("VimEnter", {
+		group = project_group,
+		callback = function()
+			-- Only run if starting without file arguments
+			if vim.fn.argc() > 0 then
+				return
+			end
+
+			-- Wait to see if persistence loaded a session
+			vim.defer_fn(function()
+				if not session_loaded then
+					setup_test_tab()
+				end
+			end, 100)
+		end,
+	})
 end
 
 return M

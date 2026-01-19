@@ -15,12 +15,7 @@ in
           layout: main-vertical
           panes:
             - nvim
-          panes:
             - # terminal for commands
-            - # for running servers/builds
-      - logs:
-          panes:
-            - # for monitoring logs/processes
   '';
 
   xdg.configFile."tmuxinator/fullstack.yml".text = ''
