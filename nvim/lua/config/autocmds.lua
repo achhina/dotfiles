@@ -192,9 +192,12 @@ function M.load_autocmds()
 	local session_loaded = false
 
 	local function setup_test_tab()
-		-- Check if test tab already exists
-		if vim.fn.tabpagenr("$") > 1 then
-			return
+		-- Check if auto-created test tab already exists
+		for i = 1, vim.fn.tabpagenr("$") do
+			local tab_var = vim.fn.gettabvar(i, "auto_created_test_tab", 0)
+			if tab_var == 1 then
+				return
+			end
 		end
 
 		-- Check if we're in a git repo with pyproject.toml
@@ -216,6 +219,9 @@ function M.load_autocmds()
 		-- Create test tab after a short delay
 		vim.defer_fn(function()
 			vim.cmd("tabnew")
+
+			-- Mark this tab as auto-created
+			vim.t.auto_created_test_tab = 1
 
 			-- Open test file if found
 			if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
