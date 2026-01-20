@@ -240,17 +240,11 @@ return {
 
 						vim.cmd("tabnext 1")
 
-						local ok, terminal = pcall(require, 'claudecode.terminal')
-						if not ok then
-							vim.notify("[Claude] Failed to load claudecode.terminal module", vim.log.levels.WARN)
-							return
-						end
-
 						local success = pcall(function()
 							if pending_claude_restore ~= false then
-								terminal.simple_toggle({}, "--resume " .. vim.fn.shellescape(pending_claude_restore))
+								vim.cmd("ClaudeCode --resume " .. vim.fn.shellescape(pending_claude_restore))
 							else
-								terminal.simple_toggle({}, "--resume")
+								vim.cmd("ClaudeCode --resume")
 							end
 						end)
 
