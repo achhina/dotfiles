@@ -49,17 +49,10 @@ local function create_lsp_keymap(bufnr)
 
 	local has_fzf, fzf_lua = pcall(require, "fzf-lua")
 
-	-- Core LSP navigation with fzf-lua fallbacks
+	-- Core LSP navigation
+	-- Uses Neovim 0.10+ built-in mappings: grr (references), gri (implementation), gra (code action), grn (rename), grt (type definition)
 	nmap("gD", vim.lsp.buf.declaration, "Goto Declaration")
 	nmap("gd", vim.lsp.buf.definition, "Goto Definition")
-	nmap("gI", vim.lsp.buf.implementation, "Goto Implementation")
-	nmap("<leader>D", vim.lsp.buf.type_definition, "Type Definition")
-
-	if has_fzf and fzf_lua.lsp_references then
-		nmap("gr", fzf_lua.lsp_references, "Goto References")
-	else
-		nmap("gr", vim.lsp.buf.references, "Goto References")
-	end
 
 	if has_fzf and fzf_lua.lsp_document_symbols then
 		nmap("<leader>sy", fzf_lua.lsp_document_symbols, "Document Symbols")
@@ -75,16 +68,9 @@ local function create_lsp_keymap(bufnr)
 
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
-	nmap("<leader>ca", vim.lsp.buf.code_action, "Code Action")
 	nmap("<leader>F", vim.lsp.buf.format, "Format Document")
 
-	-- Rename with input validation
-	nmap("<leader>rn", function()
-		local new_name = vim.fn.input("New name: ", vim.fn.expand("<cword>"))
-		if new_name ~= "" and new_name ~= vim.fn.expand("<cword>") then
-			vim.lsp.buf.rename(new_name)
-		end
-	end, "Rename with preview")
+	-- Use built-in gra for code action, grn for rename
 
 	if vim.lsp.buf.incoming_calls then
 		nmap("<leader>ci", vim.lsp.buf.incoming_calls, "Incoming calls")

@@ -46,7 +46,7 @@ let
   # Language servers for general use (also used outside editor)
   languageServers = with pkgs; [
     gopls                            # Go LSP (used with go tools)
-    rust-analyzer                    # Rust LSP (used with cargo)
+    # rust-analyzer provided by rustup
     nil                              # Nix LSP (used for nix evaluation)
     just-lsp                         # Just LSP (justfile language server)
     nginx-language-server            # Nginx configuration LSP
@@ -67,6 +67,9 @@ let
   languageRuntimes = with pkgs; [
     # Go
     go                       # Go compiler and tools
+
+    # Rust
+    rustup                   # Rust toolchain installer (includes rustc, cargo, rustfmt)
 
     # JavaScript/TypeScript
     nodejs                   # Node.js runtime

@@ -21,7 +21,7 @@ return {
 	end,
 	---@type snacks.Config
 	opts = {
-		bigfile = { enabled = false }, -- Disabled - using bigfile.nvim plugin instead
+		bigfile = { enabled = true, size = 2 * 1024 * 1024 }, -- 2MB threshold for large files
 		terminal = {
 			win = {
 				keys = {
