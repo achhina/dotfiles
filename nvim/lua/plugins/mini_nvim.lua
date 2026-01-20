@@ -69,9 +69,10 @@ return {
 					active = function()
 						-- Show terminal info for terminal buffers
 						if vim.bo.buftype == "terminal" then
+							local mode, mode_hl = statusline.section_mode({ trunc_width = 120 })
 							local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
 							return statusline.combine_groups({
-								{ hl = "MiniStatuslineModeNormal", strings = { "TERMINAL" } },
+								{ hl = mode_hl, strings = { mode } },
 								{ hl = "MiniStatuslineFilename", strings = { cwd } },
 								"%=",
 							})
