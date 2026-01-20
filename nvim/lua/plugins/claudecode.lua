@@ -47,6 +47,7 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 local function send_selection()
 	if is_file_backed() then
 		vim.cmd("ClaudeCodeSend")
+		vim.cmd("ClaudeCodeFocus")
 		return
 	end
 
@@ -96,6 +97,7 @@ end
 local function add_buffer()
 	if is_file_backed() then
 		vim.cmd("ClaudeCodeAdd %")
+		vim.cmd("ClaudeCodeFocus")
 		return
 	end
 
@@ -119,6 +121,7 @@ local function add_buffer()
 	)
 
 	vim.cmd(string.format("ClaudeCodeAdd %s", vim.fn.fnameescape(temp_file)))
+	vim.cmd("ClaudeCodeFocus")
 end
 
 return {
