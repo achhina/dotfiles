@@ -197,6 +197,9 @@ return {
 				end,
 			})
 
+			-- Store session info for manual restoration
+			local pending_claude_restore = nil
+
 			vim.api.nvim_create_autocmd("User", {
 				pattern = "PersistenceLoadPost",
 				group = claude_autostart_group,
@@ -210,8 +213,6 @@ return {
 						return
 					end
 
-					vim.cmd("tabnext 1")
-
 					local session_file = get_session_id_path()
 					local session_id = nil
 					if vim.fn.filereadable(session_file) == 1 then
@@ -224,24 +225,43 @@ return {
 						end
 					end
 
-					local ok, terminal = pcall(require, 'claudecode.terminal')
-					if not ok then
-						vim.notify("[Claude] Failed to load claudecode.terminal module", vim.log.levels.WARN)
-						return
-					end
-
-					local success = pcall(function()
-						if session_id then
-							terminal.simple_toggle({}, "--resume " .. vim.fn.shellescape(session_id))
-						else
-							terminal.simple_toggle({}, "--resume")
-						end
-					end)
-
-					if not success then
-						vim.notify("[Claude] Failed to restore session", vim.log.levels.WARN)
-					end
+					pending_claude_restore = session_id
 				end,
+			})
+
+			-- Restore Claude after VimEnter when UI is fully ready
+			vim.api.nvim_create_autocmd("VimEnter", {
+				group = claude_autostart_group,
+				callback = function()
+					vim.defer_fn(function()
+						if pending_claude_restore == nil then
+							return
+						end
+
+						vim.cmd("tabnext 1")
+
+						local ok, terminal = pcall(require, 'claudecode.terminal')
+						if not ok then
+							vim.notify("[Claude] Failed to load claudecode.terminal module", vim.log.levels.WARN)
+							return
+						end
+
+						local success = pcall(function()
+							if pending_claude_restore ~= false then
+								terminal.simple_toggle({}, "--resume " .. vim.fn.shellescape(pending_claude_restore))
+							else
+								terminal.simple_toggle({}, "--resume")
+							end
+						end)
+
+						if not success then
+							vim.notify("[Claude] Failed to restore session", vim.log.levels.WARN)
+						end
+
+						pending_claude_restore = nil
+					end, 500)
+				end,
+				nested = true,
 			})
 
 			-- Auto-restore session when opening nvim without arguments
