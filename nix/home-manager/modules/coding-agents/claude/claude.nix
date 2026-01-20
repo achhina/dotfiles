@@ -6,13 +6,19 @@
 
 let
   # Software development detector hook script (general principles for any git repo)
-  softwareDevelopmentDetector = pkgs.writeShellScript "software-development-detector.sh" (builtins.readFile ./hooks/software-development-detector.sh);
+  softwareDevelopmentDetector = pkgs.writeShellScript "software-development-detector.sh" (
+    builtins.readFile ./hooks/software-development-detector.sh
+  );
 
   # Python project detector hook script (Python-specific practices)
-  pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (builtins.readFile ./hooks/python-project-detector.sh);
+  pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (
+    builtins.readFile ./hooks/python-project-detector.sh
+  );
 
   # Neovim session binder hook script (binds Claude sessions to Neovim persistence sessions)
-  neovimSessionBinder = pkgs.writeShellScript "neovim-session-binder.sh" (builtins.readFile ./hooks/neovim-session-binder.sh);
+  neovimSessionBinder = pkgs.writeShellScript "neovim-session-binder.sh" (
+    builtins.readFile ./hooks/neovim-session-binder.sh
+  );
 in
 {
   # Claude Code settings configuration
@@ -254,7 +260,7 @@ in
 
       statusLine = {
         type = "command";
-        command = "input=$(cat); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); model=$(echo \"$input\" | jq -r '.model.display_name'); output_style=$(echo \"$input\" | jq -r '.output_style.name // \"default\"'); total_input=$(echo \"$input\" | jq -r '.context_window.total_input_tokens'); total_output=$(echo \"$input\" | jq -r '.context_window.total_output_tokens'); context_size=$(echo \"$input\" | jq -r '.context_window.context_window_size'); if [ \"$context_size\" != \"null\" ] && [ \"$context_size\" != \"0\" ]; then total_tokens=$((total_input + total_output)); usage_pct=$((total_tokens * 100 / context_size)); else usage_pct=0; fi; cd \"$cwd\" 2>/dev/null; git_branch=$(git --no-optional-locks branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \\(.*\\)/ (\\1)/'); if [ \"$total_input\" != \"null\" ] && [ \"$total_output\" != \"null\" ]; then input_k=$((total_input / 1000)); output_k=$((total_output / 1000)); token_info=\" [\${input_k}K↓ \${output_k}K↑ \${usage_pct}%%]\"; else token_info=\"\"; fi; printf \"\\033[32m$(whoami)@$(hostname -s) $(basename \"$cwd\")\${git_branch}\\033[0m \\033[36m[\${model}]\\033[0m\"; [ -n \"$token_info\" ] && printf \"\\033[33m\${token_info}\\033[0m\"";
+        command = "input=$(cat); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); model=$(echo \"$input\" | jq -r '.model.display_name'); total_input=$(echo \"$input\" | jq -r '.context_window.total_input_tokens'); total_output=$(echo \"$input\" | jq -r '.context_window.total_output_tokens'); usage_pct=$(echo \"$input\" | jq -r '.context_window.used_percentage // 0' | awk '{printf \"%.0f\", $1}'); cd \"$cwd\" 2>/dev/null; git_branch=$(git --no-optional-locks branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \\(.*\\)/ (\\1)/'); if [ \"$total_input\" != \"null\" ] && [ \"$total_output\" != \"null\" ]; then input_k=$((total_input / 1000)); output_k=$((total_output / 1000)); token_info=\" [\${input_k}K↓ \${output_k}K↑ \${usage_pct}%%]\"; else token_info=\"\"; fi; printf \"\\033[32m$(whoami)@$(hostname -s) $(basename \"$cwd\")\${git_branch}\\033[0m \\033[36m[\${model}]\\033[0m\"; [ -n \"$token_info\" ] && printf \"\\033[33m\${token_info}\\033[0m\"";
       };
 
       alwaysThinkingEnabled = true;
@@ -262,6 +268,8 @@ in
       autoUpdates = true;
 
       theme = "dark";
+
+      defaultMode = "acceptEdits";
 
       # Custom agents
       agents = [
@@ -296,6 +304,13 @@ in
           };
           autoUpdate = true;
         };
+        claude-plugins-official = {
+          source = {
+            source = "github";
+            repo = "anthropics/claude-plugins-official";
+          };
+          autoUpdate = true;
+        };
       };
 
       # Standalone plugins from GitHub
@@ -305,6 +320,7 @@ in
             source = "github";
             repo = "chrisvoncsefalvay/claude-d3js-skill";
           };
+          autoUpdate = true;
         };
       };
 
@@ -317,6 +333,18 @@ in
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
+        "github@claude-plugins-official" = true;
+        "ralph-loop@claude-plugins-official" = true;
+        "frontend-design@claude-plugins-official" = true;
+        "code-review@claude-plugins-official" = true;
+        "feature-dev@claude-plugins-official" = true;
+        "code-simplifier@claude-plugins-official" = true;
+        "pr-review-toolkit@claude-plugins-official" = true;
+        "agent-sdk-dev@claude-plugins-official" = true;
+        "pyright-lsp@claude-plugins-official" = true;
+        "plugin-dev@claude-plugins-official" = true;
+        "hookify@claude-plugins-official" = true;
+        "double-shot-latte@claude-plugins-official" = true;
       };
 
       # Session hooks
