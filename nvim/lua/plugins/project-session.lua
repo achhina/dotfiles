@@ -80,6 +80,7 @@ return {
 	-- Advanced session management
 	{
 		"folke/persistence.nvim",
+		dependencies = { "coder/claudecode.nvim" },
 		event = "BufReadPre",
 		keys = {
 			{
@@ -196,7 +197,6 @@ return {
 				end,
 			})
 
-			-- Restore Claude on session load
 			vim.api.nvim_create_autocmd("User", {
 				pattern = "PersistenceLoadPost",
 				group = claude_autostart_group,
@@ -224,15 +224,22 @@ return {
 						end
 					end
 
-					local ok, terminal = pcall(require, "claudecode.terminal")
+					local ok, terminal = pcall(require, 'claudecode.terminal')
 					if not ok then
+						vim.notify("[Claude] Failed to load claudecode.terminal module", vim.log.levels.WARN)
 						return
 					end
 
-					if session_id then
-						terminal.open({}, "--resume " .. vim.fn.shellescape(session_id))
-					else
-						terminal.open({}, "--resume")
+					local success = pcall(function()
+						if session_id then
+							terminal.simple_toggle({}, "--resume " .. vim.fn.shellescape(session_id))
+						else
+							terminal.simple_toggle({}, "--resume")
+						end
+					end)
+
+					if not success then
+						vim.notify("[Claude] Failed to restore session", vim.log.levels.WARN)
 					end
 				end,
 			})
@@ -245,8 +252,6 @@ return {
 					if vim.fn.argc(-1) == 0 then
 						vim.defer_fn(function()
 							require("persistence").load()
-							-- Emit event after persistence loads to coordinate with other plugins
-							vim.api.nvim_exec_autocmds("User", { pattern = "PersistenceLoadPost" })
 						end, 100)
 					end
 				end,

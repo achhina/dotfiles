@@ -1,51 +1,124 @@
-local function send_selection_and_focus()
-	local claudecode = require("claudecode")
-	local terminal = require("claudecode.terminal")
+local temp_files = {}
 
-	local esc = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
-	vim.api.nvim_feedkeys(esc, "nx", false)
-
-	local start_line = vim.fn.line("'<")
-	local end_line = vim.fn.line("'>")
-
-	local claude_start_line = start_line and (start_line - 1) or nil
-	local claude_end_line = end_line and (end_line - 1) or nil
-
-	claudecode.send_at_mention(vim.fn.expand("%:p"), claude_start_line, claude_end_line)
-	terminal.open()
+local function is_file_backed()
+	local filepath = vim.fn.expand("%:p")
+	return filepath ~= "" and vim.fn.filereadable(filepath) == 1
 end
 
-local function send_selection_only()
-	local claudecode = require("claudecode")
-	local terminal = require("claudecode.terminal")
+local function create_context_header(bufname, display_name, ext, line_range)
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
 
-	local esc = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
-	vim.api.nvim_feedkeys(esc, "nx", false)
+	local header_lines = {
+		"<context>",
+		"This is an in-memory buffer from the user's IDE (Neovim).",
+		"This content is not saved to disk and should be treated as read-only reference material.",
+		"",
+		"Metadata:",
+	}
 
-	local start_line = vim.fn.line("'<")
-	local end_line = vim.fn.line("'>")
+	table.insert(header_lines, string.format("  Buffer: %s", bufname ~= "" and bufname or "unnamed buffer"))
 
-	local claude_start_line = start_line and (start_line - 1) or nil
-	local claude_end_line = end_line and (end_line - 1) or nil
+	if line_range then
+		table.insert(header_lines, string.format("  Lines: %d-%d (visual selection)", line_range.start, line_range.stop))
+	else
+		table.insert(header_lines, "  Lines: entire buffer")
+	end
 
-	claudecode.send_at_mention(vim.fn.expand("%:p"), claude_start_line, claude_end_line)
-	terminal.ensure_visible()
+	table.insert(header_lines, string.format("  Timestamp: %s", timestamp))
+	table.insert(header_lines, "</context>")
+	table.insert(header_lines, "")
+
+	return header_lines
 end
 
-local function send_buffer_and_focus()
-	local claudecode = require("claudecode")
-	local terminal = require("claudecode.terminal")
-
-	claudecode.send_at_mention(vim.fn.expand("%:p"))
-	terminal.open()
+local function track_temp_file(filepath)
+	table.insert(temp_files, filepath)
 end
 
-local function send_buffer_only()
-	local claudecode = require("claudecode")
-	local terminal = require("claudecode.terminal")
+vim.api.nvim_create_autocmd("VimLeavePre", {
+	group = vim.api.nvim_create_augroup("ClaudeCodeTempCleanup", { clear = true }),
+	callback = function()
+		for _, file in ipairs(temp_files) do
+			vim.fn.delete(file)
+		end
+	end,
+})
 
-	claudecode.send_at_mention(vim.fn.expand("%:p"))
-	terminal.ensure_visible()
+local function send_selection()
+	if is_file_backed() then
+		vim.cmd("ClaudeCodeSend")
+		return
+	end
+
+	-- Get visual selection WHILE STILL IN VISUAL MODE (like upstream does)
+	local bufnr = vim.api.nvim_get_current_buf()
+
+	local anchor_pos = vim.fn.getpos("v")
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+	local p1 = { lnum = anchor_pos[2], col = anchor_pos[3] }
+	local p2 = { lnum = cursor_pos[1], col = cursor_pos[2] + 1 }
+
+	local start_coords, end_coords
+	if p1.lnum < p2.lnum or (p1.lnum == p2.lnum and p1.col <= p2.col) then
+		start_coords, end_coords = p1, p2
+	else
+		start_coords, end_coords = p2, p1
+	end
+
+	local lines = vim.api.nvim_buf_get_lines(bufnr, start_coords.lnum - 1, end_coords.lnum, false)
+
+	local bufname = vim.api.nvim_buf_get_name(0)
+	local display_name = bufname ~= "" and vim.fn.fnamemodify(bufname, ":t") or "unnamed"
+	local ext = display_name:match("%.([^.]+)$") or "txt"
+
+	local header = create_context_header(bufname, display_name, ext, {
+		start = start_coords.lnum,
+		stop = end_coords.lnum
+	})
+	local content_with_header = vim.list_extend(header, lines)
+
+	local temp_file = vim.fn.tempname() .. "." .. ext
+	vim.fn.writefile(content_with_header, temp_file, "b")
+	vim.fn.setfperm(temp_file, "rw-r--r--")
+	track_temp_file(temp_file)
+
+	vim.notify(
+		string.format("[Claude] Sending unsaved buffer '%s' via temp file", display_name),
+		vim.log.levels.INFO
+	)
+
+	vim.cmd('normal! \\<Esc>')
+	vim.cmd(string.format("ClaudeCodeAdd %s", vim.fn.fnameescape(temp_file)))
+	vim.cmd("ClaudeCodeFocus")
+end
+
+local function add_buffer()
+	if is_file_backed() then
+		vim.cmd("ClaudeCodeAdd %")
+		return
+	end
+
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+	local bufname = vim.api.nvim_buf_get_name(0)
+	local display_name = bufname ~= "" and vim.fn.fnamemodify(bufname, ":t") or "unnamed"
+	local ext = display_name:match("%.([^.]+)$") or "txt"
+
+	local header = create_context_header(bufname, display_name, ext, nil)
+	local content_with_header = vim.list_extend(header, lines)
+
+	local temp_file = vim.fn.tempname() .. "." .. ext
+	vim.fn.writefile(content_with_header, temp_file, "b")
+	vim.fn.setfperm(temp_file, "rw-r--r--")
+	track_temp_file(temp_file)
+
+	vim.notify(
+		string.format("[Claude] Sending unsaved buffer '%s' via temp file", display_name),
+		vim.log.levels.INFO
+	)
+
+	vim.cmd(string.format("ClaudeCodeAdd %s", vim.fn.fnameescape(temp_file)))
 end
 
 return {
@@ -54,6 +127,7 @@ return {
 	config = function()
 		require("claudecode").setup({
 			terminal = {
+				provider = "snacks",
 				split_width_percentage = 0.40,
 			},
 			env = {
@@ -74,10 +148,8 @@ return {
 		{ "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
 		{ "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
 
-		{ "<leader>as", send_selection_and_focus, mode = "v", desc = "Send selection & focus" },
-		{ "<leader>ab", send_buffer_and_focus, mode = "n", desc = "Send buffer & focus" },
-		{ "<leader>aS", send_selection_only, mode = "v", desc = "Send selection" },
-		{ "<leader>aB", send_buffer_only, mode = "n", desc = "Send buffer" },
+		{ "<leader>as", send_selection, mode = "v", desc = "Send selection to Claude" },
+		{ "<leader>ab", add_buffer, mode = "n", desc = "Add current buffer to Claude" },
 		{
 			"<leader>as",
 			"<cmd>ClaudeCodeTreeAdd<cr>",
