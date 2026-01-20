@@ -118,6 +118,9 @@ return {
 			local _cached_branch = nil
 			local _cached_cwd = nil
 
+			-- Track Claude PID for explicit cleanup
+			local claude_pid = nil
+
 			local function encode_path(path)
 				-- URL-style encoding for safe filesystem names
 				return path:gsub("([^A-Za-z0-9_-])", function(c)
@@ -173,6 +176,13 @@ return {
 					if bufname:match("^term://.*[Cc]laude") then
 						local state_file = get_state_file_path()
 						vim.fn.writefile({ "1" }, state_file)
+
+						-- Get PID immediately in TermOpen (before channel can close)
+						local job_id = vim.b[args.buf].terminal_job_id
+						local ok, pid = pcall(vim.fn.jobpid, job_id)
+						if ok and pid and pid > 0 then
+							claude_pid = pid
+						end
 					end
 				end,
 			})
@@ -184,6 +194,20 @@ return {
 					local bufname = vim.api.nvim_buf_get_name(args.buf)
 					if bufname:match("^term://.*[Cc]laude") then
 						vim.fn.delete(get_state_file_path())
+						claude_pid = nil
+					end
+				end,
+			})
+
+			-- Explicitly kill Claude job when Neovim exits
+			vim.api.nvim_create_autocmd("VimLeavePre", {
+				group = claude_autostart_group,
+				callback = function()
+					if claude_pid and claude_pid > 0 then
+						-- Tested: Claude ignores SIGTERM/SIGINT even after WebSocket server shutdown
+						-- Use SIGKILL immediately for reliable cleanup
+						vim.system({ "kill", "-9", tostring(claude_pid) }):wait()
+						claude_pid = nil
 					end
 				end,
 			})
@@ -233,27 +257,31 @@ return {
 			vim.api.nvim_create_autocmd("VimEnter", {
 				group = claude_autostart_group,
 				callback = function()
-					vim.defer_fn(function()
-						if pending_claude_restore == nil then
-							return
-						end
-
-						vim.cmd("tabnext 1")
-
-						local success = pcall(function()
-							if pending_claude_restore ~= false then
-								vim.cmd("ClaudeCode --resume " .. vim.fn.shellescape(pending_claude_restore))
-							else
-								vim.cmd("ClaudeCode --resume")
+					-- Use vim.schedule to defer to main event loop, not autocmd context
+					vim.schedule(function()
+						-- Additional defer to ensure Neovim is fully settled
+						vim.defer_fn(function()
+							if pending_claude_restore == nil then
+								return
 							end
-						end)
 
-						if not success then
-							vim.notify("[Claude] Failed to restore session", vim.log.levels.WARN)
-						end
+							vim.cmd("tabnext 1")
 
-						pending_claude_restore = nil
-					end, 500)
+							local success = pcall(function()
+								if pending_claude_restore ~= false then
+									vim.cmd("ClaudeCode --resume " .. vim.fn.shellescape(pending_claude_restore))
+								else
+									vim.cmd("ClaudeCode --resume")
+								end
+							end)
+
+							if not success then
+								vim.notify("[Claude] Failed to restore session", vim.log.levels.WARN)
+							end
+
+							pending_claude_restore = nil
+						end, 500)
+					end)
 				end,
 				nested = true,
 			})
