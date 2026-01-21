@@ -4,30 +4,42 @@ description: Remove obvious and redundant comments from uncommitted code changes
 
 # Task
 
-Remove obvious and redundant comments from uncommitted code changes only. Do not modify committed code.
+Launch the comment-remover agent to clean up obvious and redundant comments from uncommitted changes.
 
-# Instructions
+# Agent Invocation
 
-1. First, run `git status` and `git diff` to identify uncommitted changes
-2. Review only the files with uncommitted changes for comments to remove
-3. Remove the following types of comments:
-   - Comments that simply restate what the code obviously does (e.g., `// Calculate elapsed time` above `elapsed = end - start`)
-   - Comments describing edits like "added", "removed", "changed", "updated"
-   - Commented-out code blocks
-   - Redundant explanations that add no value beyond reading the code itself
-   - Obvious variable or function explanations (e.g., `// User ID` above `userId`)
+Use the Task tool with `subagent_type="comment-remover"` to launch the comment removal specialist.
 
-4. **DO NOT** remove:
-   - TODO, FIXME, HACK, NOTE, or similar marker comments
-   - Comments that explain "why" rather than "what"
-   - Comments that provide important context not obvious from the code
-   - Comments that would leave a scope completely empty (e.g., empty interface bodies)
-   - Documentation comments (JSDoc, docstrings, etc.)
-   - License headers or attribution comments
+The agent will autonomously:
+1. Identify uncommitted changes using git
+2. Review files for obvious and redundant comments
+3. Remove comments that don't add value
+4. Preserve important contextual comments
+5. Provide a summary of what was cleaned up
 
-5. Make edits using the Edit tool
-6. After all edits, show a summary of what was removed
+# When to Use
 
-# Style
+Use this command:
+- Before committing code (as part of /finalize workflow)
+- When cleaning up code after implementation
+- To improve code clarity by removing noise
 
-Be aggressive in removing obvious comments but conservative with contextual ones. When in doubt, keep the comment.
+# What Gets Removed
+
+The agent removes:
+- Obvious code restatements
+- Edit history comments ("Added", "Changed", etc.)
+- Commented-out code blocks
+- Redundant explanations
+- Empty placeholder comments
+
+# What Gets Preserved
+
+The agent preserves:
+- TODO, FIXME, HACK, NOTE markers
+- "Why" explanations and rationale
+- Important context and workarounds
+- Documentation comments (JSDoc, docstrings)
+- License headers and attribution
+
+Arguments: $ARGUMENTS (optional: file paths to focus on)
