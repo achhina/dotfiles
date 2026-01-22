@@ -1,6 +1,0 @@
-{
-  "name": "neovim-integration",
-  "version": "1.0.0",
-  "description": "Integrates Neovim with Claude Code via MCP for AI-powered editing",
-  "author": "Local Configuration"
-}

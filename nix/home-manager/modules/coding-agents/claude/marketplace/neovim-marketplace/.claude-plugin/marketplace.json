@@ -1,0 +1,21 @@
+{
+  "name": "neovim-marketplace",
+  "owner": {
+    "name": "Local Configuration"
+  },
+  "metadata": {
+    "description": "Local marketplace for Neovim integration plugins",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "neovim-integration",
+      "source": "./plugins/neovim-integration",
+      "description": "Integrates Neovim with Claude Code via MCP for AI-powered editing",
+      "version": "1.0.0",
+      "author": {
+        "name": "Local Configuration"
+      }
+    }
+  ]
+}

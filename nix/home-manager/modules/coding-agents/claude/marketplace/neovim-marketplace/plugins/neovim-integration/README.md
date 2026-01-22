@@ -11,31 +11,34 @@ Integrates Neovim with Claude Code using the Model Context Protocol (MCP).
 
 ## Setup
 
-### 1. Start Neovim with Socket Support
+### Automatic Setup (Recommended)
 
-Launch Neovim with a socket file:
+When you launch Claude Code from within Neovim using `claudecode.nvim`, the integration works automatically:
 
-```bash
-nvim --listen /tmp/nvim
+1. Neovim creates a unique MCP socket on startup in its temp directory
+2. The socket path is passed to Claude Code via the `NVIM_MCP_SOCKET` environment variable
+3. The MCP server connects to your specific Neovim instance
+4. Socket is automatically cleaned up when Neovim exits
+
+**Usage:**
+```vim
+<leader>ac  " Launch Claude Code (automatically connects to this Neovim instance)
 ```
 
-Or add this to your Neovim `init.lua` to always expose the socket:
+### Multiple Neovim Instances
 
-```lua
--- Start RPC server on a socket file
-vim.fn.serverstart("/tmp/nvim")
-```
+Each Neovim instance gets its own unique socket based on its process ID. When you launch Claude Code from a specific Neovim instance, it connects to that instance only.
 
-### 2. Environment Variables
+### Environment Variables
 
-- `NVIM_SOCKET_PATH`: Path to Neovim socket file (default: `/tmp/nvim`)
+- `NVIM_MCP_SOCKET`: Automatically set by Neovim to the unique socket path for this instance
 - `ALLOW_SHELL_COMMANDS`: Controls shell command execution through Neovim (default: `false`)
 
 ⚠️ **Security Note**: `ALLOW_SHELL_COMMANDS` is set to `false` for security. Claude Code already has extensive Bash permissions configured in `claude.nix`. Enabling shell commands through Neovim would create an unnecessary privilege escalation path that bypasses the existing permission system.
 
-### 3. Plugin Activation
+### Plugin Activation
 
-The plugin is automatically activated when Claude Code starts. The MCP server will connect to your running Neovim instance.
+The plugin is automatically activated when Claude Code starts from Neovim. The MCP server connects to the Neovim instance that launched it.
 
 ## MCP Tools
 

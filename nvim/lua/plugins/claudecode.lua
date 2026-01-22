@@ -136,6 +136,8 @@ return {
 			env = {
 				-- Neovim-specific identifier for session binding hook
 				CLAUDE_FROM_NEOVIM = "1",
+				-- Pass through MCP socket path for this Neovim instance
+				NVIM_MCP_SOCKET = vim.env.NVIM_MCP_SOCKET,
 			},
 			diff_opts = {
 				open_in_new_tab = true,

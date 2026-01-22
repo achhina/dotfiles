@@ -302,13 +302,6 @@ in
           };
           autoUpdate = true;
         };
-        neovim-integration = {
-          source = {
-            source = "local";
-            path = ./plugins/neovim-integration;
-          };
-          autoUpdate = false;
-        };
       };
 
       enabledPlugins = {
@@ -320,7 +313,7 @@ in
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
-        "neovim-integration" = true;
+        "neovim-integration@neovim-marketplace" = true;
         "github@claude-plugins-official" = true;
         "ralph-loop@claude-plugins-official" = true;
         "frontend-design@claude-plugins-official" = true;
@@ -385,6 +378,36 @@ in
     if [ -f "$SETTINGS_FILE" ] && [ ! -L "$SETTINGS_FILE" ]; then
       $VERBOSE_ECHO "Backing up mutable Claude Code settings to settings.json.backup"
       $DRY_RUN_CMD cp "$SETTINGS_FILE" "$BACKUP_FILE"
+    fi
+  '';
+
+  # Install local marketplace by symlinking from Nix store to ~/.claude/plugins/marketplaces/
+  # Claude Code expects local marketplaces to be in this directory
+  home.activation.installLocalMarketplace = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    MARKETPLACES_DIR="$HOME/.claude/plugins/marketplaces"
+    $DRY_RUN_CMD mkdir -p "$MARKETPLACES_DIR"
+
+    # Symlink neovim-marketplace
+    MARKETPLACE_PATH="${./marketplace/neovim-marketplace}"
+    MARKETPLACE_LINK="$MARKETPLACES_DIR/neovim-marketplace"
+
+    if [ -d "$MARKETPLACE_PATH" ]; then
+      $VERBOSE_ECHO "Installing neovim-marketplace to ~/.claude/plugins/marketplaces/"
+      # Remove existing symlink if present
+      if [ -L "$MARKETPLACE_LINK" ] || [ -e "$MARKETPLACE_LINK" ]; then
+        $DRY_RUN_CMD rm -f "$MARKETPLACE_LINK"
+      fi
+      $DRY_RUN_CMD ln -s "$MARKETPLACE_PATH" "$MARKETPLACE_LINK"
+
+      # Register marketplace with Claude Code if available
+      if command -v claude >/dev/null 2>&1; then
+        $VERBOSE_ECHO "Registering neovim-marketplace with Claude Code"
+        # Check if already registered by checking known_marketplaces.json
+        KNOWN_MARKETPLACES="$HOME/.claude/plugins/known_marketplaces.json"
+        if [ -f "$KNOWN_MARKETPLACES" ] && ! grep -q "neovim-marketplace" "$KNOWN_MARKETPLACES"; then
+          $DRY_RUN_CMD claude plugin marketplace add "$MARKETPLACE_LINK" >/dev/null 2>&1 || true
+        fi
+      fi
     fi
   '';
 
