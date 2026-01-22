@@ -5,25 +5,20 @@
 }:
 
 let
-  # Software development detector hook script (general principles for any git repo)
   softwareDevelopmentDetector = pkgs.writeShellScript "software-development-detector.sh" (
     builtins.readFile ./hooks/software-development-detector.sh
   );
 
-  # Python project detector hook script (Python-specific practices)
   pythonProjectDetector = pkgs.writeShellScript "python-project-detector.sh" (
     builtins.readFile ./hooks/python-project-detector.sh
   );
 
-  # Neovim session binder hook script (binds Claude sessions to Neovim persistence sessions)
+  # Binds Claude sessions to Neovim persistence sessions
   neovimSessionBinder = pkgs.writeShellScript "neovim-session-binder.sh" (
     builtins.readFile ./hooks/neovim-session-binder.sh
   );
 in
 {
-  # Claude Code settings configuration
-  # Managed declaratively through Home Manager
-
   programs.claude-code = {
     enable = true;
     package = null; # Don't install claude-code via Nix, use npm install instead
@@ -34,10 +29,8 @@ in
     # AGENTS.md is the source file, deployed as CLAUDE.md for Claude Code
     memory.source = ./context/AGENTS.md;
 
-    # Skills directory - all skills symlinked from ./skills/
     skillsDir = ./skills;
 
-    # Agents directory - custom subagents
     agentsDir = ./agents;
 
     settings = {
@@ -130,7 +123,6 @@ in
           "Bash(zip:*)"
           "Bash(/usr/bin/man:*)"
           "Bash(~/bin/man:*)"
-          # Docker read-only commands
           "Bash(docker ps:*)"
           "Bash(docker images:*)"
           "Bash(docker version:*)"
@@ -145,7 +137,6 @@ in
           "Bash(docker stats:*)"
           "Bash(docker top:*)"
           "Bash(docker manifest inspect:*)"
-          # Docker management commands (read-only)
           "Bash(docker container ls:*)"
           "Bash(docker container inspect:*)"
           "Bash(docker container logs:*)"
@@ -162,7 +153,6 @@ in
           "Bash(docker system df:*)"
           "Bash(docker system info:*)"
           "Bash(docker system events:*)"
-          # Homebrew read-only commands
           "Bash(brew search:*)"
           "Bash(brew info:*)"
           "Bash(brew list:*)"
@@ -180,7 +170,6 @@ in
           "Bash(brew tap-info:*)"
           "Bash(brew leaves:*)"
           "Bash(brew desc:*)"
-          # Git read-only commands
           "Bash(git show:*)"
           "Bash(git blame:*)"
           "Bash(git branch:*)"
@@ -188,12 +177,10 @@ in
           "Bash(git remote:*)"
           "Bash(git config --get:*)"
           "Bash(git config --list:*)"
-          # GitHub CLI read-only API calls
           "Bash(gh api --method GET:*)"
           "Bash(gh api --method=GET:*)"
           "Bash(gh api -X GET:*)"
           "Bash(gh api -XGET:*)"
-          # System information commands
           "Bash(which:*)"
           "Bash(whence:*)"
           "Bash(type:*)"
@@ -201,10 +188,8 @@ in
           "Bash(uname:*)"
           "Bash(pgrep:*)"
           "Bash(ps:*)"
-          # File inspection commands
           "Bash(file:*)"
           "Bash(wc:*)"
-          # Nix read-only commands
           "Bash(nix search:*)"
           "Bash(nix show-config:*)"
           "Bash(nix flake metadata:*)"
@@ -213,19 +198,16 @@ in
           "Bash(nix eval:*)"
           "Bash(nix why-depends:*)"
           "Bash(nix store diff-closures:*)"
-          # Package manager read-only commands
           "Bash(npm view:*)"
           "Bash(npm list:*)"
           "Bash(npm outdated:*)"
           "Bash(conda list:*)"
           "Bash(pip list:*)"
           "Bash(yarn list:*)"
-          # Home Manager read-only commands
           "Bash(hm news:*)"
           "Bash(hm packages:*)"
           "Bash(home-manager news:*)"
           "Bash(home-manager generations:*)"
-          # Utility commands
           "Bash(jq:*)"
           "Bash(mdfind:*)"
           "Bash(tldr:*)"
@@ -236,6 +218,7 @@ in
           "Edit(//Users/achhina/.config/**)"
           "mcp__context7__*"
           "mcp__plugin_episodic-memory_episodic-memory__*"
+          "mcp__plugin_neovim-integration_neovim__*"
           "Glob"
           "Grep"
           "Task"
@@ -271,7 +254,6 @@ in
 
       defaultMode = "acceptEdits";
 
-      # Custom agents
       agents = [
         {
           name = "github-automation";
@@ -287,7 +269,6 @@ in
         }
       ];
 
-      # Plugin configuration
       # Marketplaces contain multiple plugins
       extraKnownMarketplaces = {
         superpowers-marketplace = {
@@ -313,7 +294,6 @@ in
         };
       };
 
-      # Standalone plugins from GitHub
       plugins = {
         d3js = {
           source = {
@@ -321,6 +301,13 @@ in
             repo = "chrisvoncsefalvay/claude-d3js-skill";
           };
           autoUpdate = true;
+        };
+        neovim-integration = {
+          source = {
+            source = "local";
+            path = ./plugins/neovim-integration;
+          };
+          autoUpdate = false;
         };
       };
 
@@ -333,6 +320,7 @@ in
         "debugging-toolkit@claude-code-workflows" = true;
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
+        "neovim-integration" = true;
         "github@claude-plugins-official" = true;
         "ralph-loop@claude-plugins-official" = true;
         "frontend-design@claude-plugins-official" = true;
@@ -347,7 +335,6 @@ in
         "double-shot-latte@claude-plugins-official" = true;
       };
 
-      # Session hooks
       hooks = {
         SessionStart = [
           {
@@ -379,7 +366,6 @@ in
     # The activation scripts will convert it from symlink to mutable file with backup
     ".claude/settings.json".force = true;
 
-    # Create .keep files to ensure directories exist
     ".claude/commands/.keep".text = "";
     ".claude/agents/.keep".text = "";
 
