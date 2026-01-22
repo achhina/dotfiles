@@ -314,7 +314,7 @@ in
         "tdd-workflows@claude-code-workflows" = true;
         "d3js" = true;
         "neovim-integration@neovim-marketplace" = true;
-        "github@claude-plugins-official" = true;
+        "github@claude-plugins-official" = false;
         "ralph-loop@claude-plugins-official" = true;
         "frontend-design@claude-plugins-official" = true;
         "code-review@claude-plugins-official" = true;
