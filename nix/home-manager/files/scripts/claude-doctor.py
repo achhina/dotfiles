@@ -687,10 +687,346 @@ def check_plugin_broken_symlinks() -> CheckResult:
     )
 
 
+
+
+def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
+    """Apply fixes for failed checks."""
+    fixed_results = []
+
+    for result in results:
+        if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
+            if result.fix_command:
+                if dry_run:
+                    console_err.print(f"[blue]Would run: {result.fix_command}[/blue]")
+                else:
+                    try:
+                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
+                        subprocess.run(
+                            shlex.split(result.fix_command),
+                            shell=False,
+                            check=True,
+                            capture_output=True,
+                            text=True,
+                        )
+                        console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
+                        result.status = CheckStatus.PASS
+                        result.message += " (automatically fixed)"
+                    except subprocess.CalledProcessError as e:
+                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
+                        logger.error(
+                            "fix_command_error", check=result.name, error=e.stderr
+                        )
+            elif result.fix_function:
+                if dry_run:
+                    console_err.print(
+                        f"[blue]Would call fix function for: {result.name}[/blue]"
+                    )
+                else:
+                    try:
+                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
+                        success = result.fix_function()
+                        if success:
+                            console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
+                            result.status = CheckStatus.PASS
+                            result.message += " (automatically fixed)"
+                        else:
+                            console_err.print(
+                                f"[yellow]⚠ Fix returned False: {result.name}[/yellow]"
+                            )
+                    except Exception as e:
+                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
+                        logger.error(
+                            "fix_function_error", check=result.name, error=str(e)
+                        )
+
+        fixed_results.append(result)
+
+    return fixed_results
+
+
+# Tool Audit Models and Functions
+
+
+class ToolCall(BaseModel):
+    """Represents a tool call with key parameters."""
+
+    tool_name: str
+    timestamp: str
+    key_params: str
+    session_id: str
+    was_approved: bool
+
+
+class ToolAuditReport(BaseModel):
+    """Summary of tool call audit."""
+
+    start_date: Optional[str]
+    end_date: Optional[str]
+    total_conversations: int
+    total_tool_calls: int
+    unique_tool_calls: int
+    tool_calls: list[dict[str, Any]]
+
+
+def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
+    """Extract key parameters from tool input for uniqueness determination."""
+    if tool_name == "Bash":
+        cmd = tool_input.get("command", "")
+        # Truncate long commands but keep meaningful parts
+        return cmd[:100] if len(cmd) <= 100 else cmd[:97] + "..."
+    elif tool_name in ("Edit", "Write", "Read"):
+        return tool_input.get("file_path", "")
+    elif tool_name == "Glob":
+        return tool_input.get("pattern", "")
+    elif tool_name == "Grep":
+        return tool_input.get("pattern", "")
+    elif tool_name == "Task":
+        return tool_input.get("subagent_type", "")
+    elif tool_name == "Skill":
+        return tool_input.get("skill", "")
+    else:
+        # For other tools, use first parameter or empty
+        if tool_input:
+            first_key = next(iter(tool_input.keys()), "")
+            first_val = tool_input.get(first_key, "")
+            return f"{first_key}={first_val}"[:50]
+        return ""
+
+
+def parse_conversation_file(file_path: Path) -> list[ToolCall]:
+    """Parse a conversation JSONL file and extract approved tool calls."""
+    tool_calls = []
+    tool_use_map = {}  # Map tool_use_id to tool details
+
+    try:
+        with open(file_path) as f:
+            for line in f:
+                try:
+                    entry = json.loads(line)
+
+                    # Extract tool_use entries
+                    if entry.get("type") == "assistant":
+                        message = entry.get("message", {})
+                        if not isinstance(message, dict):
+                            continue
+
+                        content = message.get("content", [])
+                        if not isinstance(content, list):
+                            continue
+
+                        timestamp = entry.get("timestamp", "")
+                        session_id = entry.get("sessionId", "")
+
+                        for item in content:
+                            if isinstance(item, dict) and item.get("type") == "tool_use":
+                                tool_id = item.get("id")
+                                tool_name = item.get("name")
+                                tool_input = item.get("input", {})
+
+                                if tool_id and tool_name:
+                                    tool_use_map[tool_id] = {
+                                        "name": tool_name,
+                                        "input": tool_input,
+                                        "timestamp": timestamp,
+                                        "session_id": session_id,
+                                    }
+
+                    # Extract tool_result entries to determine approval
+                    elif entry.get("type") == "user":
+                        message = entry.get("message", {})
+                        if not isinstance(message, dict):
+                            continue
+
+                        content = message.get("content", [])
+                        if not isinstance(content, list):
+                            continue
+
+                        for item in content:
+                            if isinstance(item, dict) and item.get("type") == "tool_result":
+                                tool_use_id = item.get("tool_use_id")
+                                tool_result = entry.get("toolUseResult", {})
+
+                                # Check if tool was approved (success=True means it ran)
+                                # If there's an error about user denial, was_approved=False
+                                was_approved = True
+                                if not tool_result.get("success", True):
+                                    # Check if it was explicitly denied
+                                    content_text = str(item.get("content", ""))
+                                    if "doesn't want to proceed" in content_text or "denied" in content_text.lower():
+                                        was_approved = False
+
+                                if tool_use_id in tool_use_map:
+                                    tool_info = tool_use_map[tool_use_id]
+                                    key_params = extract_key_params(
+                                        tool_info["name"], tool_info["input"]
+                                    )
+
+                                    tool_calls.append(
+                                        ToolCall(
+                                            tool_name=tool_info["name"],
+                                            timestamp=tool_info["timestamp"],
+                                            key_params=key_params,
+                                            session_id=tool_info["session_id"],
+                                            was_approved=was_approved,
+                                        )
+                                    )
+
+                except json.JSONDecodeError:
+                    continue  # Skip malformed lines
+
+    except Exception as e:
+        logger.warning("conversation_parse_error", file=str(file_path), error=str(e))
+
+    return tool_calls
+
+
+def audit_tools(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    project_path: Optional[str] = None,
+) -> ToolAuditReport:
+    """Audit tool calls from conversation history."""
+    if project_path:
+        projects_dir = Path(project_path)
+    else:
+        projects_dir = Path.home() / ".claude" / "projects"
+
+    if not projects_dir.exists():
+        return ToolAuditReport(
+            start_date=start_date,
+            end_date=end_date,
+            total_conversations=0,
+            total_tool_calls=0,
+            unique_tool_calls=0,
+            tool_calls=[],
+        )
+
+    # Find all conversation files
+    conv_files = list(projects_dir.rglob("*.jsonl"))
+
+    # Parse conversations and collect tool calls
+    all_tool_calls = []
+    for conv_file in conv_files:
+        tool_calls = parse_conversation_file(conv_file)
+        all_tool_calls.extend(tool_calls)
+
+    # Filter by date if specified
+    filtered_calls = []
+    for call in all_tool_calls:
+        if not call.was_approved:
+            continue  # Skip denied tool calls
+
+        if start_date or end_date:
+            call_date = call.timestamp.split("T")[0] if "T" in call.timestamp else ""
+            if start_date and call_date < start_date:
+                continue
+            if end_date and call_date > end_date:
+                continue
+
+        filtered_calls.append(call)
+
+    # Group by tool + key params for uniqueness
+    unique_calls = {}
+    for call in filtered_calls:
+        key = f"{call.tool_name}:{call.key_params}"
+        if key not in unique_calls:
+            unique_calls[key] = {
+                "tool_name": call.tool_name,
+                "key_params": call.key_params,
+                "count": 1,
+                "first_seen": call.timestamp,
+                "last_seen": call.timestamp,
+                "sessions": {call.session_id},
+            }
+        else:
+            unique_calls[key]["count"] += 1
+            unique_calls[key]["sessions"].add(call.session_id)
+            if call.timestamp < unique_calls[key]["first_seen"]:
+                unique_calls[key]["first_seen"] = call.timestamp
+            if call.timestamp > unique_calls[key]["last_seen"]:
+                unique_calls[key]["last_seen"] = call.timestamp
+
+    # Convert to list and add session count
+    tool_call_list = []
+    for call_data in unique_calls.values():
+        call_data["session_count"] = len(call_data["sessions"])
+        call_data["sessions"] = list(call_data["sessions"])  # Convert set to list
+        tool_call_list.append(call_data)
+
+    # Sort by count (most used first)
+    tool_call_list.sort(key=lambda x: x["count"], reverse=True)
+
+    return ToolAuditReport(
+        start_date=start_date,
+        end_date=end_date,
+        total_conversations=len(conv_files),
+        total_tool_calls=len(filtered_calls),
+        unique_tool_calls=len(unique_calls),
+        tool_calls=tool_call_list,
+    )
+
+
+def format_audit_rich(report: ToolAuditReport) -> None:
+    """Format tool audit report as Rich table."""
+    console.print("\n[bold]Claude Code Tool Audit Report[/bold]")
+    if report.start_date:
+        console.print(f"Date range: {report.start_date} to {report.end_date or 'now'}")
+    console.print(f"Conversations scanned: {report.total_conversations}")
+    console.print(f"Approved tool calls: {report.total_tool_calls}")
+    console.print(f"Unique tool calls: {report.unique_tool_calls}\n")
+
+    if not report.tool_calls:
+        console.print("[yellow]No approved tool calls found in date range[/yellow]")
+        return
+
+    table = Table(title="Tool Usage Statistics")
+    table.add_column("Tool", style="cyan", no_wrap=True)
+    table.add_column("Parameters", style="dim")
+    table.add_column("Count", justify="right", style="bold")
+    table.add_column("Sessions", justify="right")
+    table.add_column("First Seen", style="dim")
+    table.add_column("Last Seen", style="dim")
+
+    for call in report.tool_calls[:50]:  # Limit to top 50
+        # Truncate long parameters
+        params = call["key_params"]
+        if len(params) > 60:
+            params = params[:57] + "..."
+
+        # Format dates
+        first_seen = call["first_seen"].split("T")[0] if "T" in call["first_seen"] else call["first_seen"]
+        last_seen = call["last_seen"].split("T")[0] if "T" in call["last_seen"] else call["last_seen"]
+
+        table.add_row(
+            call["tool_name"],
+            params,
+            str(call["count"]),
+            str(call["session_count"]),
+            first_seen,
+            last_seen,
+        )
+
+    console.print(table)
+
+    if len(report.tool_calls) > 50:
+        console.print(f"\n[dim]Showing top 50 of {len(report.tool_calls)} unique tool calls[/dim]")
+
+
+def format_audit_json(report: ToolAuditReport) -> None:
+    """Format tool audit report as JSON."""
+    print(report.model_dump_json(indent=2))
+
+
 # CLI
 
 
-@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
+def cli():
+    """Claude Code diagnostic and audit tool."""
+    pass
+
+
+@cli.command(name="check")
 @click.option(
     "--format",
     "-f",
@@ -723,7 +1059,7 @@ def check_plugin_broken_symlinks() -> CheckResult:
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level",
 )
-def main(
+def check_command(
     format: str,
     filter: Optional[str],
     fix: bool,
@@ -731,22 +1067,19 @@ def main(
     verbose: int,
     log_level: str,
 ):
-    """Diagnostic tool for Claude Code installations.
-
-    Runs comprehensive health checks on your Claude Code environment,
-    including installation, configuration, plugins, and performance.
+    """Run diagnostic health checks on Claude Code installation.
 
     Examples:
 
-        claude-doctor                          # Run all checks
+        claude-doctor check                          # Run all checks
 
-        claude-doctor --filter "plugin.*"      # Only plugin checks
+        claude-doctor check --filter "plugin.*"      # Only plugin checks
 
-        claude-doctor --dry-run --fix          # Preview fixes
+        claude-doctor check --dry-run --fix          # Preview fixes
 
-        claude-doctor --fix                    # Fix issues automatically
+        claude-doctor check --fix                    # Fix issues automatically
 
-        claude-doctor -vvv                     # Maximum verbosity
+        claude-doctor check -vvv                     # Maximum verbosity
     """
     # Configure log level
     if verbose:
@@ -829,59 +1162,68 @@ def main(
         sys.exit(1)
 
 
-def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
-    """Apply fixes for failed checks."""
-    fixed_results = []
+@cli.command(name="audit-tools")
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["rich", "json"], case_sensitive=False),
+    default="rich",
+    help="Output format",
+)
+@click.option(
+    "--start-date",
+    type=str,
+    help="Start date filter (YYYY-MM-DD)",
+)
+@click.option(
+    "--end-date",
+    type=str,
+    help="End date filter (YYYY-MM-DD)",
+)
+@click.option(
+    "--project",
+    type=str,
+    help="Custom project path (default: ~/.claude/projects)",
+)
+def audit_tools_command(
+    format: str,
+    start_date: Optional[str],
+    end_date: Optional[str],
+    project: Optional[str],
+):
+    """Audit approved tool calls from conversation history.
 
-    for result in results:
-        if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
-            if result.fix_command:
-                if dry_run:
-                    console_err.print(f"[blue]Would run: {result.fix_command}[/blue]")
-                else:
-                    try:
-                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
-                        subprocess.run(
-                            shlex.split(result.fix_command),
-                            shell=False,
-                            check=True,
-                            capture_output=True,
-                            text=True,
-                        )
-                        console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
-                        result.status = CheckStatus.PASS
-                        result.message += " (automatically fixed)"
-                    except subprocess.CalledProcessError as e:
-                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
-                        logger.error(
-                            "fix_command_error", check=result.name, error=e.stderr
-                        )
-            elif result.fix_function:
-                if dry_run:
-                    console_err.print(
-                        f"[blue]Would call fix function for: {result.name}[/blue]"
-                    )
-                else:
-                    try:
-                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
-                        success = result.fix_function()
-                        if success:
-                            console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
-                            result.status = CheckStatus.PASS
-                            result.message += " (automatically fixed)"
-                        else:
-                            console_err.print(
-                                f"[yellow]⚠ Fix returned False: {result.name}[/yellow]"
-                            )
-                    except Exception as e:
-                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
-                        logger.error(
-                            "fix_function_error", check=result.name, error=str(e)
-                        )
+    Analyzes past conversations and reports unique tool calls that were
+    approved (not denied by user). Tool calls are grouped by tool name
+    and key parameters.
 
-        fixed_results.append(result)
+    Examples:
 
-    return fixed_results
+        claude-doctor audit-tools                             # All time
+
+        claude-doctor audit-tools --start-date 2026-01-01     # Since date
+
+        claude-doctor audit-tools --start-date 2026-01-01 --end-date 2026-01-31
+
+        claude-doctor audit-tools --format json > audit.json  # JSON export
+    """
+    report = audit_tools(start_date=start_date, end_date=end_date, project_path=project)
+
+    if format == "json":
+        format_audit_json(report)
+    else:
+        format_audit_rich(report)
+
+
+def main():
+    """Main entry point with default command support."""
+    import sys
+
+    # If no subcommand provided, default to 'check' for backward compatibility
+    if len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].startswith("-")):
+        sys.argv.insert(1, "check")
+
+    cli()
 
 
 if __name__ == "__main__":
