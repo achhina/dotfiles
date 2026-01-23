@@ -3,12 +3,7 @@
 # dependencies = ["click", "structlog", "rich", "pydantic"]
 # ///
 
-"""
-Diagnostic tool for Claude Code installations.
-
-Provides comprehensive health checks across environment, configuration,
-plugins, MCP servers, permissions, performance, and hooks.
-"""
+from __future__ import annotations
 
 import json
 import logging
@@ -30,6 +25,13 @@ from click.shell_completion import ZshComplete, add_completion_class
 from pydantic import BaseModel, ConfigDict, Field
 from rich.console import Console
 from rich.table import Table
+
+"""
+Diagnostic tool for Claude Code installations.
+
+Provides comprehensive health checks across environment, configuration,
+plugins, MCP servers, permissions, performance, and hooks.
+"""
 
 
 # Custom ZshComplete for autoload compatibility
