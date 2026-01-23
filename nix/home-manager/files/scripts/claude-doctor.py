@@ -336,3 +336,132 @@ def check_node_version() -> CheckResult:
             severity=CheckSeverity.HIGH,
             fix_command="Install Node.js via Nix or system package manager",
         )
+
+
+# Configuration Checks
+
+@check(
+    name="config.settings_file",
+    category="config",
+    severity=CheckSeverity.CRITICAL,
+    description="Verify settings.json exists and is valid JSON",
+)
+def check_settings_file() -> CheckResult:
+    """Check if settings.json exists and is valid JSON."""
+    settings_path = Path.home() / ".claude" / "settings.json"
+
+    if not settings_path.exists():
+        return CheckResult(
+            name="config.settings_file",
+            status=CheckStatus.FAIL,
+            message="settings.json does not exist",
+            severity=CheckSeverity.CRITICAL,
+            details={"path": str(settings_path)},
+        )
+
+    try:
+        with open(settings_path) as f:
+            json.load(f)
+
+        return CheckResult(
+            name="config.settings_file",
+            status=CheckStatus.PASS,
+            message="settings.json is valid JSON",
+            severity=CheckSeverity.CRITICAL,
+            details={"path": str(settings_path)},
+        )
+    except json.JSONDecodeError as e:
+        return CheckResult(
+            name="config.settings_file",
+            status=CheckStatus.FAIL,
+            message=f"settings.json is not valid JSON: {e}",
+            severity=CheckSeverity.CRITICAL,
+            details={"path": str(settings_path), "error": str(e)},
+        )
+    except (IOError, OSError, PermissionError) as e:
+        return CheckResult(
+            name="config.settings_file",
+            status=CheckStatus.FAIL,
+            message=f"Cannot read settings.json: {e}",
+            severity=CheckSeverity.CRITICAL,
+            details={"path": str(settings_path), "error": str(e)},
+        )
+
+
+@check(
+    name="config.settings_writable",
+    category="config",
+    severity=CheckSeverity.HIGH,
+    depends_on=["config.settings_file"],
+    description="Verify settings file is writable",
+)
+def check_settings_writable() -> CheckResult:
+    """Check if settings.json is writable (not stuck as symlink)."""
+    settings_path = Path.home() / ".claude" / "settings.json"
+
+    if settings_path.is_symlink():
+        target = settings_path.readlink()
+        is_broken = not settings_path.exists()
+
+        if is_broken:
+            return CheckResult(
+                name="config.settings_writable",
+                status=CheckStatus.FAIL,
+                message="settings.json is a broken symlink",
+                severity=CheckSeverity.CRITICAL,
+                fix_command="rm ~/.claude/settings.json && echo '{}' > ~/.claude/settings.json",
+                details={"target": str(target), "broken": True},
+            )
+
+        return CheckResult(
+            name="config.settings_writable",
+            status=CheckStatus.FAIL,
+            message="settings.json is a symlink (should be mutable file)",
+            severity=CheckSeverity.HIGH,
+            fix_command="cp -L ~/.claude/settings.json ~/.claude/settings.json.tmp && rm ~/.claude/settings.json && mv ~/.claude/settings.json.tmp ~/.claude/settings.json",
+            details={"target": str(target)},
+        )
+
+    if not os.access(settings_path, os.W_OK):
+        return CheckResult(
+            name="config.settings_writable",
+            status=CheckStatus.FAIL,
+            message="settings.json is not writable",
+            severity=CheckSeverity.HIGH,
+            fix_command="chmod u+w ~/.claude/settings.json",
+        )
+
+    return CheckResult(
+        name="config.settings_writable",
+        status=CheckStatus.PASS,
+        message="settings.json is writable",
+        severity=CheckSeverity.HIGH,
+    )
+
+
+@check(
+    name="config.memory_file",
+    category="config",
+    severity=CheckSeverity.MEDIUM,
+    description="Verify CLAUDE.md memory file exists",
+)
+def check_memory_file() -> CheckResult:
+    """Check if CLAUDE.md exists."""
+    memory_path = Path.home() / ".claude" / "CLAUDE.md"
+
+    if not memory_path.exists():
+        return CheckResult(
+            name="config.memory_file",
+            status=CheckStatus.WARN,
+            message="CLAUDE.md not found (optional but recommended)",
+            severity=CheckSeverity.MEDIUM,
+            details={"path": str(memory_path)},
+        )
+
+    return CheckResult(
+        name="config.memory_file",
+        status=CheckStatus.PASS,
+        message="CLAUDE.md found",
+        severity=CheckSeverity.MEDIUM,
+        details={"path": str(memory_path)},
+    )
