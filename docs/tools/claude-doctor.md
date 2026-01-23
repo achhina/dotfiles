@@ -1,11 +1,12 @@
 # claude-doctor
 
-Diagnostic tool for Claude Code installations.
+Diagnostic and audit tool for Claude Code installations.
 
 ## Overview
 
-`claude-doctor` performs comprehensive health checks across your Claude Code environment, including:
+`claude-doctor` provides two main functions:
 
+**Diagnostic Checks** - Comprehensive health checks across your Claude Code environment:
 - Environment setup (Claude CLI, Node.js)
 - Configuration files (settings.json, CLAUDE.md)
 - Plugin system (marketplaces, cache, symlinks)
@@ -14,12 +15,21 @@ Diagnostic tool for Claude Code installations.
 - Performance metrics
 - Hooks
 
-## Usage
+**Tool Audit** - Analyze approved tool calls from conversation history:
+- Extract unique tool usage patterns
+- Filter by date range
+- Group by tool name and key parameters
+- Export as Rich table or JSON
 
-### Run all checks
+## Commands
+
+### Diagnostic Checks
+
+Run all checks:
 
 ```bash
-claude-doctor
+claude-doctor           # Defaults to 'check' subcommand
+claude-doctor check     # Explicit subcommand
 ```
 
 ### Filter checks by pattern
@@ -79,10 +89,50 @@ claude-doctor -vvv
 - `plugin.cache_dir`: Verify cache accessibility
 - `plugin.broken_symlinks`: Find broken links
 
+## Tool Usage Audit
+
+Analyze approved tool calls from conversation history to understand your workflow patterns.
+
+### Basic Usage
+
+```bash
+# Audit all conversations
+claude-doctor audit-tools
+
+# Filter by date range
+claude-doctor audit-tools --start-date 2026-01-01
+claude-doctor audit-tools --start-date 2026-01-01 --end-date 2026-01-31
+
+# Export as JSON
+claude-doctor audit-tools --format json > audit.json
+```
+
+### What Gets Audited
+
+- **Approved tools only**: Only tool calls that weren't denied by user
+- **Unique grouping**: Grouped by tool name + key parameters
+  - `Edit: /path/to/file.py` (unique per file)
+  - `Bash: git status` (unique per command pattern)
+  - `Task: subagent-type` (unique per subagent)
+- **Statistics**: Count, session count, first/last seen timestamps
+
+### Use Cases
+
+```bash
+# Find most used tools in last week
+claude-doctor audit-tools --start-date 2026-01-17
+
+# Analyze specific project
+claude-doctor audit-tools --project /path/to/.claude/projects
+
+# Generate workflow report for analysis
+claude-doctor audit-tools --format json | jq '.tool_calls[] | select(.count > 10)'
+```
+
 ## Exit Codes
 
-- `0`: All checks passed
-- `1`: One or more checks failed
+- `0`: All checks passed (check command only)
+- `1`: One or more checks failed (check command only)
 
 ## Examples
 
