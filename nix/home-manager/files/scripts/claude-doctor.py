@@ -226,3 +226,113 @@ def safe_check_wrapper(metadata: CheckMetadata, check_func: Callable) -> CheckRe
             severity=metadata.severity,
             details={"exception": str(e), "type": type(e).__name__},
         )
+
+
+# Environment Checks
+
+@check(
+    name="environment.claude_installed",
+    category="environment",
+    severity=CheckSeverity.CRITICAL,
+    description="Verify Claude Code is installed",
+)
+def check_claude_installed() -> CheckResult:
+    """Check if claude command exists in PATH."""
+    try:
+        claude_path = shutil.which("claude")
+
+        if claude_path:
+            return CheckResult(
+                name="environment.claude_installed",
+                status=CheckStatus.PASS,
+                message=f"Claude Code found at {claude_path}",
+                severity=CheckSeverity.CRITICAL,
+                details={"path": claude_path},
+            )
+        else:
+            return CheckResult(
+                name="environment.claude_installed",
+                status=CheckStatus.FAIL,
+                message="Claude Code not found in PATH",
+                severity=CheckSeverity.CRITICAL,
+                fix_command="npm install -g --prefix ~/.local/share/npm @anthropic-ai/claude-code",
+                details={"expected_path": "~/.local/share/npm/bin/claude"},
+            )
+    except Exception as e:
+        return CheckResult(
+            name="environment.claude_installed",
+            status=CheckStatus.FAIL,
+            message=f"Error checking Claude installation: {e}",
+            severity=CheckSeverity.CRITICAL,
+        )
+
+
+@check(
+    name="environment.claude_version",
+    category="environment",
+    severity=CheckSeverity.MEDIUM,
+    depends_on=["environment.claude_installed"],
+    description="Check Claude Code version",
+)
+def check_claude_version() -> CheckResult:
+    """Check if Claude Code version is recent."""
+    try:
+        result = subprocess.run(
+            ["claude", "--version"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        version_output = result.stdout.strip()
+
+        return CheckResult(
+            name="environment.claude_version",
+            status=CheckStatus.PASS,
+            message=f"Claude Code version: {version_output}",
+            severity=CheckSeverity.MEDIUM,
+            details={"version": version_output},
+        )
+    except subprocess.CalledProcessError as e:
+        return CheckResult(
+            name="environment.claude_version",
+            status=CheckStatus.FAIL,
+            message=f"Could not determine Claude Code version (exit code: {e.returncode})",
+            severity=CheckSeverity.MEDIUM,
+            details={"returncode": e.returncode},
+        )
+
+
+@check(
+    name="environment.node_version",
+    category="environment",
+    severity=CheckSeverity.HIGH,
+    description="Check Node.js version",
+)
+def check_node_version() -> CheckResult:
+    """Ensure Node.js meets minimum requirements."""
+    try:
+        result = subprocess.run(
+            ["node", "--version"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        version = result.stdout.strip()
+
+        return CheckResult(
+            name="environment.node_version",
+            status=CheckStatus.PASS,
+            message=f"Node.js version: {version}",
+            severity=CheckSeverity.HIGH,
+            details={"version": version},
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return CheckResult(
+            name="environment.node_version",
+            status=CheckStatus.FAIL,
+            message="Node.js not found",
+            severity=CheckSeverity.HIGH,
+            fix_command="Install Node.js via Nix or system package manager",
+        )
