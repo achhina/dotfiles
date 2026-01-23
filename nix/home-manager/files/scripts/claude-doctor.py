@@ -74,10 +74,11 @@ logger = structlog.get_logger()
 
 # Output Formatting
 
+
 def format_rich(report: DiagnosticReport) -> None:
     """Format report as Rich table."""
     # Summary
-    console.print(f"\n[bold]Claude Code Diagnostic Report[/bold]")
+    console.print("\n[bold]Claude Code Diagnostic Report[/bold]")
     console.print(f"Timestamp: {report.timestamp}")
     console.print(f"Checks run: {report.checks_run}")
 
@@ -96,7 +97,8 @@ def format_rich(report: DiagnosticReport) -> None:
     # Group by category
     by_category: dict[str, list[CheckResult]] = {}
     for result in report.results:
-        category = result.name.split(".")[0]
+        parts = result.name.split(".", 1)
+        category = parts[0] if parts else "unknown"
         by_category.setdefault(category, []).append(result)
 
     # Table per category
@@ -118,7 +120,8 @@ def format_rich(report: DiagnosticReport) -> None:
                 status = "[dim]○ SKIP[/dim]"
 
             # Check name without category prefix
-            check_name = result.name.split(".", 1)[1]
+            parts = result.name.split(".", 1)
+            check_name = parts[1] if len(parts) > 1 else result.name
             if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
                 if result.severity == CheckSeverity.CRITICAL:
                     check_name = f"[red bold]{check_name}[/red bold]"
@@ -142,7 +145,7 @@ def format_rich(report: DiagnosticReport) -> None:
         for result in fixable:
             if result.fix_command:
                 console.print(f"  • {result.name}: [cyan]{result.fix_command}[/cyan]")
-        console.print(f"\nRun with [cyan]--fix[/cyan] to apply fixes automatically\n")
+        console.print("\nRun with [cyan]--fix[/cyan] to apply fixes automatically\n")
 
 
 def format_json(report: DiagnosticReport) -> None:
@@ -162,8 +165,10 @@ PLUGIN_CACHE_DIR = CLAUDE_HOME / "plugins" / "cache"
 
 # Data Models
 
+
 class CheckStatus(str, Enum):
     """Status of a diagnostic check."""
+
     PASS = "pass"
     WARN = "warn"
     FAIL = "fail"
@@ -172,6 +177,7 @@ class CheckStatus(str, Enum):
 
 class CheckSeverity(str, Enum):
     """Severity level of a check."""
+
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -180,6 +186,7 @@ class CheckSeverity(str, Enum):
 
 class CheckResult(BaseModel):
     """Result of a diagnostic check."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     name: str
@@ -193,6 +200,7 @@ class CheckResult(BaseModel):
 
 class CheckMetadata(BaseModel):
     """Metadata for a diagnostic check."""
+
     name: str
     category: str
     severity: CheckSeverity
@@ -202,6 +210,7 @@ class CheckMetadata(BaseModel):
 
 class DiagnosticReport(BaseModel):
     """Complete diagnostic report."""
+
     timestamp: str
     checks_run: int
     passed: int
@@ -244,7 +253,9 @@ def check(
     return decorator
 
 
-def get_checks_by_filter(pattern: Optional[str] = None) -> list[tuple[CheckMetadata, Callable]]:
+def get_checks_by_filter(
+    pattern: Optional[str] = None,
+) -> list[tuple[CheckMetadata, Callable]]:
     """Get checks matching regex pattern, in dependency order.
 
     Args:
@@ -318,6 +329,7 @@ def safe_check_wrapper(metadata: CheckMetadata, check_func: Callable) -> CheckRe
 
 
 # Environment Checks
+
 
 @check(
     name="environment.claude_installed",
@@ -428,6 +440,7 @@ def check_node_version() -> CheckResult:
 
 
 # Configuration Checks
+
 
 @check(
     name="config.settings_file",
@@ -558,6 +571,7 @@ def check_memory_file() -> CheckResult:
 
 # Plugin Checks
 
+
 @check(
     name="plugin.marketplace_dir",
     category="plugin",
@@ -646,13 +660,21 @@ def check_plugin_broken_symlinks() -> CheckResult:
                 broken.append(str(path))
 
     if broken:
+        total_count = len(broken)
+        shown_count = min(5, total_count)
+        message = (
+            f"Found {total_count} broken symlink(s)"
+            if total_count <= 5
+            else f"Found {total_count} broken symlinks (showing first {shown_count})"
+        )
+        quoted_paths = [shlex.quote(path) for path in broken[:5]]
         return CheckResult(
             name="plugin.broken_symlinks",
             status=CheckStatus.WARN,
-            message=f"Found {len(broken)} broken symlink(s)",
+            message=message,
             severity=CheckSeverity.MEDIUM,
             details={"broken_links": broken[:5] if len(broken) > 5 else broken},
-            fix_command=f"rm {' '.join(broken[:5])}",
+            fix_command=f"rm {' '.join(quoted_paths)}",
         )
 
     return CheckResult(
@@ -664,6 +686,7 @@ def check_plugin_broken_symlinks() -> CheckResult:
 
 
 # CLI
+
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
@@ -679,9 +702,7 @@ def check_plugin_broken_symlinks() -> CheckResult:
     type=str,
     help="Regex pattern to filter checks (e.g., 'plugin.*')",
 )
-@click.option(
-    "--fix", is_flag=True, help="Automatically attempt to fix issues"
-)
+@click.option("--fix", is_flag=True, help="Automatically attempt to fix issues")
 @click.option(
     "--dry-run",
     "-n",
@@ -751,8 +772,15 @@ def main(
     # Run checks
     results = []
     skipped = set()
+    total_checks = len(checks)
 
-    for metadata, check_func in checks:
+    for idx, (metadata, check_func) in enumerate(checks, 1):
+        # Show progress (only for rich output, not JSON)
+        if format == "rich":
+            console_err.print(
+                f"[dim]Running check {idx}/{total_checks}: {metadata.name}[/dim]"
+            )
+
         # Skip if dependency failed
         if any(dep in skipped for dep in metadata.depends_on):
             result = CheckResult(
@@ -823,10 +851,14 @@ def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
                         result.message += " (automatically fixed)"
                     except subprocess.CalledProcessError as e:
                         console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
-                        logger.error("fix_command_error", check=result.name, error=e.stderr)
+                        logger.error(
+                            "fix_command_error", check=result.name, error=e.stderr
+                        )
             elif result.fix_function:
                 if dry_run:
-                    console_err.print(f"[blue]Would call fix function for: {result.name}[/blue]")
+                    console_err.print(
+                        f"[blue]Would call fix function for: {result.name}[/blue]"
+                    )
                 else:
                     try:
                         console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
@@ -836,10 +868,14 @@ def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
                             result.status = CheckStatus.PASS
                             result.message += " (automatically fixed)"
                         else:
-                            console_err.print(f"[yellow]⚠ Fix returned False: {result.name}[/yellow]")
+                            console_err.print(
+                                f"[yellow]⚠ Fix returned False: {result.name}[/yellow]"
+                            )
                     except Exception as e:
                         console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
-                        logger.error("fix_function_error", check=result.name, error=str(e))
+                        logger.error(
+                            "fix_function_error", check=result.name, error=str(e)
+                        )
 
         fixed_results.append(result)
 
