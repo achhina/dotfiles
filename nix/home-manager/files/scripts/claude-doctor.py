@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -69,6 +70,89 @@ structlog.configure(
 )
 
 logger = structlog.get_logger()
+
+
+# Output Formatting
+
+def format_rich(report: DiagnosticReport) -> None:
+    """Format report as Rich table."""
+    # Summary
+    console.print(f"\n[bold]Claude Code Diagnostic Report[/bold]")
+    console.print(f"Timestamp: {report.timestamp}")
+    console.print(f"Checks run: {report.checks_run}")
+
+    summary_parts = []
+    if report.passed > 0:
+        summary_parts.append(f"[green]{report.passed} passed[/green]")
+    if report.warned > 0:
+        summary_parts.append(f"[yellow]{report.warned} warnings[/yellow]")
+    if report.failed > 0:
+        summary_parts.append(f"[red]{report.failed} failed[/red]")
+    if report.skipped > 0:
+        summary_parts.append(f"[dim]{report.skipped} skipped[/dim]")
+
+    console.print(f"Results: {', '.join(summary_parts)}\n")
+
+    # Group by category
+    by_category: dict[str, list[CheckResult]] = {}
+    for result in report.results:
+        category = result.name.split(".")[0]
+        by_category.setdefault(category, []).append(result)
+
+    # Table per category
+    for category, results in by_category.items():
+        table = Table(title=f"{category.capitalize()} Checks")
+        table.add_column("Check", style="cyan")
+        table.add_column("Status", style="bold")
+        table.add_column("Message")
+
+        for result in results:
+            # Status with color
+            if result.status == CheckStatus.PASS:
+                status = "[green]✓ PASS[/green]"
+            elif result.status == CheckStatus.WARN:
+                status = "[yellow]⚠ WARN[/yellow]"
+            elif result.status == CheckStatus.FAIL:
+                status = "[red]✗ FAIL[/red]"
+            else:
+                status = "[dim]○ SKIP[/dim]"
+
+            # Check name without category prefix
+            check_name = result.name.split(".", 1)[1]
+            if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
+                if result.severity == CheckSeverity.CRITICAL:
+                    check_name = f"[red bold]{check_name}[/red bold]"
+                elif result.severity == CheckSeverity.HIGH:
+                    check_name = f"[red]{check_name}[/red]"
+
+            table.add_row(check_name, status, result.message)
+
+        console.print(table)
+        console.print()
+
+    # Show fix suggestions
+    fixable = [
+        r
+        for r in report.results
+        if r.status in (CheckStatus.FAIL, CheckStatus.WARN)
+        and (r.fix_command or r.fix_function)
+    ]
+    if fixable:
+        console.print("[bold yellow]Suggested Fixes:[/bold yellow]")
+        for result in fixable:
+            if result.fix_command:
+                console.print(f"  • {result.name}: [cyan]{result.fix_command}[/cyan]")
+        console.print(f"\nRun with [cyan]--fix[/cyan] to apply fixes automatically\n")
+
+
+def format_json(report: DiagnosticReport) -> None:
+    """Format report as JSON."""
+    print(
+        report.model_dump_json(
+            indent=2, exclude={"results": {"__all__": {"fix_function"}}}
+        )
+    )
+
 
 # Claude Code directories
 CLAUDE_HOME = Path.home() / ".claude"
@@ -577,3 +661,190 @@ def check_plugin_broken_symlinks() -> CheckResult:
         message="No broken symlinks found",
         severity=CheckSeverity.MEDIUM,
     )
+
+
+# CLI
+
+@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["rich", "json"], case_sensitive=False),
+    default="rich",
+    help="Output format",
+)
+@click.option(
+    "--filter",
+    "-F",
+    type=str,
+    help="Regex pattern to filter checks (e.g., 'plugin.*')",
+)
+@click.option(
+    "--fix", is_flag=True, help="Automatically attempt to fix issues"
+)
+@click.option(
+    "--dry-run",
+    "-n",
+    is_flag=True,
+    help="Show what fixes would be applied without applying them",
+)
+@click.option(
+    "--verbose",
+    "-v",
+    count=True,
+    help="Increase verbosity (can be repeated: -v, -vv, -vvv)",
+)
+@click.option(
+    "--log-level",
+    type=click.Choice(["debug", "info", "warning", "error"], case_sensitive=False),
+    default=DEFAULT_LOG_LEVEL,
+    help="Set logging level",
+)
+def main(
+    format: str,
+    filter: Optional[str],
+    fix: bool,
+    dry_run: bool,
+    verbose: int,
+    log_level: str,
+):
+    """Diagnostic tool for Claude Code installations.
+
+    Runs comprehensive health checks on your Claude Code environment,
+    including installation, configuration, plugins, and performance.
+
+    Examples:
+
+        claude-doctor                          # Run all checks
+
+        claude-doctor --filter "plugin.*"      # Only plugin checks
+
+        claude-doctor --dry-run --fix          # Preview fixes
+
+        claude-doctor --fix                    # Fix issues automatically
+
+        claude-doctor -vvv                     # Maximum verbosity
+    """
+    # Configure log level
+    if verbose:
+        log_level = ["warning", "info", "debug", "debug"][min(verbose, 3)]
+
+    if not any(key.endswith("_COMPLETE") for key in os.environ.keys()):
+        level_int = getattr(logging, log_level.upper())
+        structlog.configure(
+            processors=[
+                structlog.processors.add_log_level,
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.dev.ConsoleRenderer(),
+            ],
+            wrapper_class=structlog.make_filtering_bound_logger(level_int),
+            logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
+        )
+
+    # Get checks to run
+    checks = get_checks_by_filter(filter)
+
+    if not checks:
+        console_err.print(f"[yellow]No checks match filter: {filter}[/yellow]")
+        sys.exit(1)
+
+    # Run checks
+    results = []
+    skipped = set()
+
+    for metadata, check_func in checks:
+        # Skip if dependency failed
+        if any(dep in skipped for dep in metadata.depends_on):
+            result = CheckResult(
+                name=metadata.name,
+                status=CheckStatus.SKIP,
+                message="Skipped due to failed dependency",
+                severity=metadata.severity,
+            )
+            skipped.add(metadata.name)
+        else:
+            logger.info(f"Running check: {metadata.name}")
+            result = safe_check_wrapper(metadata, check_func)
+            if (
+                result.status == CheckStatus.FAIL
+                and metadata.severity == CheckSeverity.CRITICAL
+            ):
+                skipped.add(metadata.name)
+
+        results.append(result)
+
+    # Apply fixes if requested
+    if fix:
+        results = apply_fixes(results, dry_run)
+
+    # Generate report
+    report = DiagnosticReport(
+        timestamp=datetime.now().isoformat(),
+        checks_run=len(results),
+        passed=sum(1 for r in results if r.status == CheckStatus.PASS),
+        warned=sum(1 for r in results if r.status == CheckStatus.WARN),
+        failed=sum(1 for r in results if r.status == CheckStatus.FAIL),
+        skipped=sum(1 for r in results if r.status == CheckStatus.SKIP),
+        results=results,
+    )
+
+    # Output report
+    if format == "json":
+        format_json(report)
+    else:
+        format_rich(report)
+
+    # Exit with error if any checks failed
+    if report.failed > 0:
+        sys.exit(1)
+
+
+def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
+    """Apply fixes for failed checks."""
+    fixed_results = []
+
+    for result in results:
+        if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
+            if result.fix_command:
+                if dry_run:
+                    console_err.print(f"[blue]Would run: {result.fix_command}[/blue]")
+                else:
+                    try:
+                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
+                        subprocess.run(
+                            shlex.split(result.fix_command),
+                            shell=False,
+                            check=True,
+                            capture_output=True,
+                            text=True,
+                        )
+                        console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
+                        result.status = CheckStatus.PASS
+                        result.message += " (automatically fixed)"
+                    except subprocess.CalledProcessError as e:
+                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
+                        logger.error("fix_command_error", check=result.name, error=e.stderr)
+            elif result.fix_function:
+                if dry_run:
+                    console_err.print(f"[blue]Would call fix function for: {result.name}[/blue]")
+                else:
+                    try:
+                        console_err.print(f"[cyan]Fixing {result.name}...[/cyan]")
+                        success = result.fix_function()
+                        if success:
+                            console_err.print(f"[green]✓ Fixed: {result.name}[/green]")
+                            result.status = CheckStatus.PASS
+                            result.message += " (automatically fixed)"
+                        else:
+                            console_err.print(f"[yellow]⚠ Fix returned False: {result.name}[/yellow]")
+                    except Exception as e:
+                        console_err.print(f"[red]✗ Fix failed: {result.name}[/red]")
+                        logger.error("fix_function_error", check=result.name, error=str(e))
+
+        fixed_results.append(result)
+
+    return fixed_results
+
+
+if __name__ == "__main__":
+    main()
