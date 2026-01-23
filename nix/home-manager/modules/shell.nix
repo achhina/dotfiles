@@ -351,6 +351,11 @@ in
     executable = true;
   };
 
+  home.file."bin/claude-doctor" = {
+    source = ../files/scripts/claude-doctor.py;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
@@ -546,6 +551,21 @@ in
         touch "$COMPLETIONS_DIR"
       else
         echo "Warning: Failed to generate worktree completions (exit code: $?)" >&2
+      fi
+    fi
+  '';
+
+  # Generate claude-doctor completion after activation
+  home.activation.generateClaudeDoctorCompletion = lib.hm.dag.entryAfter [ "installPackages" ] ''
+    COMPLETIONS_DIR="$XDG_DATA_HOME/zsh/site-functions"
+    mkdir -p "$COMPLETIONS_DIR"
+    if [ -x $HOME/bin/claude-doctor ]; then
+      $VERBOSE_ECHO "Generating claude-doctor zsh completions..."
+      export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
+      if _CLAUDE_DOCTOR_COMPLETE=zsh_source $HOME/bin/claude-doctor > "$COMPLETIONS_DIR/_claude_doctor"; then
+        touch "$COMPLETIONS_DIR"
+      else
+        echo "Warning: Failed to generate claude-doctor completions (exit code: $?)" >&2
       fi
     fi
   '';
