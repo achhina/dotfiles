@@ -70,6 +70,11 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
+# Claude Code directories
+CLAUDE_HOME = Path.home() / ".claude"
+PLUGIN_MARKETPLACE_DIR = CLAUDE_HOME / "plugins" / "marketplaces"
+PLUGIN_CACHE_DIR = CLAUDE_HOME / "plugins" / "cache"
+
 
 # Data Models
 
@@ -464,4 +469,111 @@ def check_memory_file() -> CheckResult:
         message="CLAUDE.md found",
         severity=CheckSeverity.MEDIUM,
         details={"path": str(memory_path)},
+    )
+
+
+# Plugin Checks
+
+@check(
+    name="plugin.marketplace_dir",
+    category="plugin",
+    severity=CheckSeverity.MEDIUM,
+    description="Verify marketplaces directory exists",
+)
+def check_marketplace_dir() -> CheckResult:
+    """Check if marketplaces directory exists."""
+    marketplace_dir = PLUGIN_MARKETPLACE_DIR
+
+    if not marketplace_dir.exists():
+        return CheckResult(
+            name="plugin.marketplace_dir",
+            status=CheckStatus.WARN,
+            message="Marketplaces directory does not exist",
+            severity=CheckSeverity.MEDIUM,
+            fix_command=f"mkdir -p {marketplace_dir}",
+            details={"path": str(marketplace_dir)},
+        )
+
+    return CheckResult(
+        name="plugin.marketplace_dir",
+        status=CheckStatus.PASS,
+        message="Marketplaces directory exists",
+        severity=CheckSeverity.MEDIUM,
+        details={"path": str(marketplace_dir)},
+    )
+
+
+@check(
+    name="plugin.cache_dir",
+    category="plugin",
+    severity=CheckSeverity.MEDIUM,
+    description="Verify cache directory exists and is accessible",
+)
+def check_cache_dir() -> CheckResult:
+    """Check if plugin cache directory is accessible."""
+    cache_dir = PLUGIN_CACHE_DIR
+
+    if not cache_dir.exists():
+        return CheckResult(
+            name="plugin.cache_dir",
+            status=CheckStatus.WARN,
+            message="Plugin cache directory does not exist",
+            severity=CheckSeverity.MEDIUM,
+            fix_command=f"mkdir -p {cache_dir}",
+            details={"path": str(cache_dir)},
+        )
+
+    if not os.access(cache_dir, os.R_OK | os.W_OK):
+        return CheckResult(
+            name="plugin.cache_dir",
+            status=CheckStatus.FAIL,
+            message="Plugin cache directory is not accessible",
+            severity=CheckSeverity.MEDIUM,
+            fix_command=f"chmod u+rw {cache_dir}",
+            details={"path": str(cache_dir)},
+        )
+
+    return CheckResult(
+        name="plugin.cache_dir",
+        status=CheckStatus.PASS,
+        message="Plugin cache directory accessible",
+        severity=CheckSeverity.MEDIUM,
+        details={"path": str(cache_dir)},
+    )
+
+
+@check(
+    name="plugin.broken_symlinks",
+    category="plugin",
+    severity=CheckSeverity.MEDIUM,
+    description="Scan for broken symlinks in plugin directories",
+)
+def check_plugin_broken_symlinks() -> CheckResult:
+    """Find broken symlinks in plugin directories."""
+    plugin_dirs = [PLUGIN_MARKETPLACE_DIR, PLUGIN_CACHE_DIR]
+
+    broken = []
+    for base_dir in plugin_dirs:
+        if not base_dir.exists():
+            continue
+
+        for path in base_dir.rglob("*"):
+            if path.is_symlink() and not path.exists():
+                broken.append(str(path))
+
+    if broken:
+        return CheckResult(
+            name="plugin.broken_symlinks",
+            status=CheckStatus.WARN,
+            message=f"Found {len(broken)} broken symlink(s)",
+            severity=CheckSeverity.MEDIUM,
+            details={"broken_links": broken[:5] if len(broken) > 5 else broken},
+            fix_command=f"rm {' '.join(broken[:5])}",
+        )
+
+    return CheckResult(
+        name="plugin.broken_symlinks",
+        status=CheckStatus.PASS,
+        message="No broken symlinks found",
+        severity=CheckSeverity.MEDIUM,
     )
