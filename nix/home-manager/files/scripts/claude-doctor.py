@@ -120,3 +120,109 @@ class DiagnosticReport(BaseModel):
     failed: int
     skipped: int
     results: list[CheckResult]
+
+
+# Check Registry
+
+_CHECK_REGISTRY: dict[str, tuple[CheckMetadata, Callable]] = {}
+
+
+def check(
+    name: str,
+    category: str,
+    severity: CheckSeverity = CheckSeverity.MEDIUM,
+    depends_on: Optional[list[str]] = None,
+    description: str = "",
+) -> Callable:
+    """Decorator to register a diagnostic check."""
+
+    def decorator(func: Callable[[], CheckResult]) -> Callable:
+        metadata = CheckMetadata(
+            name=name,
+            category=category,
+            severity=severity,
+            depends_on=depends_on or [],
+            description=description or func.__doc__ or "",
+        )
+        _CHECK_REGISTRY[name] = (metadata, func)
+
+        @wraps(func)
+        def wrapper() -> CheckResult:
+            return func()
+
+        return wrapper
+
+    return decorator
+
+
+def get_checks_by_filter(pattern: Optional[str] = None) -> list[tuple[CheckMetadata, Callable]]:
+    """Get checks matching regex pattern, in dependency order.
+
+    Args:
+        pattern: Optional regex pattern to filter check names
+
+    Returns:
+        List of (metadata, function) tuples in dependency order
+
+    Raises:
+        ValueError: If circular dependencies are detected
+        re.error: If pattern is invalid regex
+    """
+    if pattern:
+        try:
+            regex = re.compile(pattern)
+        except re.error as e:
+            raise ValueError(f"Invalid regex pattern '{pattern}': {e}") from e
+        filtered = {k: v for k, v in _CHECK_REGISTRY.items() if regex.search(k)}
+    else:
+        filtered = _CHECK_REGISTRY
+
+    # Topological sort by dependencies with cycle detection
+    sorted_checks = []
+    resolved = set()
+    visiting = set()
+
+    def resolve(name: str):
+        if name in resolved:
+            return
+        if name not in filtered:
+            return
+
+        if name in visiting:
+            # Circular dependency detected
+            cycle_path = " -> ".join(list(visiting) + [name])
+            raise ValueError(
+                f"Circular dependency detected: {cycle_path}. "
+                f"Check '{name}' depends on itself through this cycle."
+            )
+
+        visiting.add(name)
+        try:
+            metadata, func = filtered[name]
+            for dep in metadata.depends_on:
+                resolve(dep)
+
+            sorted_checks.append((metadata, func))
+            resolved.add(name)
+        finally:
+            visiting.discard(name)
+
+    for name in filtered:
+        resolve(name)
+
+    return sorted_checks
+
+
+def safe_check_wrapper(metadata: CheckMetadata, check_func: Callable) -> CheckResult:
+    """Wrap check execution with error handling."""
+    try:
+        return check_func()
+    except Exception as e:
+        logger.exception("check_error", check=metadata.name)
+        return CheckResult(
+            name=metadata.name,
+            status=CheckStatus.FAIL,
+            message=f"Check raised exception: {type(e).__name__}: {e}",
+            severity=metadata.severity,
+            details={"exception": str(e), "type": type(e).__name__},
+        )
