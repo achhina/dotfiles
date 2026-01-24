@@ -129,6 +129,10 @@ return {
 					completions = {
 						autoImport = true,
 					},
+					inlayHints = {
+						variableTypes = true,
+						callArgumentNames = true,
+					},
 				},
 			},
 			rust_analyzer = {
