@@ -688,8 +688,6 @@ def check_plugin_broken_symlinks() -> CheckResult:
     )
 
 
-
-
 def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
     """Apply fixes for failed checks."""
     fixed_results = []
@@ -861,7 +859,12 @@ def generate_permission_pattern(tool_name: str, key_params: str) -> str:
             return "Bash"
 
         # Skip overly specific paths in bash commands
-        if cmd.startswith("/") or cmd.startswith("./") or cmd.startswith("~/") or "/" in cmd:
+        if (
+            cmd.startswith("/")
+            or cmd.startswith("./")
+            or cmd.startswith("~/")
+            or "/" in cmd
+        ):
             # These are file paths, not commands - skip them
             # Examples: /usr/bin/python, ./script.sh, nix/home-manager/files/scripts/file.py
             return None
@@ -963,6 +966,7 @@ def would_tool_call_be_permitted(
             elif "*" in pattern_cmd:
                 # Simple glob matching - convert to regex
                 import re
+
                 regex_pattern = "^" + re.escape(pattern_cmd).replace(r"\*", ".*") + "$"
                 if re.match(regex_pattern, key_params):
                     return True
@@ -981,13 +985,18 @@ def would_tool_call_be_permitted(
             # Extract path from pattern
             if pattern.endswith("/**)"):
                 # Directory wildcard pattern: Tool(//path/to/dir/**)
-                base_path = pattern[len(tool_name)+3:-4]  # Remove "Tool(//" and "/**)"
+                base_path = pattern[
+                    len(tool_name) + 3 : -4
+                ]  # Remove "Tool(//" and "/**)"
                 # Match if file is under this directory
-                if key_params.startswith("/" + base_path + "/") or key_params == "/" + base_path:
+                if (
+                    key_params.startswith("/" + base_path + "/")
+                    or key_params == "/" + base_path
+                ):
                     return True
             elif pattern.endswith(")"):
                 # Exact file pattern: Tool(./path/to/file)
-                file_path = pattern[len(tool_name)+1:-1]  # Remove "Tool(" and ")"
+                file_path = pattern[len(tool_name) + 1 : -1]  # Remove "Tool(" and ")"
                 if key_params == file_path:
                     return True
 
@@ -1084,7 +1093,10 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                 if not tool_result.get("success", True):
                                     # Check if it was explicitly denied
                                     content_text = str(item.get("content", ""))
-                                    if "doesn't want to proceed" in content_text or "denied" in content_text.lower():
+                                    if (
+                                        "doesn't want to proceed" in content_text
+                                        or "denied" in content_text.lower()
+                                    ):
                                         was_approved = False
 
                                 if tool_use_id in tool_use_map:
@@ -1228,8 +1240,16 @@ def format_audit_rich(report: ToolAuditReport) -> None:
             params = params[:57] + "..."
 
         # Format dates
-        first_seen = call["first_seen"].split("T")[0] if "T" in call["first_seen"] else call["first_seen"]
-        last_seen = call["last_seen"].split("T")[0] if "T" in call["last_seen"] else call["last_seen"]
+        first_seen = (
+            call["first_seen"].split("T")[0]
+            if "T" in call["first_seen"]
+            else call["first_seen"]
+        )
+        last_seen = (
+            call["last_seen"].split("T")[0]
+            if "T" in call["last_seen"]
+            else call["last_seen"]
+        )
 
         table.add_row(
             call["tool_name"],
@@ -1243,7 +1263,9 @@ def format_audit_rich(report: ToolAuditReport) -> None:
     console.print(table)
 
     if len(report.tool_calls) > 50:
-        console.print(f"\n[dim]Showing top 50 of {len(report.tool_calls)} unique tool calls[/dim]")
+        console.print(
+            f"\n[dim]Showing top 50 of {len(report.tool_calls)} unique tool calls[/dim]"
+        )
 
 
 def format_audit_json(report: ToolAuditReport) -> None:
@@ -1484,10 +1506,13 @@ def audit_tools_command(
             )
             # Skip None patterns (overly specific or unwanted patterns)
             if pattern is not None:
-                pattern_counts[pattern] = pattern_counts.get(pattern, 0) + tool_call["count"]
+                pattern_counts[pattern] = (
+                    pattern_counts.get(pattern, 0) + tool_call["count"]
+                )
 
         # All patterns in pattern_counts are for tool calls that would be denied
         new_patterns = pattern_counts
+        console = Console()
 
         if format == "json":
             # JSON output for suggestions
@@ -1504,7 +1529,6 @@ def audit_tools_command(
             console.print_json(data=suggestions)
         else:
             # Rich table output for suggestions
-            console = Console()
             console.print(
                 f"\n[bold]Permission Pattern Suggestions[/bold]"
                 f"\nExisting patterns in allow list: {len(existing_patterns)}"
@@ -1523,10 +1547,12 @@ def audit_tools_command(
 
                 console.print(table)
                 console.print(
-                    f"\n[dim]Add these patterns to permissions.allow in ~/.config/nix/home-manager/modules/coding-agents/claude/claude.nix[/dim]"
+                    "\n[dim]Add these patterns to permissions.allow in ~/.config/nix/home-manager/modules/coding-agents/claude/claude.nix[/dim]"
                 )
             else:
-                console.print("[green]✓[/green] All approved tool calls are already permitted!")
+                console.print(
+                    "[green]✓[/green] All approved tool calls are already permitted!"
+                )
     else:
         # Regular audit output
         if format == "json":
