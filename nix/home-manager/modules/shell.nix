@@ -373,6 +373,8 @@ in
       # ============================================================================
       # Early initialization - PATH and tool setup
       # With tmux configured for non-login shells, this runs in all interactive shells
+      # For tmux panes (non-login), we set PATH here since .zprofile won't run
+      # For login shells, .zprofile sets PATH first, then this runs (harmless redundancy)
       # ============================================================================
 
       ${lib.optionalString pkgs.stdenv.isDarwin ''
@@ -383,10 +385,13 @@ in
         fi
       ''}
 
-      # Setup PATH
-      # Since tmux spawns non-login shells, macOS path_helper won't run in panes
-      # This is fine - we explicitly set the PATH we want here
-      export PATH="$HOME/.local/bin:$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+      # Setup PATH - prioritize Nix profile over system directories
+      # This is critical for tmux panes (non-login shells) where .zprofile doesn't run
+      export PATH="$HOME/.nix-profile/bin:$HOME/.local/bin:$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+
+      # Remove duplicate PATH entries (using zsh's unique array feature)
+      typeset -U path
+      export PATH
 
       # Docker completion now handled by oh-my-zsh docker plugin
 
@@ -493,11 +498,18 @@ in
     # .zprofile - Login shells only
     # Following romkatv's recommendation: avoid unless absolutely necessary
     # With tmux configured for non-login shells, this file won't run for tmux panes
-    # Only runs for initial terminal login (which is fine - does nothing)
-    # PATH and Homebrew initialization moved to .zshrc (initContent)
+    # Only runs for initial terminal login
+    # EXCEPTION: On macOS, /etc/zprofile runs path_helper which reorders PATH
+    # We must re-establish PATH priority here, AFTER path_helper runs
     profileExtra = ''
-      # Left empty intentionally - all interactive setup moved to .zshrc
-      # This follows expert consensus (romkatv, Nick Janetakis)
+      # Re-prioritize Nix profile after macOS path_helper reorders PATH
+      # macOS /etc/zprofile runs path_helper which moves /usr/bin to front
+      # This runs after system profile, restoring our intended PATH order
+      export PATH="$HOME/.nix-profile/bin:$HOME/.local/bin:$HOME/.local/share/npm/bin:$HOME/bin:$PATH"
+
+      # Remove duplicate PATH entries (using zsh's unique array feature)
+      typeset -U path
+      export PATH
     '';
 
     shellAliases = {
