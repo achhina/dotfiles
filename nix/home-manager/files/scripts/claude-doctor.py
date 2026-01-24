@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # /// script
-# dependencies = ["click", "structlog", "rich", "pydantic", "claude-code-transcripts"]
+# dependencies = ["click", "structlog", "rich", "pydantic", "claude-code-transcripts", "python-dateutil"]
 # ///
 
 from __future__ import annotations
@@ -22,6 +22,7 @@ from typing import Any, Callable, Optional
 import click
 import structlog
 from click.shell_completion import ZshComplete, add_completion_class
+from dateutil.relativedelta import relativedelta
 from pydantic import BaseModel, ConfigDict, Field
 from rich.console import Console
 from rich.table import Table
@@ -793,6 +794,49 @@ def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
         return ""
 
 
+def parse_relative_date(date_str: str) -> str:
+    """Parse relative date strings like '-1d', '-7d', '-1w' to YYYY-MM-DD format.
+
+    Supports pandas-style relative dates:
+        -Nd: N days ago (e.g., '-1d' = yesterday, '-7d' = 7 days ago)
+        -Nw: N weeks ago (e.g., '-1w' = 1 week ago)
+        -Nm: N months ago (actual month arithmetic, not approximation)
+        -Ny: N years ago (actual year arithmetic)
+
+    If the string is already in YYYY-MM-DD format, returns it unchanged.
+    """
+    if not date_str:
+        return date_str
+
+    # Check if it's already in YYYY-MM-DD format
+    if re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
+        return date_str
+
+    # Parse relative date format: -Nd, -Nw, -Nm, -Ny
+    match = re.match(r"^-(\d+)([dwmy])$", date_str)
+    if not match:
+        return date_str  # Return unchanged if not a relative format
+
+    amount = int(match.group(1))
+    unit = match.group(2)
+
+    # Use relativedelta for accurate date arithmetic
+    today = datetime.now()
+    if unit == "d":
+        delta = relativedelta(days=amount)
+    elif unit == "w":
+        delta = relativedelta(weeks=amount)
+    elif unit == "m":
+        delta = relativedelta(months=amount)
+    elif unit == "y":
+        delta = relativedelta(years=amount)
+    else:
+        return date_str
+
+    target_date = today - delta
+    return target_date.strftime("%Y-%m-%d")
+
+
 def generate_permission_pattern(tool_name: str, key_params: str) -> str:
     """Generate a permission pattern from a tool call.
 
@@ -1352,12 +1396,12 @@ def check_command(
 @click.option(
     "--start-date",
     type=str,
-    help="Start date filter (YYYY-MM-DD)",
+    help="Start date filter (YYYY-MM-DD or relative like '-7d', '-1w', '-1m')",
 )
 @click.option(
     "--end-date",
     type=str,
-    help="End date filter (YYYY-MM-DD)",
+    help="End date filter (YYYY-MM-DD or relative like '-1d', '-2w')",
 )
 @click.option(
     "--project",
@@ -1388,10 +1432,20 @@ def audit_tools_command(
 
         claude-doctor audit-tools --start-date 2026-01-01     # Since date
 
-        claude-doctor audit-tools --start-date 2026-01-01 --end-date 2026-01-31
+        claude-doctor audit-tools --start-date -7d            # Last 7 days
+
+        claude-doctor audit-tools --start-date -1w --end-date -1d  # Last week
+
+        claude-doctor audit-tools --start-date -1m            # Last month
 
         claude-doctor audit-tools --format json > audit.json  # JSON export
     """
+    # Parse relative date strings (e.g., '-1d', '-7d', '-1w')
+    if start_date:
+        start_date = parse_relative_date(start_date)
+    if end_date:
+        end_date = parse_relative_date(end_date)
+
     report = audit_tools(start_date=start_date, end_date=end_date, project_path=project)
 
     if suggest_permissions:

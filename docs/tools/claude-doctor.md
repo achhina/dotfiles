@@ -99,9 +99,17 @@ Analyze approved tool calls from conversation history to understand your workflo
 # Audit all conversations
 claude-doctor audit-tools
 
-# Filter by date range
+# Filter by date range (absolute)
 claude-doctor audit-tools --start-date 2026-01-01
 claude-doctor audit-tools --start-date 2026-01-01 --end-date 2026-01-31
+
+# Filter by date range (relative - pandas-style)
+claude-doctor audit-tools --start-date -7d           # Last 7 days
+claude-doctor audit-tools --start-date -1w           # Last week
+claude-doctor audit-tools --start-date -1m           # Last month
+claude-doctor audit-tools --start-date -1w --end-date -1d  # Last week excluding today
+
+# Relative date formats: -Nd (days), -Nw (weeks), -Nm (months), -Ny (years)
 
 # Export as JSON
 claude-doctor audit-tools --format json > audit.json
