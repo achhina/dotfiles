@@ -123,39 +123,11 @@ return {
 				},
 			},
 			nginx_language_server = {},
-			basedpyright = {
-				python = {
-					pythonPath = get_python_path(),
-				},
-				basedpyright = {
-					analysis = {
-						typeCheckingMode = "recommended",
-						diagnosticMode = "workspace",
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
-						autoImportCompletions = true,
-						extraPaths = { "." },
-						indexing = true,
-						autoFormatStrings = true,
-						reportImplicitStringConcatenation = "none",
-
-						inlayHints = {
-							variableTypes = true,
-							callArgumentNames = true,
-							functionReturnTypes = true,
-							genericTypes = false,
-						},
-
-						diagnosticSeverityOverrides = {
-							reportMissingTypeStubs = "none",
-						},
-
-						ignore = {
-							"**/.venv",
-							"**/venv",
-							"**/site-packages",
-							"**/__pycache__",
-						},
+			ty = {
+				ty = {
+					diagnosticMode = "workspace",
+					completions = {
+						autoImport = true,
 					},
 				},
 			},
