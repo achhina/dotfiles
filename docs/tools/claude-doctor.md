@@ -104,12 +104,14 @@ claude-doctor audit-tools --start-date 2026-01-01
 claude-doctor audit-tools --start-date 2026-01-01 --end-date 2026-01-31
 
 # Filter by date range (relative - pandas-style)
+claude-doctor audit-tools --start-date -1h           # Last hour
+claude-doctor audit-tools --start-date -12h          # Last 12 hours
 claude-doctor audit-tools --start-date -7d           # Last 7 days
 claude-doctor audit-tools --start-date -1w           # Last week
 claude-doctor audit-tools --start-date -1m           # Last month
 claude-doctor audit-tools --start-date -1w --end-date -1d  # Last week excluding today
 
-# Relative date formats: -Nd (days), -Nw (weeks), -Nm (months), -Ny (years)
+# Relative date formats: -NM (minutes, uppercase), -Nh (hours), -Nd (days), -Nw (weeks), -Nm (months, lowercase), -Ny (years)
 
 # Export as JSON
 claude-doctor audit-tools --format json > audit.json

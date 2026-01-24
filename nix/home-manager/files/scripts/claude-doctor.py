@@ -795,15 +795,20 @@ def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
 
 
 def parse_relative_date(date_str: str) -> str:
-    """Parse relative date strings like '-1d', '-7d', '-1w' to YYYY-MM-DD format.
+    """Parse relative date strings to YYYY-MM-DD format.
 
     Supports pandas-style relative dates:
+        -NM: N minutes ago (e.g., '-30M' = 30 minutes ago) - uppercase M
+        -Nh: N hours ago (e.g., '-1h' = 1 hour ago, '-12h' = 12 hours ago)
         -Nd: N days ago (e.g., '-1d' = yesterday, '-7d' = 7 days ago)
         -Nw: N weeks ago (e.g., '-1w' = 1 week ago)
-        -Nm: N months ago (actual month arithmetic, not approximation)
-        -Ny: N years ago (actual year arithmetic)
+        -Nm: N months ago (e.g., '-1m' = 1 month ago) - lowercase m
+        -Ny: N years ago (e.g., '-1y' = 1 year ago)
 
     If the string is already in YYYY-MM-DD format, returns it unchanged.
+
+    Raises:
+        click.BadParameter: If the date format is invalid
     """
     if not date_str:
         return date_str
@@ -812,28 +817,34 @@ def parse_relative_date(date_str: str) -> str:
     if re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
         return date_str
 
-    # Parse relative date format: -Nd, -Nw, -Nm, -Ny
-    match = re.match(r"^-(\d+)([dwmy])$", date_str)
+    # Parse relative date format: -Nd, -Nw, -Nm, -Ny, -Nh, -NM
+    # Note: uppercase M for minutes, lowercase m for months
+    match = re.match(r"^-(\d+)([MhDdwmy])$", date_str)
     if not match:
-        return date_str  # Return unchanged if not a relative format
+        raise click.BadParameter(
+            f"Invalid date format: '{date_str}'. "
+            f"Use YYYY-MM-DD or relative format like -1h, -30M, -7d, -1w, -1m, -1y"
+        )
 
     amount = int(match.group(1))
     unit = match.group(2)
 
     # Use relativedelta for accurate date arithmetic
-    today = datetime.now()
-    if unit == "d":
+    now = datetime.now()
+    if unit == "M":  # Minutes (uppercase)
+        delta = relativedelta(minutes=amount)
+    elif unit == "h":  # Hours
+        delta = relativedelta(hours=amount)
+    elif unit in ("d", "D"):  # Days (allow both cases)
         delta = relativedelta(days=amount)
-    elif unit == "w":
+    elif unit == "w":  # Weeks
         delta = relativedelta(weeks=amount)
-    elif unit == "m":
+    elif unit == "m":  # Months (lowercase)
         delta = relativedelta(months=amount)
-    elif unit == "y":
+    elif unit == "y":  # Years
         delta = relativedelta(years=amount)
-    else:
-        return date_str
 
-    target_date = today - delta
+    target_date = now - delta
     return target_date.strftime("%Y-%m-%d")
 
 
@@ -1396,12 +1407,12 @@ def check_command(
 @click.option(
     "--start-date",
     type=str,
-    help="Start date filter (YYYY-MM-DD or relative like '-7d', '-1w', '-1m')",
+    help="Start date filter (YYYY-MM-DD or relative like '-1h', '-7d', '-1w', '-1m')",
 )
 @click.option(
     "--end-date",
     type=str,
-    help="End date filter (YYYY-MM-DD or relative like '-1d', '-2w')",
+    help="End date filter (YYYY-MM-DD or relative like '-1h', '-1d', '-2w')",
 )
 @click.option(
     "--project",
@@ -1431,6 +1442,10 @@ def audit_tools_command(
         claude-doctor audit-tools                             # All time
 
         claude-doctor audit-tools --start-date 2026-01-01     # Since date
+
+        claude-doctor audit-tools --start-date -1h            # Last hour
+
+        claude-doctor audit-tools --start-date -12h           # Last 12 hours
 
         claude-doctor audit-tools --start-date -7d            # Last 7 days
 
