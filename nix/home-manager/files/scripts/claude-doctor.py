@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # /// script
-# dependencies = ["click", "structlog", "rich", "pydantic"]
+# dependencies = ["click", "structlog", "rich", "pydantic", "claude-code-transcripts"]
 # ///
 
 from __future__ import annotations
@@ -793,6 +793,22 @@ def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
         return ""
 
 
+def extract_content_items(content: Any) -> list[dict]:
+    """Extract content items from message content.
+
+    Handles both legacy format (string) and modern format (list of blocks).
+    Based on Simon Willison's claude-code-transcripts parser.
+    """
+    if isinstance(content, str):
+        # Legacy format: content is a plain string
+        return [{"type": "text", "text": content}]
+    elif isinstance(content, list):
+        # Modern format: content is a list of blocks
+        return [item for item in content if isinstance(item, dict)]
+    else:
+        return []
+
+
 def parse_conversation_file(file_path: Path) -> list[ToolCall]:
     """Parse a conversation JSONL file and extract approved tool calls."""
     tool_calls = []
@@ -803,22 +819,25 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
             for line in f:
                 try:
                     entry = json.loads(line)
+                    entry_type = entry.get("type")
 
-                    # Extract tool_use entries
-                    if entry.get("type") == "assistant":
+                    # Skip non-conversation entries
+                    if entry_type not in ("user", "assistant"):
+                        continue
+
+                    # Extract tool_use entries from assistant messages
+                    if entry_type == "assistant":
                         message = entry.get("message", {})
                         if not isinstance(message, dict):
                             continue
 
-                        content = message.get("content", [])
-                        if not isinstance(content, list):
-                            continue
-
+                        # Use helper to handle both legacy and modern content formats
+                        content_items = extract_content_items(message.get("content"))
                         timestamp = entry.get("timestamp", "")
                         session_id = entry.get("sessionId", "")
 
-                        for item in content:
-                            if isinstance(item, dict) and item.get("type") == "tool_use":
+                        for item in content_items:
+                            if item.get("type") == "tool_use":
                                 tool_id = item.get("id")
                                 tool_name = item.get("name")
                                 tool_input = item.get("input", {})
@@ -831,20 +850,23 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                         "session_id": session_id,
                                     }
 
-                    # Extract tool_result entries to determine approval
-                    elif entry.get("type") == "user":
+                    # Extract tool_result entries from user messages to determine approval
+                    elif entry_type == "user":
                         message = entry.get("message", {})
                         if not isinstance(message, dict):
                             continue
 
-                        content = message.get("content", [])
-                        if not isinstance(content, list):
-                            continue
+                        # Use helper to handle both legacy and modern content formats
+                        content_items = extract_content_items(message.get("content"))
 
-                        for item in content:
-                            if isinstance(item, dict) and item.get("type") == "tool_result":
+                        for item in content_items:
+                            if item.get("type") == "tool_result":
                                 tool_use_id = item.get("tool_use_id")
                                 tool_result = entry.get("toolUseResult", {})
+
+                                # Ensure tool_result is a dict (handle legacy formats)
+                                if not isinstance(tool_result, dict):
+                                    tool_result = {}
 
                                 # Check if tool was approved (success=True means it ran)
                                 # If there's an error about user denial, was_approved=False
@@ -871,11 +893,13 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                         )
                                     )
 
-                except json.JSONDecodeError:
-                    continue  # Skip malformed lines
+                except (json.JSONDecodeError, AttributeError, KeyError, TypeError):
+                    # Skip malformed lines or entries with unexpected structure
+                    continue
 
     except Exception as e:
-        logger.warning("conversation_parse_error", file=str(file_path), error=str(e))
+        # Log file-level errors (e.g., file not found, permission denied)
+        logger.warning("conversation_file_error", file=str(file_path), error=str(e))
 
     return tool_calls
 
