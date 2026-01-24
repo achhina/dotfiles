@@ -817,7 +817,11 @@ def generate_permission_pattern(tool_name: str, key_params: str) -> str:
 
         return f"Bash({cmd}:*)"
 
-    elif tool_name in ("Edit", "Write", "Read"):
+    elif tool_name == "Edit":
+        # Skip Edit - handled by defaultMode = "acceptEdits" in config
+        return None
+
+    elif tool_name in ("Write", "Read"):
         # For file operations, generate wildcard pattern if it's in a known directory
         if key_params.startswith("/Users/"):
             # Extract directory pattern (e.g., //Users/achhina/.config/** )
