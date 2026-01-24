@@ -869,6 +869,81 @@ def load_existing_allow_list() -> set[str]:
         return set()
 
 
+def would_tool_call_be_permitted(
+    tool_name: str, key_params: str, existing_patterns: set[str]
+) -> bool:
+    """Check if a specific tool call would be permitted by existing allow list.
+
+    Implements Claude Code's documented permission matching logic:
+    https://code.claude.com/docs/en/settings#permission-pattern-matching-syntax
+    """
+    # Rule 1: Bare tool name matches ALL uses
+    # e.g., "Read" matches any Read operation
+    if tool_name in existing_patterns:
+        return True
+
+    # Rule 2: For Bash commands, implement documented wildcard behavior
+    if tool_name == "Bash" and key_params:
+        for pattern in existing_patterns:
+            if not pattern.startswith("Bash("):
+                continue
+
+            # Extract pattern between "Bash(" and ")"
+            pattern_cmd = pattern[5:-1]  # Remove "Bash(" and ")"
+
+            # Type 1: Prefix matching with ":*" (word boundary required)
+            # e.g., "Bash(git commit:*)" matches "git commit -m foo" but not "git"
+            if pattern_cmd.endswith(":*"):
+                prefix = pattern_cmd[:-2]  # Remove ":*"
+                # Check if command starts with prefix followed by space or is exact match
+                if key_params == prefix or key_params.startswith(prefix + " "):
+                    return True
+
+            # Type 2: Glob matching with "*" anywhere
+            # e.g., "Bash(git * main)" matches "git checkout main"
+            elif "*" in pattern_cmd:
+                # Simple glob matching - convert to regex
+                import re
+                regex_pattern = "^" + re.escape(pattern_cmd).replace(r"\*", ".*") + "$"
+                if re.match(regex_pattern, key_params):
+                    return True
+
+            # Type 3: Exact match
+            # e.g., "Bash(npm run build)" only matches that exact command
+            elif pattern_cmd == key_params:
+                return True
+
+    # Rule 3: For file operations, check path patterns with wildcards
+    elif tool_name in ("Read", "Write", "Edit") and key_params:
+        for pattern in existing_patterns:
+            if not pattern.startswith(f"{tool_name}("):
+                continue
+
+            # Extract path from pattern
+            if pattern.endswith("/**)"):
+                # Directory wildcard pattern: Tool(//path/to/dir/**)
+                base_path = pattern[len(tool_name)+3:-4]  # Remove "Tool(//" and "/**)"
+                # Match if file is under this directory
+                if key_params.startswith("/" + base_path + "/") or key_params == "/" + base_path:
+                    return True
+            elif pattern.endswith(")"):
+                # Exact file pattern: Tool(./path/to/file)
+                file_path = pattern[len(tool_name)+1:-1]  # Remove "Tool(" and ")"
+                if key_params == file_path:
+                    return True
+
+    # Rule 4: For MCP tools, check wildcard patterns
+    elif tool_name.startswith("mcp__"):
+        parts = tool_name.split("__")
+        if len(parts) >= 2:
+            wildcard_pattern = f"{parts[0]}__{parts[1]}__*"
+            if wildcard_pattern in existing_patterns:
+                return True
+        # Also check for exact match (already handled by Rule 1 above)
+
+    return False
+
+
 def extract_content_items(content: Any) -> list[dict]:
     """Extract content items from message content.
 
@@ -1320,8 +1395,17 @@ def audit_tools_command(
         existing_patterns = load_existing_allow_list()
         pattern_counts: dict[str, int] = {}
 
-        # Count occurrences of each permission pattern
+        # Filter tool calls to only those that would be DENIED by existing patterns
+        # Then count occurrences of patterns needed for those denied calls
         for tool_call in report.tool_calls:
+            # Check if this specific tool call would be permitted
+            if would_tool_call_be_permitted(
+                tool_call["tool_name"], tool_call["key_params"], existing_patterns
+            ):
+                # Skip - already permitted
+                continue
+
+            # Generate pattern for this denied tool call
             pattern = generate_permission_pattern(
                 tool_call["tool_name"], tool_call["key_params"]
             )
@@ -1329,12 +1413,8 @@ def audit_tools_command(
             if pattern is not None:
                 pattern_counts[pattern] = pattern_counts.get(pattern, 0) + tool_call["count"]
 
-        # Filter out patterns that are already in allow list
-        new_patterns = {
-            pattern: count
-            for pattern, count in pattern_counts.items()
-            if pattern not in existing_patterns
-        }
+        # All patterns in pattern_counts are for tool calls that would be denied
+        new_patterns = pattern_counts
 
         if format == "json":
             # JSON output for suggestions
