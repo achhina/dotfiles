@@ -24,7 +24,7 @@ in
     extraPackages = with pkgs; [
       # Editor-only LSPs
       lua-language-server
-      basedpyright
+      ty
       typescript-language-server
       yaml-language-server
       dockerfile-language-server
