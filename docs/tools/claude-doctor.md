@@ -116,6 +116,29 @@ claude-doctor audit-tools --format json > audit.json
   - `Task: subagent-type` (unique per subagent)
 - **Statistics**: Count, session count, first/last seen timestamps
 
+### Permission Suggestions
+
+Generate permission patterns for your allow list based on approved tool calls:
+
+```bash
+# Suggest new permissions to add
+claude-doctor audit-tools --suggest-permissions
+
+# Suggest from specific time period
+claude-doctor audit-tools --start-date 2026-01-01 --suggest-permissions
+
+# Export suggestions as JSON
+claude-doctor audit-tools --suggest-permissions --format json
+```
+
+This analyzes all approved tool calls and suggests permission patterns that aren't already in your allow list. Patterns follow the format used in `~/.config/nix/home-manager/modules/coding-agents/claude/claude.nix`:
+
+- **Bash commands**: `Bash(command:*)` - e.g., `Bash(git:*)`, `Bash(python3:*)`
+- **File operations**: `Tool(//path/to/dir/**)` - e.g., `Read(//Users/username/.config/**)`
+- **Other tools**: Just the tool name - `Glob`, `WebFetch`, etc.
+
+Use this to identify which permissions you frequently approve manually and should add to your configuration.
+
 ### Use Cases
 
 ```bash
@@ -127,6 +150,9 @@ claude-doctor audit-tools --project /path/to/.claude/projects
 
 # Generate workflow report for analysis
 claude-doctor audit-tools --format json | jq '.tool_calls[] | select(.count > 10)'
+
+# Find permissions to add based on last month's usage
+claude-doctor audit-tools --start-date 2026-01-01 --suggest-permissions
 ```
 
 ## Exit Codes

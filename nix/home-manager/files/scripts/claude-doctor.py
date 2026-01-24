@@ -793,6 +793,82 @@ def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
         return ""
 
 
+def generate_permission_pattern(tool_name: str, key_params: str) -> str:
+    """Generate a permission pattern from a tool call.
+
+    Returns a pattern suitable for Claude Code's permissions.allow list.
+    Follows the format used in claude.nix configuration.
+    """
+    if tool_name == "Bash":
+        # Extract the command (first word) from the key_params
+        cmd = key_params.split()[0] if key_params else ""
+        if not cmd:
+            return "Bash"
+
+        # Skip overly specific paths in bash commands
+        if cmd.startswith("/") or cmd.startswith("./") or cmd.startswith("~/") or "/" in cmd:
+            # These are file paths, not commands - skip them
+            # Examples: /usr/bin/python, ./script.sh, nix/home-manager/files/scripts/file.py
+            return None
+
+        # For variable assignments like BASE_SHA=..., skip them
+        if "=" in cmd:
+            return None
+
+        return f"Bash({cmd}:*)"
+
+    elif tool_name in ("Edit", "Write", "Read"):
+        # For file operations, generate wildcard pattern if it's in a known directory
+        if key_params.startswith("/Users/"):
+            # Extract directory pattern (e.g., //Users/achhina/.config/** )
+            parts = key_params.split("/")
+            if len(parts) >= 4:  # At least /Users/username/dir/
+                # parts[0] is empty, parts[1] is "Users", parts[2] is "username", parts[3] is "dir"
+                base_path = "/".join(parts[1:4])  # "Users/username/dir"
+                return f"{tool_name}(//{base_path}/**)"
+        return tool_name
+    elif tool_name == "Glob":
+        return "Glob"
+    elif tool_name == "Grep":
+        return "Grep"
+    elif tool_name == "Task":
+        return "Task"
+    elif tool_name == "Skill":
+        return "Skill"
+    elif tool_name == "TodoWrite":
+        return "TodoWrite"
+    elif tool_name == "WebFetch":
+        return "WebFetch"
+    elif tool_name == "WebSearch":
+        return "WebSearch"
+    elif tool_name == "AskUserQuestion":
+        return "AskUserQuestion"
+    elif tool_name == "NotebookEdit":
+        return "NotebookEdit"
+    elif tool_name.startswith("mcp__"):
+        # MCP tools: extract the service name and use wildcard
+        # e.g., mcp__context7__query-docs -> mcp__context7__*
+        parts = tool_name.split("__")
+        if len(parts) >= 2:
+            return f"{parts[0]}__{parts[1]}__*"
+        return tool_name
+    else:
+        # Unknown tool, return as-is
+        return tool_name
+
+
+def load_existing_allow_list() -> set[str]:
+    """Load existing allow list from Claude Code settings.json."""
+    settings_file = Path.home() / ".claude" / "settings.json"
+    try:
+        with open(settings_file) as f:
+            settings = json.load(f)
+            allow_list = settings.get("permissions", {}).get("allow", [])
+            return set(allow_list)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+
+
 def extract_content_items(content: Any) -> list[dict]:
     """Extract content items from message content.
 
@@ -1209,11 +1285,17 @@ def check_command(
     type=str,
     help="Custom project path (default: ~/.claude/projects)",
 )
+@click.option(
+    "--suggest-permissions",
+    is_flag=True,
+    help="Suggest permission patterns for allow list based on approved tool calls",
+)
 def audit_tools_command(
     format: str,
     start_date: Optional[str],
     end_date: Optional[str],
     project: Optional[str],
+    suggest_permissions: bool,
 ):
     """Audit approved tool calls from conversation history.
 
@@ -1233,10 +1315,71 @@ def audit_tools_command(
     """
     report = audit_tools(start_date=start_date, end_date=end_date, project_path=project)
 
-    if format == "json":
-        format_audit_json(report)
+    if suggest_permissions:
+        # Generate permission pattern suggestions
+        existing_patterns = load_existing_allow_list()
+        pattern_counts: dict[str, int] = {}
+
+        # Count occurrences of each permission pattern
+        for tool_call in report.tool_calls:
+            pattern = generate_permission_pattern(
+                tool_call["tool_name"], tool_call["key_params"]
+            )
+            # Skip None patterns (overly specific or unwanted patterns)
+            if pattern is not None:
+                pattern_counts[pattern] = pattern_counts.get(pattern, 0) + tool_call["count"]
+
+        # Filter out patterns that are already in allow list
+        new_patterns = {
+            pattern: count
+            for pattern, count in pattern_counts.items()
+            if pattern not in existing_patterns
+        }
+
+        if format == "json":
+            # JSON output for suggestions
+            suggestions = {
+                "existing_patterns_count": len(existing_patterns),
+                "new_patterns_count": len(new_patterns),
+                "suggestions": [
+                    {"pattern": pattern, "usage_count": count}
+                    for pattern, count in sorted(
+                        new_patterns.items(), key=lambda x: x[1], reverse=True
+                    )
+                ],
+            }
+            console.print_json(data=suggestions)
+        else:
+            # Rich table output for suggestions
+            console = Console()
+            console.print(
+                f"\n[bold]Permission Pattern Suggestions[/bold]"
+                f"\nExisting patterns in allow list: {len(existing_patterns)}"
+                f"\nNew patterns to consider: {len(new_patterns)}\n"
+            )
+
+            if new_patterns:
+                table = Table(title="Suggested Permission Patterns")
+                table.add_column("Pattern", style="cyan")
+                table.add_column("Usage Count", style="green", justify="right")
+
+                for pattern, count in sorted(
+                    new_patterns.items(), key=lambda x: x[1], reverse=True
+                ):
+                    table.add_row(pattern, str(count))
+
+                console.print(table)
+                console.print(
+                    f"\n[dim]Add these patterns to permissions.allow in ~/.config/nix/home-manager/modules/coding-agents/claude/claude.nix[/dim]"
+                )
+            else:
+                console.print("[green]✓[/green] All approved tool calls are already permitted!")
     else:
-        format_audit_rich(report)
+        # Regular audit output
+        if format == "json":
+            format_audit_json(report)
+        else:
+            format_audit_rich(report)
 
 
 def main():
