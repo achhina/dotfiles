@@ -846,11 +846,12 @@ def parse_relative_date(date_str: str) -> str:
     return target_date.strftime("%Y-%m-%d")
 
 
-def generate_permission_pattern(tool_name: str, key_params: str) -> str:
+def generate_permission_pattern(tool_name: str, key_params: str) -> Optional[str]:
     """Generate a permission pattern from a tool call.
 
     Returns a pattern suitable for Claude Code's permissions.allow list.
     Follows the format used in claude.nix configuration.
+    Returns None for patterns that should be skipped (overly specific or unwanted).
     """
     if tool_name == "Bash":
         # Extract the command (first word) from the key_params
