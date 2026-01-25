@@ -12,7 +12,7 @@ let
     bandwhich              # Network utilization by process
     dust                   # Modern du alternative
     cloc                   # Count lines of code
-    pre-commit             # Git pre-commit hooks
+    # pre-commit - removed temporarily due to Swift 5.10.1/clang 21 build issues
     bitwarden-cli          # Password manager CLI (bw)
     bws                    # Bitwarden Secrets Manager CLI
   ];
