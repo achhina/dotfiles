@@ -28,7 +28,7 @@ in
       typescript-language-server
       yaml-language-server
       dockerfile-language-server
-      marksman
+      # marksman - removed temporarily due to Swift 5.10.1/clang 21 build issues
       taplo
       vscode-langservers-extracted
       clang-tools              # Provides clangd LSP for C/C++
