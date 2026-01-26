@@ -1,6 +1,23 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
+  # Override arrays - modify these for work/local-specific changes
+  # git rerere will learn to auto-resolve conflicts in this section
+  overrideAdd = with pkgs; [
+    # Add work-specific packages here
+  ];
+
+  overrideRemove = [
+    # Add package names to remove here (use pname, e.g., "obsidian")
+  ];
+
+  # Helper to get package name from a package or derivation
+  getPkgName = pkg:
+    if builtins.isString pkg then pkg
+    else if pkg ? pname then pkg.pname
+    else if pkg ? name then pkg.name
+    else builtins.trace "Warning: Cannot determine package name for ${toString pkg}" "";
+
   # Core system tools and utilities
   coreTools = with pkgs; [
     git                    # Version control
@@ -137,9 +154,8 @@ let
     isd                  # TUI to interactively work with systemd units
     signal-desktop       # Private messaging app
   ];
-in
-{
-  home.packages =
+  # Combine base packages
+  basePackages =
     coreTools
     ++ modernCLI
     ++ aiTools
@@ -153,4 +169,14 @@ in
     ++ guiApps
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages;
+
+  # Apply overrides: filter out removed packages, add new ones
+  finalPackages =
+    (builtins.filter
+      (pkg: !(builtins.elem (getPkgName pkg) overrideRemove))
+      basePackages)
+    ++ overrideAdd;
+in
+{
+  home.packages = finalPackages;
 }
