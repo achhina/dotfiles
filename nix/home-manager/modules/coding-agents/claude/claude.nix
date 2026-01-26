@@ -232,6 +232,8 @@ in
           "Bash(git commit --no-verify:*)"
         ];
 
+        defaultMode = "acceptEdits";
+
         additionalDirectories = [
           "~/docs"
           "/tmp"
@@ -251,7 +253,7 @@ in
 
       theme = "dark";
 
-      defaultMode = "acceptEdits";
+      defaultPermissionMode = "acceptEdits";
 
       agents = [
         {
