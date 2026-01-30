@@ -98,7 +98,8 @@ let
     luaPackages.luarocks     # Lua package manager
 
     # Python
-    python312Packages.black                      # Code formatter for IPython (see https://github.com/ipython/ipython/issues/14532 for ruff workaround)
+    # @upstream-issue: https://github.com/ipython/ipython/issues/14532
+    python312Packages.black                      # Code formatter for IPython (ruff workaround)
     python312Packages.ipython                    # Enhanced Python REPL
     uv                                           # Fast Python package manager
     python312Packages.copier                     # Project templating tool

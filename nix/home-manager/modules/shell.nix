@@ -356,6 +356,11 @@ in
     executable = true;
   };
 
+  home.file."bin/check-upstream-issues" = {
+    source = ../files/scripts/check-upstream-issues.py;
+    executable = true;
+  };
+
   # Zsh shell configuration
   programs.zsh = {
     enable = true;
@@ -578,6 +583,21 @@ in
         touch "$COMPLETIONS_DIR"
       else
         echo "Warning: Failed to generate claude-doctor completions (exit code: $?)" >&2
+      fi
+    fi
+  '';
+
+  # Generate check-upstream-issues completion after activation
+  home.activation.generateCheckUpstreamIssuesCompletion = lib.hm.dag.entryAfter [ "installPackages" ] ''
+    COMPLETIONS_DIR="$XDG_DATA_HOME/zsh/site-functions"
+    mkdir -p "$COMPLETIONS_DIR"
+    if [ -x $HOME/bin/check-upstream-issues ]; then
+      $VERBOSE_ECHO "Generating check-upstream-issues zsh completions..."
+      export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
+      if _CHECK_UPSTREAM_ISSUES_COMPLETE=zsh_source $HOME/bin/check-upstream-issues > "$COMPLETIONS_DIR/_check_upstream_issues"; then
+        touch "$COMPLETIONS_DIR"
+      else
+        echo "Warning: Failed to generate check-upstream-issues completions (exit code: $?)" >&2
       fi
     fi
   '';
