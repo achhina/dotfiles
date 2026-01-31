@@ -22,7 +22,6 @@ import click
 from click.shell_completion import ZshComplete, add_completion_class
 from pydantic import BaseModel
 from rich.console import Console
-from rich.table import Table
 
 
 # Custom ZshComplete that generates function names compatible with zsh autoload
@@ -70,6 +69,21 @@ class IssueStatus(BaseModel):
     locations: list[IssueLocation]
 
 
+class Summary(BaseModel):
+    """Summary statistics for issue tracking."""
+
+    resolved_count: int
+    open_count: int
+
+
+class OutputReport(BaseModel):
+    """Complete output report for issue tracking."""
+
+    resolved: list[IssueStatus]
+    open: list[IssueStatus]
+    summary: Summary
+
+
 def find_upstream_issues(
     directory: Path, default_repo: Optional[str]
 ) -> dict[str, list[IssueLocation]]:
@@ -89,7 +103,8 @@ def find_upstream_issues(
             "--line-number",
             "--no-heading",
             "--no-follow",  # Don't follow symlinks
-            "--glob", "!check-upstream-issues.py",  # Exclude this script (has example tags)
+            "--glob",
+            "!check-upstream-issues.py",  # Exclude this script (has example tags)
             r"@upstream-issue:\s*(?:https://github\.com/[^/]+/[^/]+/issues/\d+|#\d+)",
         ],
         cwd=directory,
@@ -295,52 +310,15 @@ def format_json_output(resolved: list[IssueStatus], open_issues: list[IssueStatu
         resolved: List of resolved (closed) issues
         open_issues: List of still-open issues
     """
-    output = {
-        "resolved": [
-            {
-                "url": issue.url,
-                "org": issue.org,
-                "repo": issue.repo,
-                "number": issue.number,
-                "state": issue.state,
-                "closed_at": issue.closed_at,
-                "title": issue.title,
-                "locations": [
-                    {
-                        "file": str(loc.file),
-                        "line": loc.line,
-                        "comment": loc.comment,
-                    }
-                    for loc in issue.locations
-                ],
-            }
-            for issue in resolved
-        ],
-        "open": [
-            {
-                "url": issue.url,
-                "org": issue.org,
-                "repo": issue.repo,
-                "number": issue.number,
-                "state": issue.state,
-                "title": issue.title,
-                "locations": [
-                    {
-                        "file": str(loc.file),
-                        "line": loc.line,
-                        "comment": loc.comment,
-                    }
-                    for loc in issue.locations
-                ],
-            }
-            for issue in open_issues
-        ],
-        "summary": {
-            "resolved_count": len(resolved),
-            "open_count": len(open_issues),
-        },
-    }
-    print(json.dumps(output, indent=2))
+    output = OutputReport(
+        resolved=resolved,
+        open=open_issues,
+        summary=Summary(
+            resolved_count=len(resolved),
+            open_count=len(open_issues),
+        ),
+    )
+    print(output.model_dump_json(indent=2))
 
 
 @click.command()
