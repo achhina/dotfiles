@@ -88,6 +88,8 @@ def find_upstream_issues(
             "rg",
             "--line-number",
             "--no-heading",
+            "--no-follow",  # Don't follow symlinks
+            "--glob", "!check-upstream-issues.py",  # Exclude this script (has example tags)
             r"@upstream-issue:\s*(?:https://github\.com/[^/]+/[^/]+/issues/\d+|#\d+)",
         ],
         cwd=directory,
@@ -95,11 +97,19 @@ def find_upstream_issues(
         text=True,
     )
 
-    if result.returncode != 0 and result.returncode != 1:
-        # Exit code 1 means no matches, which is fine
+    # ripgrep exit codes:
+    # 0 = matches found
+    # 1 = no matches
+    # 2 = error occurred (e.g., broken symlink) but partial results may be valid
+    # We accept codes 0-2 since ripgrep still produces usable results
+    # Stderr warnings (like broken symlinks) are expected and can be ignored
+    if result.returncode > 2:
+        # Only fail for truly fatal errors (code > 2)
         console_err.print(
-            f"[red]Error running ripgrep:[/red] {result.stderr}", style="red"
+            f"[red]Fatal error running ripgrep (exit {result.returncode}):[/red]"
         )
+        if result.stderr:
+            console_err.print(result.stderr)
         sys.exit(1)
 
     # Parse ripgrep output: file:line:matched_text
