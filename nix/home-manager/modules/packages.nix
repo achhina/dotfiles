@@ -29,6 +29,7 @@ let
     bandwhich              # Network utilization by process
     dust                   # Modern du alternative
     cloc                   # Count lines of code
+    # @upstream-issue: https://github.com/NixOS/nixpkgs/issues/483584
     # pre-commit - removed temporarily due to Swift 5.10.1/clang 21 build issues
     bitwarden-cli          # Password manager CLI (bw)
     bws                    # Bitwarden Secrets Manager CLI
@@ -107,7 +108,8 @@ let
 
   # Document processing and generation tools
   documentTools = with pkgs; [
-    # Wrap mermaid-cli to use Chrome for puppeteer
+    # @upstream-issue: https://github.com/NixOS/nixpkgs/issues/335148
+    # Wrap mermaid-cli to use Chrome for puppeteer (missing dependencies workaround)
     (pkgs.writeShellScriptBin "mmdc" ''
       ${if pkgs.stdenv.isDarwin then ''
         # On macOS, use Homebrew Chrome (stable path, no GC issues)
@@ -149,7 +151,8 @@ let
   # Linux-specific packages
   linuxPackages = with pkgs; [
     google-chrome        # Web browser (macOS protects app bundles in Nix store from GC)
-    firefox              # Web browser (builds on Linux, has gtk+3 issues on macOS)
+    # @upstream-issue: https://github.com/NixOS/nixpkgs/issues/450042
+    firefox              # Web browser (builds on Linux, gtk+3 build fails on macOS)
     firefoxpwa           # Progressive Web Apps for Firefox
     alacritty            # GPU-accelerated terminal emulator
     isd                  # TUI to interactively work with systemd units
