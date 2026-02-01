@@ -34,6 +34,7 @@ let
   baseAllowPermissions = [
           "Bash(actionlint:*)"
           "Bash(awk:*)"
+          "Bash(btop:*)"
           "Bash(cat:*)"
           "Bash(command:*)"
           "Bash(col:*)"
@@ -86,6 +87,7 @@ let
           "Bash(grep:*)"
           "Bash(head:*)"
           "Bash(hexdump:*)"
+          "Bash(htop:*)"
           "Bash(hm:*)"
           "Bash(home-manager:*)"
           "Bash(jest:*)"
@@ -110,6 +112,7 @@ let
           "Bash(playwright:*)"
           "Bash(pre-commit:*)"
           "Bash(prettier:*)"
+          "Bash(pstree:*)"
           "Bash(pytest:*)"
           "Bash(python:*)"
           "Bash(refresh-env:*)"
