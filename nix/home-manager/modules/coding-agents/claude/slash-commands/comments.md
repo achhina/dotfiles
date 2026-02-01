@@ -1,59 +1,78 @@
 ---
-description: Remove obvious and redundant comments from uncommitted code changes
+description: Remove obvious and redundant comments from code
+argument-hint: "[--scope changes|codebase] [@path ...]"
+allowed-tools: ["Read", "Edit", "Grep", "Glob", "Bash(git *)"]
+model: claude-haiku-4-20250514
 ---
 
 # Task
 
-Launch the comment-remover agent to clean up obvious and redundant comments from uncommitted changes.
+Remove obvious and redundant comments from code with flexible scope and file targeting.
+
+# Arguments
+
+**Scope** (what to analyze):
+- `--scope changes` (default) - uncommitted changes only
+- `--scope codebase` - entire codebase
+
+**File Targeting** (which files):
+- Use `@` prefix to target specific files or directories
+- Multiple paths supported: `@src/ @tests/ @utils.py`
+- No `@` paths = process all files in scope
+
+# Examples
+
+```bash
+/comments                           # All uncommitted changes
+/comments --scope codebase          # Entire codebase
+/comments @file.py                  # Uncommitted changes in file.py only
+/comments @src/ @tests/            # Uncommitted changes in src/ and tests/
+/comments --scope codebase @file.py # Entire file.py (not just uncommitted)
+```
 
 # Agent Invocation
 
-Use the Task tool with `subagent_type="comment-remover"` to launch the comment removal specialist.
+Use the Task tool with `subagent_type="comment-remover"`.
 
-The agent will autonomously:
-1. When file paths provided: Check for uncommitted changes via git diff
-   - If diff exists: Process only the uncommitted changes
-   - If no diff: Process the entire file (even if committed)
-2. When no file paths provided: Process all uncommitted changes
-3. Review files for obvious and redundant comments
-4. Remove comments that don't add value
-5. Preserve important contextual comments
-6. Provide a summary of what was cleaned up
+Pass the arguments: $ARGUMENTS
+
+The agent must parse the arguments to extract:
+- `--scope` flag: `changes` (default) or `codebase`
+- File/directory paths: Any arguments prefixed with `@`
+- If no paths specified: process all files in scope
+
+The agent will:
+1. Parse `$ARGUMENTS` to determine scope and file targeting
+2. For `changes` scope: use git diff to identify modified files (or filter to specified @ paths)
+3. For `codebase` scope: process all files (or filter to specified @ paths)
+4. Review files for obvious and redundant comments
+5. Remove comments that don't add value
+6. Preserve important contextual comments
+7. Provide a summary of changes
 
 # When to Use
 
-Use this command:
 - Before committing code (as part of /finalize workflow)
 - When cleaning up code after implementation
 - To improve code clarity by removing noise
-- On specific files (committed or uncommitted) by passing file paths
+- On specific files, directories, or entire codebase
 
 # What Gets Removed
 
-The agent removes:
-- Obvious code restatements
-- Edit history comments ("Added", "Changed", etc.)
+- Obvious code restatements (e.g., `// Set x to 5` above `x = 5`)
+- Edit history comments ("Added", "Changed", "Updated")
 - Commented-out code blocks
-- Redundant explanations
+- Redundant explanations that add no value
 - Empty placeholder comments
 
 # What Gets Preserved
 
-The agent preserves:
 - TODO, FIXME, HACK, NOTE markers
 - "Why" explanations and rationale
 - Important context and workarounds
 - Documentation comments (JSDoc, docstrings)
 - License headers and attribution
 
-# Arguments
+# Warning
 
-Pass file paths to focus on specific files:
-- `/comments path/to/file.py` - Process this file (diff if exists, else entire file)
-- `/comments file1.js file2.js` - Process multiple specific files
-- `/comments` - Process all uncommitted changes
-
-The agent intelligently chooses scope:
-- **With file path + uncommitted changes**: Process only the diff
-- **With file path + no uncommitted changes**: Process entire file
-- **Without file path**: Process all uncommitted changes across repository
+When using `--scope codebase`, this modifies files throughout the entire codebase. Review changes carefully before committing.
