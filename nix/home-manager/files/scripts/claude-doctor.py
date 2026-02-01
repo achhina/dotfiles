@@ -990,7 +990,7 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open"}
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open", "exec", "set", "sysctl"}
         if cmd in skip_commands:
             return None
 
@@ -1006,12 +1006,16 @@ def generate_permission_pattern(
                     break
 
             if subcommand:
-                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset", "stash"}
+                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset", "stash", "pull"}
                 if cmd == "git" and subcommand in skip_git_subcommands:
                     return None
 
-                skip_gh_subcommands = {"pr"}
+                skip_gh_subcommands = {"pr", "secret", "variable"}
                 if cmd == "gh" and subcommand in skip_gh_subcommands:
+                    return None
+
+                skip_docker_subcommands = {"exec", "run", "stop", "rm"}
+                if cmd == "docker" and subcommand in skip_docker_subcommands:
                     return None
 
                 return f"Bash({cmd} {subcommand}:*)"
