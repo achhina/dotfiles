@@ -35,7 +35,6 @@ plugins, MCP servers, permissions, performance, and hooks.
 """
 
 
-# Custom ZshComplete for autoload compatibility
 @add_completion_class
 class AutoloadZshComplete(ZshComplete):
     """ZshComplete subclass for zsh autoload compatibility."""
@@ -44,19 +43,14 @@ class AutoloadZshComplete(ZshComplete):
 
     @property
     def func_name(self) -> str:
-        """Generate function name without _completion suffix."""
         safe_name = re.sub(r"\W+", "", self.prog_name.replace("-", "_"), flags=re.ASCII)
         return f"_{safe_name}"
 
 
-# Constants
 DEFAULT_LOG_LEVEL = "warning"
 
-# Global consoles
 console = Console()
 console_err = Console(file=sys.stderr, stderr=True)
-
-# Configure logging
 if any(key.endswith("_COMPLETE") for key in os.environ.keys()):
     log_level_int = logging.CRITICAL
 else:
@@ -75,12 +69,7 @@ structlog.configure(
 logger = structlog.get_logger()
 
 
-# Output Formatting
-
-
 def format_rich(report: DiagnosticReport) -> None:
-    """Format report as Rich table."""
-    # Summary
     console.print("\n[bold]Claude Code Diagnostic Report[/bold]")
     console.print(f"Timestamp: {report.timestamp}")
     console.print(f"Checks run: {report.checks_run}")
@@ -97,14 +86,11 @@ def format_rich(report: DiagnosticReport) -> None:
 
     console.print(f"Results: {', '.join(summary_parts)}\n")
 
-    # Group by category
     by_category: dict[str, list[CheckResult]] = {}
     for result in report.results:
         parts = result.name.split(".", 1)
         category = parts[0] if parts else "unknown"
         by_category.setdefault(category, []).append(result)
-
-    # Table per category
     for category, results in by_category.items():
         table = Table(title=f"{category.capitalize()} Checks")
         table.add_column("Check", style="cyan")
@@ -112,7 +98,6 @@ def format_rich(report: DiagnosticReport) -> None:
         table.add_column("Message")
 
         for result in results:
-            # Status with color
             if result.status == CheckStatus.PASS:
                 status = "[green]✓ PASS[/green]"
             elif result.status == CheckStatus.WARN:
@@ -122,21 +107,27 @@ def format_rich(report: DiagnosticReport) -> None:
             else:
                 status = "[dim]○ SKIP[/dim]"
 
-            # Check name without category prefix
             parts = result.name.split(".", 1)
             check_name = parts[1] if len(parts) > 1 else result.name
-            if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
-                if result.severity == CheckSeverity.CRITICAL:
-                    check_name = f"[red bold]{check_name}[/red bold]"
-                elif result.severity == CheckSeverity.HIGH:
-                    check_name = f"[red]{check_name}[/red]"
 
-            table.add_row(check_name, status, result.message)
+            if ":" in check_name:
+                main_name, sub_name = check_name.split(":", 1)
+                check_name = f"  ↳ {sub_name}"
+            message = result.message
+            if result.status in (CheckStatus.FAIL, CheckStatus.WARN):
+                if (
+                    result.severity == CheckSeverity.CRITICAL
+                    or result.severity == CheckSeverity.HIGH
+                ):
+                    message = f"[red]{message}[/red]"
+                elif result.severity == CheckSeverity.MEDIUM:
+                    message = f"[yellow]{message}[/yellow]"
+
+            table.add_row(check_name, status, message)
 
         console.print(table)
         console.print()
 
-    # Show fix suggestions
     fixable = [
         r
         for r in report.results
@@ -152,7 +143,6 @@ def format_rich(report: DiagnosticReport) -> None:
 
 
 def format_json(report: DiagnosticReport) -> None:
-    """Format report as JSON."""
     print(
         report.model_dump_json(
             indent=2, exclude={"results": {"__all__": {"fix_function"}}}
@@ -160,18 +150,12 @@ def format_json(report: DiagnosticReport) -> None:
     )
 
 
-# Claude Code directories
 CLAUDE_HOME = Path.home() / ".claude"
 PLUGIN_MARKETPLACE_DIR = CLAUDE_HOME / "plugins" / "marketplaces"
 PLUGIN_CACHE_DIR = CLAUDE_HOME / "plugins" / "cache"
 
 
-# Data Models
-
-
 class CheckStatus(str, Enum):
-    """Status of a diagnostic check."""
-
     PASS = "pass"
     WARN = "warn"
     FAIL = "fail"
@@ -179,8 +163,6 @@ class CheckStatus(str, Enum):
 
 
 class CheckSeverity(str, Enum):
-    """Severity level of a check."""
-
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -188,8 +170,6 @@ class CheckSeverity(str, Enum):
 
 
 class CheckResult(BaseModel):
-    """Result of a diagnostic check."""
-
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     name: str
@@ -202,8 +182,6 @@ class CheckResult(BaseModel):
 
 
 class CheckMetadata(BaseModel):
-    """Metadata for a diagnostic check."""
-
     name: str
     category: str
     severity: CheckSeverity
@@ -212,8 +190,6 @@ class CheckMetadata(BaseModel):
 
 
 class DiagnosticReport(BaseModel):
-    """Complete diagnostic report."""
-
     timestamp: str
     checks_run: int
     passed: int
@@ -222,8 +198,6 @@ class DiagnosticReport(BaseModel):
     skipped: int
     results: list[CheckResult]
 
-
-# Check Registry
 
 _CHECK_REGISTRY: dict[str, tuple[CheckMetadata, Callable]] = {}
 
@@ -235,8 +209,6 @@ def check(
     depends_on: Optional[list[str]] = None,
     description: str = "",
 ) -> Callable:
-    """Decorator to register a diagnostic check."""
-
     def decorator(func: Callable[[], CheckResult]) -> Callable:
         metadata = CheckMetadata(
             name=name,
@@ -280,7 +252,6 @@ def get_checks_by_filter(
     else:
         filtered = _CHECK_REGISTRY
 
-    # Topological sort by dependencies with cycle detection
     sorted_checks = []
     resolved = set()
     visiting = set()
@@ -292,7 +263,6 @@ def get_checks_by_filter(
             return
 
         if name in visiting:
-            # Circular dependency detected
             cycle_path = " -> ".join(list(visiting) + [name])
             raise ValueError(
                 f"Circular dependency detected: {cycle_path}. "
@@ -316,22 +286,32 @@ def get_checks_by_filter(
     return sorted_checks
 
 
-def safe_check_wrapper(metadata: CheckMetadata, check_func: Callable) -> CheckResult:
-    """Wrap check execution with error handling."""
+def safe_check_wrapper(
+    metadata: CheckMetadata, check_func: Callable
+) -> list[CheckResult]:
+    """Wrap check execution with error handling.
+
+    Returns a list of CheckResult objects. Most checks return a single result,
+    but some checks (like debug.recent_errors) can return multiple results
+    for better table formatting.
+    """
     try:
-        return check_func()
+        result = check_func()
+        if isinstance(result, list):
+            return result
+        else:
+            return [result]
     except Exception as e:
         logger.exception("check_error", check=metadata.name)
-        return CheckResult(
-            name=metadata.name,
-            status=CheckStatus.FAIL,
-            message=f"Check raised exception: {type(e).__name__}: {e}",
-            severity=metadata.severity,
-            details={"exception": str(e), "type": type(e).__name__},
-        )
-
-
-# Environment Checks
+        return [
+            CheckResult(
+                name=metadata.name,
+                status=CheckStatus.FAIL,
+                message=f"Check raised exception: {type(e).__name__}: {e}",
+                severity=metadata.severity,
+                details={"exception": str(e), "type": type(e).__name__},
+            )
+        ]
 
 
 @check(
@@ -341,7 +321,6 @@ def safe_check_wrapper(metadata: CheckMetadata, check_func: Callable) -> CheckRe
     description="Verify Claude Code is installed",
 )
 def check_claude_installed() -> CheckResult:
-    """Check if claude command exists in PATH."""
     try:
         claude_path = shutil.which("claude")
 
@@ -379,7 +358,6 @@ def check_claude_installed() -> CheckResult:
     description="Check Claude Code version",
 )
 def check_claude_version() -> CheckResult:
-    """Check if Claude Code version is recent."""
     try:
         result = subprocess.run(
             ["claude", "--version"],
@@ -414,7 +392,6 @@ def check_claude_version() -> CheckResult:
     description="Check Node.js version",
 )
 def check_node_version() -> CheckResult:
-    """Ensure Node.js meets minimum requirements."""
     try:
         result = subprocess.run(
             ["node", "--version"],
@@ -442,9 +419,6 @@ def check_node_version() -> CheckResult:
         )
 
 
-# Configuration Checks
-
-
 @check(
     name="config.settings_file",
     category="config",
@@ -452,7 +426,6 @@ def check_node_version() -> CheckResult:
     description="Verify settings.json exists and is valid JSON",
 )
 def check_settings_file() -> CheckResult:
-    """Check if settings.json exists and is valid JSON."""
     settings_path = Path.home() / ".claude" / "settings.json"
 
     if not settings_path.exists():
@@ -501,7 +474,6 @@ def check_settings_file() -> CheckResult:
     description="Verify settings file is writable",
 )
 def check_settings_writable() -> CheckResult:
-    """Check if settings.json is writable (not stuck as symlink)."""
     settings_path = Path.home() / ".claude" / "settings.json"
 
     if settings_path.is_symlink():
@@ -551,7 +523,6 @@ def check_settings_writable() -> CheckResult:
     description="Verify CLAUDE.md memory file exists",
 )
 def check_memory_file() -> CheckResult:
-    """Check if CLAUDE.md exists."""
     memory_path = Path.home() / ".claude" / "CLAUDE.md"
 
     if not memory_path.exists():
@@ -572,7 +543,147 @@ def check_memory_file() -> CheckResult:
     )
 
 
-# Plugin Checks
+@check(
+    name="debug.recent_errors",
+    category="debug",
+    severity=CheckSeverity.MEDIUM,
+    description="Scan recent debug logs for errors",
+)
+def check_debug_log_errors() -> list[CheckResult]:
+    debug_dir = Path.home() / ".claude" / "debug"
+
+    if not debug_dir.exists():
+        return CheckResult(
+            name="debug.recent_errors",
+            status=CheckStatus.SKIP,
+            message="Debug directory not found",
+            severity=CheckSeverity.MEDIUM,
+            details={"path": str(debug_dir)},
+        )
+
+    try:
+        debug_files = sorted(
+            [f for f in debug_dir.glob("*.txt") if f.is_file()],
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
+        )[:5]
+    except Exception as e:
+        return CheckResult(
+            name="debug.recent_errors",
+            status=CheckStatus.FAIL,
+            message=f"Failed to scan debug directory: {e}",
+            severity=CheckSeverity.MEDIUM,
+        )
+
+    if not debug_files:
+        return CheckResult(
+            name="debug.recent_errors",
+            status=CheckStatus.SKIP,
+            message="No debug log files found",
+            severity=CheckSeverity.MEDIUM,
+        )
+
+    most_recent = debug_files[0]
+    try:
+        with open(most_recent) as f:
+            first_line = f.readline()
+            timestamp_match = re.search(
+                r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})", first_line
+            )
+            most_recent_time = (
+                timestamp_match.group(1) if timestamp_match else "unknown"
+            )
+    except Exception:
+        most_recent_time = "unknown"
+
+    error_counts = {}
+    total_errors = 0
+
+    for log_file in debug_files:
+        try:
+            with open(log_file) as f:
+                for line in f:
+                    if "[ERROR]" in line:
+                        total_errors += 1
+                        error_msg = re.sub(
+                            r"^\d{4}-\d{2}-\d{2}T[\d:Z.-]+ \[ERROR\] ", "", line.strip()
+                        )
+                        if "T.filter is not a function" in error_msg:
+                            error_counts.setdefault(
+                                "T.filter is not a function (repeated)", 0
+                            )
+                            error_counts["T.filter is not a function (repeated)"] += 1
+                        else:
+                            error_counts[error_msg] = error_counts.get(error_msg, 0) + 1
+        except Exception:
+            continue
+
+    if not error_counts:
+        return [
+            CheckResult(
+                name="debug.recent_errors",
+                status=CheckStatus.PASS,
+                message=f"No errors in recent debug logs (last session: {most_recent_time})",
+                severity=CheckSeverity.MEDIUM,
+                details={
+                    "last_session": most_recent_time,
+                    "logs_checked": len(debug_files),
+                },
+            )
+        ]
+
+    top_errors = sorted(
+        [(msg, count) for msg, count in error_counts.items() if "T.filter" not in msg],
+        key=lambda x: x[1],
+        reverse=True,
+    )[:5]
+
+    unique_errors = len([msg for msg in error_counts.keys() if "T.filter" not in msg])
+    t_filter_count = error_counts.get("T.filter is not a function (repeated)", 0)
+
+    summary_parts = []
+    summary_parts.append(f"{total_errors} errors")
+    summary_parts.append(f"{unique_errors} types")
+    if t_filter_count > 0:
+        summary_parts.append(f"{t_filter_count}× T.filter excluded")
+    summary_parts.append(f"last: {most_recent_time}")
+
+    message = f"Found {', '.join(summary_parts)}"
+
+    status = CheckStatus.WARN if top_errors else CheckStatus.PASS
+
+    results = [
+        CheckResult(
+            name="debug.recent_errors",
+            status=status,
+            message=message,
+            severity=CheckSeverity.MEDIUM,
+            details={
+                "last_session": most_recent_time,
+                "logs_checked": len(debug_files),
+                "total_errors": total_errors,
+                "unique_errors": unique_errors,
+                "t_filter_count": t_filter_count,
+            },
+        )
+    ]
+
+    for idx, (error_msg, count) in enumerate(top_errors, 1):
+        preview = f"error{idx}"
+        display_msg = f"{count}× {error_msg}"
+        if len(display_msg) > 100:
+            display_msg = display_msg[:97] + "..."
+
+        results.append(
+            CheckResult(
+                name=f"debug.recent_errors:{preview}",
+                status=CheckStatus.WARN,
+                message=display_msg,
+                severity=CheckSeverity.MEDIUM,
+            )
+        )
+
+    return results
 
 
 @check(
@@ -582,7 +693,6 @@ def check_memory_file() -> CheckResult:
     description="Verify marketplaces directory exists",
 )
 def check_marketplace_dir() -> CheckResult:
-    """Check if marketplaces directory exists."""
     marketplace_dir = PLUGIN_MARKETPLACE_DIR
 
     if not marketplace_dir.exists():
@@ -611,7 +721,6 @@ def check_marketplace_dir() -> CheckResult:
     description="Verify cache directory exists and is accessible",
 )
 def check_cache_dir() -> CheckResult:
-    """Check if plugin cache directory is accessible."""
     cache_dir = PLUGIN_CACHE_DIR
 
     if not cache_dir.exists():
@@ -650,7 +759,6 @@ def check_cache_dir() -> CheckResult:
     description="Scan for broken symlinks in plugin directories",
 )
 def check_plugin_broken_symlinks() -> CheckResult:
-    """Find broken symlinks in plugin directories."""
     plugin_dirs = [PLUGIN_MARKETPLACE_DIR, PLUGIN_CACHE_DIR]
 
     broken = []
@@ -689,7 +797,6 @@ def check_plugin_broken_symlinks() -> CheckResult:
 
 
 def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
-    """Apply fixes for failed checks."""
     fixed_results = []
 
     for result in results:
@@ -743,12 +850,7 @@ def apply_fixes(results: list[CheckResult], dry_run: bool) -> list[CheckResult]:
     return fixed_results
 
 
-# Tool Audit Models and Functions
-
-
 class ToolCall(BaseModel):
-    """Represents a tool call with key parameters."""
-
     tool_name: str
     timestamp: str
     key_params: str
@@ -757,8 +859,6 @@ class ToolCall(BaseModel):
 
 
 class ToolAuditReport(BaseModel):
-    """Summary of tool call audit."""
-
     start_date: Optional[str]
     end_date: Optional[str]
     total_conversations: int
@@ -768,10 +868,8 @@ class ToolAuditReport(BaseModel):
 
 
 def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
-    """Extract key parameters from tool input for uniqueness determination."""
     if tool_name == "Bash":
         cmd = tool_input.get("command", "")
-        # Truncate long commands but keep meaningful parts
         return cmd[:100] if len(cmd) <= 100 else cmd[:97] + "..."
     elif tool_name in ("Edit", "Write", "Read"):
         return tool_input.get("file_path", "")
@@ -784,7 +882,6 @@ def extract_key_params(tool_name: str, tool_input: dict[str, Any]) -> str:
     elif tool_name == "Skill":
         return tool_input.get("skill", "")
     else:
-        # For other tools, use first parameter or empty
         if tool_input:
             first_key = next(iter(tool_input.keys()), "")
             first_val = tool_input.get(first_key, "")
@@ -811,12 +908,9 @@ def parse_relative_date(date_str: str) -> str:
     if not date_str:
         return date_str
 
-    # Check if it's already in YYYY-MM-DD format
     if re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
         return date_str
 
-    # Parse relative date format: -Nd, -Nw, -Nm, -Ny, -Nh, -NM
-    # Note: uppercase M for minutes, lowercase m for months
     match = re.match(r"^-(\d+)([MhDdwmy])$", date_str)
     if not match:
         raise click.BadParameter(
@@ -827,7 +921,6 @@ def parse_relative_date(date_str: str) -> str:
     amount = int(match.group(1))
     unit = match.group(2)
 
-    # Use relativedelta for accurate date arithmetic
     now = datetime.now()
     if unit == "M":  # Minutes (uppercase)
         delta = relativedelta(minutes=amount)
@@ -854,40 +947,31 @@ def generate_permission_pattern(tool_name: str, key_params: str) -> Optional[str
     Returns None for patterns that should be skipped (overly specific or unwanted).
     """
     if tool_name == "Bash":
-        # Extract the command (first word) from the key_params
         cmd = key_params.split()[0] if key_params else ""
         if not cmd:
             return "Bash"
 
-        # Skip overly specific paths in bash commands
         if (
             cmd.startswith("/")
             or cmd.startswith("./")
             or cmd.startswith("~/")
             or "/" in cmd
         ):
-            # These are file paths, not commands - skip them
-            # Examples: /usr/bin/python, ./script.sh, nix/home-manager/files/scripts/file.py
             return None
 
-        # For variable assignments like BASE_SHA=..., skip them
         if "=" in cmd:
             return None
 
         return f"Bash({cmd}:*)"
 
     elif tool_name == "Edit":
-        # Skip Edit - handled by defaultMode = "acceptEdits" in config
         return None
 
     elif tool_name in ("Write", "Read"):
-        # For file operations, generate wildcard pattern if it's in a known directory
         if key_params.startswith("/Users/"):
-            # Extract directory pattern (e.g., //Users/achhina/.config/** )
             parts = key_params.split("/")
-            if len(parts) >= 4:  # At least /Users/username/dir/
-                # parts[0] is empty, parts[1] is "Users", parts[2] is "username", parts[3] is "dir"
-                base_path = "/".join(parts[1:4])  # "Users/username/dir"
+            if len(parts) >= 4:
+                base_path = "/".join(parts[1:4])
                 return f"{tool_name}(//{base_path}/**)"
         return tool_name
     elif tool_name == "Glob":
@@ -909,19 +993,15 @@ def generate_permission_pattern(tool_name: str, key_params: str) -> Optional[str
     elif tool_name == "NotebookEdit":
         return "NotebookEdit"
     elif tool_name.startswith("mcp__"):
-        # MCP tools: extract the service name and use wildcard
-        # e.g., mcp__context7__query-docs -> mcp__context7__*
         parts = tool_name.split("__")
         if len(parts) >= 2:
             return f"{parts[0]}__{parts[1]}__*"
         return tool_name
     else:
-        # Unknown tool, return as-is
         return tool_name
 
 
 def load_existing_allow_list() -> set[str]:
-    """Load existing allow list from Claude Code settings.json."""
     settings_file = Path.home() / ".claude" / "settings.json"
     try:
         with open(settings_file) as f:
@@ -940,75 +1020,54 @@ def would_tool_call_be_permitted(
     Implements Claude Code's documented permission matching logic:
     https://code.claude.com/docs/en/settings#permission-pattern-matching-syntax
     """
-    # Rule 1: Bare tool name matches ALL uses
-    # e.g., "Read" matches any Read operation
     if tool_name in existing_patterns:
         return True
 
-    # Rule 2: For Bash commands, implement documented wildcard behavior
     if tool_name == "Bash" and key_params:
         for pattern in existing_patterns:
             if not pattern.startswith("Bash("):
                 continue
 
-            # Extract pattern between "Bash(" and ")"
-            pattern_cmd = pattern[5:-1]  # Remove "Bash(" and ")"
+            pattern_cmd = pattern[5:-1]
 
-            # Type 1: Prefix matching with ":*" (word boundary required)
-            # e.g., "Bash(git commit:*)" matches "git commit -m foo" but not "git"
             if pattern_cmd.endswith(":*"):
-                prefix = pattern_cmd[:-2]  # Remove ":*"
-                # Check if command starts with prefix followed by space or is exact match
+                prefix = pattern_cmd[:-2]
                 if key_params == prefix or key_params.startswith(prefix + " "):
                     return True
 
-            # Type 2: Glob matching with "*" anywhere
-            # e.g., "Bash(git * main)" matches "git checkout main"
             elif "*" in pattern_cmd:
-                # Simple glob matching - convert to regex
                 import re
 
                 regex_pattern = "^" + re.escape(pattern_cmd).replace(r"\*", ".*") + "$"
                 if re.match(regex_pattern, key_params):
                     return True
 
-            # Type 3: Exact match
-            # e.g., "Bash(npm run build)" only matches that exact command
             elif pattern_cmd == key_params:
                 return True
 
-    # Rule 3: For file operations, check path patterns with wildcards
     elif tool_name in ("Read", "Write", "Edit") and key_params:
         for pattern in existing_patterns:
             if not pattern.startswith(f"{tool_name}("):
                 continue
 
-            # Extract path from pattern
             if pattern.endswith("/**)"):
-                # Directory wildcard pattern: Tool(//path/to/dir/**)
-                base_path = pattern[
-                    len(tool_name) + 3 : -4
-                ]  # Remove "Tool(//" and "/**)"
-                # Match if file is under this directory
+                base_path = pattern[len(tool_name) + 3 : -4]
                 if (
                     key_params.startswith("/" + base_path + "/")
                     or key_params == "/" + base_path
                 ):
                     return True
             elif pattern.endswith(")"):
-                # Exact file pattern: Tool(./path/to/file)
-                file_path = pattern[len(tool_name) + 1 : -1]  # Remove "Tool(" and ")"
+                file_path = pattern[len(tool_name) + 1 : -1]
                 if key_params == file_path:
                     return True
 
-    # Rule 4: For MCP tools, check wildcard patterns
     elif tool_name.startswith("mcp__"):
         parts = tool_name.split("__")
         if len(parts) >= 2:
             wildcard_pattern = f"{parts[0]}__{parts[1]}__*"
             if wildcard_pattern in existing_patterns:
                 return True
-        # Also check for exact match (already handled by Rule 1 above)
 
     return False
 
@@ -1020,19 +1079,16 @@ def extract_content_items(content: Any) -> list[dict]:
     Based on Simon Willison's claude-code-transcripts parser.
     """
     if isinstance(content, str):
-        # Legacy format: content is a plain string
         return [{"type": "text", "text": content}]
     elif isinstance(content, list):
-        # Modern format: content is a list of blocks
         return [item for item in content if isinstance(item, dict)]
     else:
         return []
 
 
 def parse_conversation_file(file_path: Path) -> list[ToolCall]:
-    """Parse a conversation JSONL file and extract approved tool calls."""
     tool_calls = []
-    tool_use_map = {}  # Map tool_use_id to tool details
+    tool_use_map = {}
 
     try:
         with open(file_path) as f:
@@ -1041,11 +1097,9 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                     entry = json.loads(line)
                     entry_type = entry.get("type")
 
-                    # Skip non-conversation entries
                     if entry_type not in ("user", "assistant"):
                         continue
 
-                    # Extract tool_use entries from assistant messages
                     if entry_type == "assistant":
                         message = entry.get("message", {})
                         if not isinstance(message, dict):
@@ -1161,7 +1215,7 @@ def audit_tools(
     filtered_calls = []
     for call in all_tool_calls:
         if not call.was_approved:
-            continue  # Skip denied tool calls
+            continue
 
         if start_date or end_date:
             call_date = call.timestamp.split("T")[0] if "T" in call.timestamp else ""
@@ -1172,7 +1226,6 @@ def audit_tools(
 
         filtered_calls.append(call)
 
-    # Group by tool + key params for uniqueness
     unique_calls = {}
     for call in filtered_calls:
         key = f"{call.tool_name}:{call.key_params}"
@@ -1193,14 +1246,12 @@ def audit_tools(
             if call.timestamp > unique_calls[key]["last_seen"]:
                 unique_calls[key]["last_seen"] = call.timestamp
 
-    # Convert to list and add session count
     tool_call_list = []
     for call_data in unique_calls.values():
         call_data["session_count"] = len(call_data["sessions"])
-        call_data["sessions"] = list(call_data["sessions"])  # Convert set to list
+        call_data["sessions"] = list(call_data["sessions"])
         tool_call_list.append(call_data)
 
-    # Sort by count (most used first)
     tool_call_list.sort(key=lambda x: x["count"], reverse=True)
 
     return ToolAuditReport(
@@ -1214,7 +1265,6 @@ def audit_tools(
 
 
 def format_audit_rich(report: ToolAuditReport) -> None:
-    """Format tool audit report as Rich table."""
     console.print("\n[bold]Claude Code Tool Audit Report[/bold]")
     if report.start_date:
         console.print(f"Date range: {report.start_date} to {report.end_date or 'now'}")
@@ -1234,13 +1284,11 @@ def format_audit_rich(report: ToolAuditReport) -> None:
     table.add_column("First Seen", style="dim")
     table.add_column("Last Seen", style="dim")
 
-    for call in report.tool_calls[:50]:  # Limit to top 50
-        # Truncate long parameters
+    for call in report.tool_calls[:50]:
         params = call["key_params"]
         if len(params) > 60:
             params = params[:57] + "..."
 
-        # Format dates
         first_seen = (
             call["first_seen"].split("T")[0]
             if "T" in call["first_seen"]
@@ -1375,23 +1423,28 @@ def check_command(
 
         # Skip if dependency failed
         if any(dep in skipped for dep in metadata.depends_on):
-            result = CheckResult(
-                name=metadata.name,
-                status=CheckStatus.SKIP,
-                message="Skipped due to failed dependency",
-                severity=metadata.severity,
-            )
+            check_results = [
+                CheckResult(
+                    name=metadata.name,
+                    status=CheckStatus.SKIP,
+                    message="Skipped due to failed dependency",
+                    severity=metadata.severity,
+                )
+            ]
             skipped.add(metadata.name)
         else:
             logger.info(f"Running check: {metadata.name}")
-            result = safe_check_wrapper(metadata, check_func)
-            if (
-                result.status == CheckStatus.FAIL
+            check_results = safe_check_wrapper(metadata, check_func)
+            # Mark as skipped if the main check failed critically
+            if any(
+                r.status == CheckStatus.FAIL
+                and r.name == metadata.name
                 and metadata.severity == CheckSeverity.CRITICAL
+                for r in check_results
             ):
                 skipped.add(metadata.name)
 
-        results.append(result)
+        results.extend(check_results)
 
     # Apply fixes if requested
     if fix:
