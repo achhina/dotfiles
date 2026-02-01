@@ -22,10 +22,6 @@ let
     builtins.readFile ./hooks/block-file-writing-via-bash.sh
   );
 
-  blockGitCFlag = pkgs.writeShellScript "block-git-c-flag.sh" (
-    builtins.readFile ./hooks/block-git-c-flag.sh
-  );
-
   # Load local overrides if they exist (gitignored file for user customization)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
@@ -284,8 +280,11 @@ let
   ];
 
   baseDenyPermissions = [
-    "Bash(git * --no-verify)"
+    "Bash(git * --no-verify)"      # Block --no-verify flag (skips hooks)
     "Bash(git * --no-verify *)"
+    "Bash(git -C *)"                # Block -C flag (breaks permission patterns)
+    "Bash(git --git-dir *)"         # Block --git-dir flag
+    "Bash(git --work-tree *)"       # Block --work-tree flag
   ];
 
   # Merge base permissions with local overrides
@@ -460,10 +459,6 @@ in
               {
                 type = "command";
                 command = "${blockFileWritingViaBash}";
-              }
-              {
-                type = "command";
-                command = "${blockGitCFlag}";
               }
             ];
           }
