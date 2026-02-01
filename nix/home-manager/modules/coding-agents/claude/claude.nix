@@ -90,6 +90,8 @@ let
           "Bash(htop:*)"
           "Bash(hm:*)"
           "Bash(home-manager:*)"
+          "Bash(ifconfig:*)"
+          "Bash(iostat:*)"
           "Bash(jest:*)"
           "Bash(just:*)"
           "Bash(ls:*)"
