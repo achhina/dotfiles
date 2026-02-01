@@ -16,8 +16,11 @@ if [[ "$TOOL_NAME" != "Bash" ]]; then
     exit 0
 fi
 
-# Check for file-writing patterns
-if echo "$COMMAND" | grep -qE '(cat\s*<<|echo\s+.*>|printf\s+.*>)'; then
+# Check for file-writing patterns (excluding stderr/stdout redirects)
+# Match: cat > file.txt, echo "text" > file.txt, printf "text" > file.txt
+# Exclude: >&2 (stderr), >&1 (stdout), >> (append in logs), > /dev/null
+if echo "$COMMAND" | grep -qE '(cat|echo|printf)\s+[^>]*>\s*[a-zA-Z0-9_./-]+' && \
+   ! echo "$COMMAND" | grep -qE '>\s*(&[12]|/dev/)'; then
     cat >&2 <<'EOF'
 🚫 **File writing via bash detected!**
 
