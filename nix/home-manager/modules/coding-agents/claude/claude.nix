@@ -32,8 +32,10 @@ let
       {
         allowPermissions = [ ];
         denyPermissions = [ ];
+        askPermissions = [ ];
         removeAllowPermissions = [ ];
         removeDenyPermissions = [ ];
+        removeAskPermissions = [ ];
       };
 
   # Helper to filter out items
@@ -113,6 +115,9 @@ let
     "Bash(gh api --method=GET *)"
     "Bash(gh api -X GET *)"
     "Bash(gh api -XGET *)"
+    "Bash(gh api search/* *)"              # Search operations
+    "Bash(gh api repos/*/*/issues *)"     # List/view issues (ask prompts if mutating)
+    "Bash(gh api repos/*/*/pulls *)"      # List/view PRs (ask prompts if mutating)
     "Bash(gh attestation verify *)"
     "Bash(gh auth status *)"
     "Bash(gh browse *)"
@@ -281,13 +286,15 @@ let
 
   baseDenyPermissions = [
     # Git safety
-    "Bash(git * --no-verify)"      # Block --no-verify flag (skips hooks)
+    "Bash(git * --no-verify)"      # Skips hooks
     "Bash(git * --no-verify *)"
-    "Bash(git -C *)"                # Block -C flag (breaks permission patterns)
-    "Bash(git --git-dir *)"         # Block --git-dir flag
-    "Bash(git --work-tree *)"       # Block --work-tree flag
+    "Bash(git -C *)"                # Breaks permission patterns
+    "Bash(git --git-dir *)"
+    "Bash(git --work-tree *)"
+  ];
 
-    # GitHub API safety - block mutating HTTP methods (anywhere in args)
+  baseAskPermissions = [
+    # GitHub API - escape hatches for mutating methods (ask instead of deny)
     "Bash(gh api * --method POST *)"
     "Bash(gh api * --method=POST *)"
     "Bash(gh api * -X POST *)"
@@ -314,6 +321,10 @@ let
   finalDenyPermissions =
     (filterOut localOverrides.removeDenyPermissions baseDenyPermissions)
     ++ localOverrides.denyPermissions;
+
+  finalAskPermissions =
+    (filterOut localOverrides.removeAskPermissions baseAskPermissions)
+    ++ localOverrides.askPermissions;
 
   # Where skillsDir gets deployed at runtime
   skillsDeployedPath = "$HOME/.claude/skills";
@@ -345,6 +356,7 @@ in
       permissions = {
         allow = finalAllowPermissions;
         deny = finalDenyPermissions;
+        ask = finalAskPermissions;
         defaultMode = "acceptEdits";
 
         additionalDirectories = [
