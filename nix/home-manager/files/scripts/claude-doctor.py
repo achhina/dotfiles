@@ -1057,9 +1057,9 @@ def generate_permission_pattern(
                 if cmd == "tmux" and subcommand in skip_tmux_subcommands:
                     return None
 
-                return f"Bash({cmd} {subcommand}:*)"
+                return f"Bash({cmd} {subcommand} *)"
 
-        return f"Bash({cmd}:*)"
+        return f"Bash({cmd} *)"
 
     elif tool_name == "Edit":
         return None
@@ -1099,12 +1099,18 @@ def generate_permission_pattern(
 
 
 def load_existing_allow_list() -> set[str]:
+    """Load both allow and ask permission patterns.
+
+    Returns combined set since both auto-approve tool calls.
+    """
     settings_file = Path.home() / ".claude" / "settings.json"
     try:
         with open(settings_file) as f:
             settings = json.load(f)
-            allow_list = settings.get("permissions", {}).get("allow", [])
-            return set(allow_list)
+            permissions = settings.get("permissions", {})
+            allow_list = permissions.get("allow", [])
+            ask_list = permissions.get("ask", [])
+            return set(allow_list + ask_list)
     except (FileNotFoundError, json.JSONDecodeError):
         return set()
 
@@ -1127,7 +1133,8 @@ def would_tool_call_be_permitted(
 
             pattern_cmd = pattern[5:-1]
 
-            if pattern_cmd.endswith(":*"):
+            # Handle both old (:*) and new ( *) glob syntax
+            if pattern_cmd.endswith(":*") or pattern_cmd.endswith(" *"):
                 prefix = pattern_cmd[:-2]
                 if key_params == prefix or key_params.startswith(prefix + " "):
                     return True
