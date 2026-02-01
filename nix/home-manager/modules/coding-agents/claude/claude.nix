@@ -22,7 +22,7 @@ let
     builtins.readFile ./hooks/block-file-writing-via-bash.sh
   );
 
-  # Load local overrides if they exist (gitignored file for user customization)
+  # Load local overrides if they exist (separate file to simplify rebasing)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
   localOverrides =
