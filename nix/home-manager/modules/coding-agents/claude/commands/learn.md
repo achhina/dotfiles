@@ -73,7 +73,7 @@ to copy files instead of using Home Manager's built-in symlinking.
 
 **Working approach:**
 \`\`\`nix
-programs.claude-code.commandsDir = ./slash-commands;
+programs.claude-code.commandsDir = ./commands;
 \`\`\`
 
 This properly symlinks command files to `~/.claude/commands/`.

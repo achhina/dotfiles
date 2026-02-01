@@ -340,7 +340,7 @@ in
     enable = true;
     package = null;
 
-    commandsDir = ./slash-commands;
+    commandsDir = ./commands;
 
     memory.source = ./context/AGENTS.md;
 
@@ -547,7 +547,7 @@ in
           ) templateFiles
         );
       in
-      pkgs.replaceVars ./slash-commands/issue.md {
+      pkgs.replaceVars ./commands/issue.md {
         fallbackTemplates = templateList;
       };
   };
