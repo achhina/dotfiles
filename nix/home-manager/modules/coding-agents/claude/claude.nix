@@ -311,6 +311,13 @@ let
     "Bash(gh api * --method=PATCH *)"
     "Bash(gh api * -X PATCH *)"
     "Bash(gh api * -XPATCH *)"
+
+    # GitHub API - body-providing flags (infer POST/PATCH)
+    "Bash(gh api * --input *)"
+    "Bash(gh api * --field *)"
+    "Bash(gh api * -f *)"          # Shorthand for --field
+    "Bash(gh api * -F *)"          # Shorthand for --field (from file)
+    "Bash(gh api * --raw-field *)"
   ];
 
   # Merge base permissions with local overrides
