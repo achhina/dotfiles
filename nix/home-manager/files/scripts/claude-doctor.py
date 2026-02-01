@@ -955,7 +955,21 @@ def generate_permission_pattern(
     if existing_patterns is None:
         existing_patterns = set()
 
-    skip_internal_tools = {"ListMcpResourcesTool", "ReadMcpResourceTool"}
+    skip_internal_tools = {
+        "ListMcpResourcesTool",
+        "ReadMcpResourceTool",
+        "McpSearch",
+        "AgentOutput",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "TaskOutput",
+        "TaskStop",
+        "KillShell",
+        "ExitPlanMode",
+        "EnterPlanMode",
+    }
     if tool_name in skip_internal_tools:
         return None
 
