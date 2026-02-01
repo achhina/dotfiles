@@ -66,6 +66,7 @@ let
     gopls                            # Go LSP (used with go tools)
     # rust-analyzer provided by rustup
     nil                              # Nix LSP (used for nix evaluation)
+    pyright                          # Python LSP (provides pyright-langserver)
     just-lsp                         # Just LSP (justfile language server)
     nginx-language-server            # Nginx configuration LSP
     docker-credential-helpers        # Docker credential helpers
