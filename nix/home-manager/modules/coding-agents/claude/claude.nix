@@ -103,6 +103,7 @@ let
           "Bash(man:*)"
           "Bash(mdls:*)"
           "Bash(mkdir:*)"
+          "Bash(mktemp:*)"
           "Bash(mypy:*)"
           "Bash(nix:*)"
           "Bash(nix-channel:*)"
