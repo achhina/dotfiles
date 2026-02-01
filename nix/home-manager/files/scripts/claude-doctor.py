@@ -939,15 +939,25 @@ def parse_relative_date(date_str: str) -> str:
     return target_date.strftime("%Y-%m-%d")
 
 
-def generate_permission_pattern(tool_name: str, key_params: str) -> Optional[str]:
+def generate_permission_pattern(
+    tool_name: str, key_params: str, existing_patterns: Optional[set[str]] = None
+) -> Optional[str]:
     """Generate a permission pattern from a tool call.
 
     Returns a pattern suitable for Claude Code's permissions.allow list.
     Follows the format used in claude.nix configuration.
     Returns None for patterns that should be skipped (overly specific or unwanted).
+
+    If fine-grained variants of a command exist in existing_patterns
+    (e.g., Bash(git add:*), Bash(git commit:*)), generates a subcommand
+    pattern instead of a general pattern.
     """
+    if existing_patterns is None:
+        existing_patterns = set()
+
     if tool_name == "Bash":
-        cmd = key_params.split()[0] if key_params else ""
+        parts = key_params.split()
+        cmd = parts[0] if parts else ""
         if not cmd:
             return "Bash"
 
@@ -962,6 +972,23 @@ def generate_permission_pattern(tool_name: str, key_params: str) -> Optional[str
         if "=" in cmd:
             return None
 
+        # Check if fine-grained patterns exist for this command
+        has_fine_grained = any(
+            p.startswith(f"Bash({cmd} ") for p in existing_patterns
+        )
+
+        if has_fine_grained and len(parts) > 1:
+            # Extract subcommand (skip flags to find the actual subcommand)
+            subcommand = None
+            for part in parts[1:]:
+                if not part.startswith("-"):
+                    subcommand = part
+                    break
+
+            if subcommand:
+                return f"Bash({cmd} {subcommand}:*)"
+
+        # Return simple pattern if no fine-grained variants exist
         return f"Bash({cmd}:*)"
 
     elif tool_name == "Edit":
@@ -1556,7 +1583,7 @@ def audit_tools_command(
 
             # Generate pattern for this denied tool call
             pattern = generate_permission_pattern(
-                tool_call["tool_name"], tool_call["key_params"]
+                tool_call["tool_name"], tool_call["key_params"], existing_patterns
             )
             # Skip None patterns (overly specific or unwanted patterns)
             if pattern is not None:
