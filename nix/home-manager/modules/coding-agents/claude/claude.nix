@@ -160,6 +160,7 @@ let
           "Bash(docker stats:*)"
           "Bash(docker top:*)"
           "Bash(docker manifest inspect:*)"
+          "Bash(docker compose:*)"
           "Bash(docker container ls:*)"
           "Bash(docker container inspect:*)"
           "Bash(docker container logs:*)"
