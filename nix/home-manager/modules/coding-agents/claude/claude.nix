@@ -53,6 +53,7 @@ in
           "Bash(fd:*)"
           "Bash(git add:*)"
           "Bash(git commit:*)"
+          "Bash(git mv:*)"
           "Bash(git log:*)"
           "Bash(git ls-tree:*)"
           "Bash(git worktree:*)"
