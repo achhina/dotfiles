@@ -47,6 +47,7 @@ in
           "Bash(cat:*)"
           "Bash(command:*)"
           "Bash(col:*)"
+          "Bash(copier:*)"
           "Bash(diff:*)"
           "Bash(echo:*)"
           "Bash(find:*)"
