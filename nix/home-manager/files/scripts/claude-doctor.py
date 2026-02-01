@@ -959,7 +959,7 @@ def generate_permission_pattern(
         "ListMcpResourcesTool",
         "ReadMcpResourceTool",
         "McpSearch",
-        "AgentOutput",
+        "AgentOutputTool",
         "TaskCreate",
         "TaskGet",
         "TaskList",
