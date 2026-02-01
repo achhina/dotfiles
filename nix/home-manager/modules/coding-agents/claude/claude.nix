@@ -351,6 +351,8 @@ in
       ];
 
       # Marketplaces contain multiple plugins
+      # @upstream-issue: https://github.com/anthropics/claude-code/issues/16870
+      # extraKnownMarketplaces is ignored by Claude Code - activation script workaround required
       extraKnownMarketplaces = {
         superpowers-marketplace = {
           source = {
@@ -372,6 +374,13 @@ in
             repo = "anthropics/claude-plugins-official";
           };
           autoUpdate = true;
+        };
+        neovim-marketplace = {
+          source = {
+            source = "directory";
+            path = "\${HOME}/.claude/plugins/marketplaces/neovim-marketplace";
+          };
+          autoUpdate = false;
         };
       };
 
@@ -484,8 +493,11 @@ in
     fi
   '';
 
-  # Install local marketplace by symlinking from Nix store to ~/.claude/plugins/marketplaces/
-  # Claude Code expects local marketplaces to be in this directory
+  # @upstream-issue: https://github.com/anthropics/claude-code/issues/16870
+  # Claude Code ignores extraKnownMarketplaces in settings files, requiring manual registration
+  # This activation script works around the bug by:
+  # 1. Symlinking local marketplaces from Nix store to ~/.claude/plugins/marketplaces/
+  # 2. Registering them via `claude plugin marketplace add` CLI command
   home.activation.installLocalMarketplace = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     MARKETPLACES_DIR="$HOME/.claude/plugins/marketplaces"
     $DRY_RUN_CMD mkdir -p "$MARKETPLACES_DIR"
@@ -502,7 +514,7 @@ in
       fi
       $DRY_RUN_CMD ln -s "$MARKETPLACE_PATH" "$MARKETPLACE_LINK"
 
-      # Register marketplace with Claude Code if available
+      # Register marketplace with Claude Code (workaround for upstream bug)
       if command -v claude >/dev/null 2>&1; then
         $VERBOSE_ECHO "Registering neovim-marketplace with Claude Code"
         # Check if already registered by checking known_marketplaces.json
