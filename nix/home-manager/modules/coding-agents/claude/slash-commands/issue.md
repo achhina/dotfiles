@@ -32,7 +32,7 @@ Use the `github` skill to create an issue. The skill will:
 2. Generate concise issue content based on context
 3. Infer the title format based on discovered templates
 4. Suggest appropriate labels from the available repository labels
-5. Open the draft in your IDE (if connected) for review
+5. Open the draft in your IDE (if connected) for review, showing the suggested title and label(s)
 6. Let you edit, regenerate, or submit
 7. Submit via `gh issue create` when you approve
 
