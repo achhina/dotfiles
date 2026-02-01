@@ -29,14 +29,6 @@
           modules = [ ./home-manager/home.nix ];
         };
     in {
-      # homeConfigurations naming strategy:
-      # - System-based: "aarch64-darwin", "x86_64-darwin", etc. (auto-generated)
-      #
-      # Shell aliases (shell.nix) use ${pkgs.stdenv.hostPlatform.system} which automatically resolves
-      # to the correct system-based configuration (e.g., "aarch64-darwin").
-      #
-      # Note: Do NOT use hostname-based configurations (e.g., "MacBook-Pro").
-      # Hostnames vary per machine, but system type is consistent and portable.
       homeConfigurations = forAllSystems (system:
         mkHomeConfiguration system
       );

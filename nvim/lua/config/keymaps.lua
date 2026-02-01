@@ -49,8 +49,6 @@ local function create_lsp_keymap(bufnr)
 
 	local has_fzf, fzf_lua = pcall(require, "fzf-lua")
 
-	-- Core LSP navigation
-	-- Uses Neovim 0.10+ built-in mappings: grr (references), gri (implementation), gra (code action), grn (rename), grt (type definition)
 	nmap("gD", vim.lsp.buf.declaration, "Goto Declaration")
 	nmap("gd", vim.lsp.buf.definition, "Goto Definition")
 
@@ -69,8 +67,6 @@ local function create_lsp_keymap(bufnr)
 	nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 	nmap("<leader>k", vim.lsp.buf.signature_help, "Signature Documentation")
 	nmap("<leader>F", vim.lsp.buf.format, "Format Document")
-
-	-- Use built-in gra for code action, grn for rename
 
 	if vim.lsp.buf.incoming_calls then
 		nmap("<leader>ci", vim.lsp.buf.incoming_calls, "Incoming calls")
@@ -169,7 +165,6 @@ function M.load_dap_keymaps()
 	local dap = require("dap")
 	local dapui = require("dapui")
 
-	-- Core debugging controls
 	safe_keymap("n", "<leader>ds", dap.continue, { desc = "Debug: Start/Continue" })
 	safe_keymap("n", "<leader>dS", dap.close, { desc = "Debug: Stop" })
 	safe_keymap("n", "<leader>dn", dap.step_over, { desc = "Debug: Step Over" })
@@ -199,7 +194,6 @@ function M.load_dap_keymaps()
 	safe_keymap("n", "<leader>dq", dap.repl.toggle, { desc = "Debug: Toggle REPL" })
 end
 
--- Test execution
 safe_keymap("n", "<leader>tn", function()
 	local has_neotest, neotest = pcall(require, "neotest")
 	if has_neotest then

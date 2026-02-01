@@ -5,13 +5,11 @@ function M.load_options()
 	vim.wo.number = true
 	vim.o.mouse = "a"
 
-	-- Remove this option if you want your OS clipboard to remain independent.
 	vim.o.clipboard = "unnamedplus"
 
 	vim.o.breakindent = true
 	vim.o.undofile = true
 
-	-- Case insensitive searching UNLESS /C or capital in search
 	vim.o.ignorecase = true
 	vim.o.smartcase = true
 
@@ -23,18 +21,13 @@ function M.load_options()
 
 	vim.o.autoread = true
 
-	-- Enhanced command-line completion (handled by noice.nvim)
 	vim.o.wildmenu = true
 	vim.o.wildmode = "full"
 	vim.o.wildoptions = "pum,tagfile"
 
-	-- NOTE: You should make sure your terminal supports this
 	vim.o.termguicolors = true
 
-	-- Global statusline (single statusline for entire editor, not per window)
 	vim.o.laststatus = 3
-
-	-- Neovim 0.10+ supports OSC8 hyperlinks automatically when termguicolors is enabled
 
 	vim.opt.tabstop = 4
 	vim.opt.shiftwidth = 4

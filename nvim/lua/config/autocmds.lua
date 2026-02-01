@@ -102,36 +102,28 @@ function M.load_autocmds()
 	autocmd("VimResized", {
 		group = ui_group,
 		callback = function()
-			-- Save current tab before tabdo
 			local current_tab = vim.api.nvim_get_current_tabpage()
 
-			-- Equalize all windows first
 			vim.cmd("tabdo wincmd =")
 
-			-- Restore current tab
 			vim.api.nvim_set_current_tabpage(current_tab)
-
-			-- Then resize Claude Code terminal to maintain its configured width percentage
 			local ok, claudecode = pcall(require, "claudecode")
 			if ok then
 				local config = claudecode.config or {}
 				local terminal_config = config.terminal or {}
 				local width_pct = terminal_config.split_width_percentage or 0.40
 
-				-- Get the Claude Code terminal buffer number
 				local term_ok, term_module = pcall(require, "claudecode.terminal")
 				if term_ok and term_module.get_active_terminal_bufnr then
 					local claude_bufnr = term_module.get_active_terminal_bufnr()
 
-					-- Find window displaying the Claude Code terminal
 					if claude_bufnr then
 						for _, win in ipairs(vim.api.nvim_list_wins()) do
 							local buf = vim.api.nvim_win_get_buf(win)
 							if buf == claude_bufnr then
-								-- Calculate desired width based on total columns
 								local desired_width = math.floor(vim.o.columns * width_pct)
 								pcall(vim.api.nvim_win_set_width, win, desired_width)
-								break -- Found the window, stop searching
+								break
 							end
 						end
 					end

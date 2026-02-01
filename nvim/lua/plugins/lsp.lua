@@ -1,7 +1,7 @@
 return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
-		"saghen/blink.cmp", -- Ensure blink is set up before LSP uses it
+		"saghen/blink.cmp",
 		{
 			"j-hui/fidget.nvim",
 			opts = {
@@ -30,7 +30,6 @@ return {
 		},
 	},
 	config = function()
-		-- Ensure blink.cmp is set up before LSP tries to use it
 		local blink = require("blink.cmp")
 		if not blink.config then
 			local lazy_config = require("lazy.core.config")

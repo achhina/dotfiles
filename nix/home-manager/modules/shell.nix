@@ -418,12 +418,6 @@ in
     completionInit = ''
       # Note: This entire section is SKIPPED by Home Manager when oh-my-zsh.enable = true
       # See: https://github.com/nix-community/home-manager/issues/3965
-      #
-      # When oh-my-zsh is enabled:
-      # - compinit is handled by oh-my-zsh.sh with metadata-based cache invalidation
-      # - Plugin configuration (zstyle) goes in oh-my-zsh.extraConfig instead
-      #
-      # This section only matters if you disable oh-my-zsh in the future.
     '';
 
     # Simple autoloadable functions
