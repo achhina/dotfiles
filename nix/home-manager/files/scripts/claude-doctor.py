@@ -990,13 +990,40 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open", "exec", "set", "sysctl", "direnv", "openssl", "printf", "#"}
+        skip_commands = {
+            "python3",
+            "npx",
+            "for",
+            "mv",
+            "rm",
+            "cp",
+            "pkill",
+            "cd",
+            "curl",
+            "chmod",
+            "source",
+            "claude",
+            "nix-env",
+            "docker-compose",
+            "bash",
+            "node",
+            "zsh",
+            "kill",
+            "uvx",
+            "lua",
+            "open",
+            "exec",
+            "set",
+            "sysctl",
+            "direnv",
+            "openssl",
+            "printf",
+            "#",
+        }
         if cmd in skip_commands:
             return None
 
-        has_fine_grained = any(
-            p.startswith(f"Bash({cmd} ") for p in existing_patterns
-        )
+        has_fine_grained = any(p.startswith(f"Bash({cmd} ") for p in existing_patterns)
 
         if has_fine_grained and len(parts) > 1:
             subcommand = None
@@ -1006,7 +1033,15 @@ def generate_permission_pattern(
                     break
 
             if subcommand:
-                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset", "stash", "pull"}
+                skip_git_subcommands = {
+                    "revert",
+                    "restore",
+                    "push",
+                    "checkout",
+                    "reset",
+                    "stash",
+                    "pull",
+                }
                 if cmd == "git" and subcommand in skip_git_subcommands:
                     return None
 
@@ -1096,7 +1131,11 @@ def would_tool_call_be_permitted(
                 prefix = pattern_cmd[:-2]
                 if key_params == prefix or key_params.startswith(prefix + " "):
                     return True
-                if prefix and not prefix[-1].isalnum() and key_params.startswith(prefix):
+                if (
+                    prefix
+                    and not prefix[-1].isalnum()
+                    and key_params.startswith(prefix)
+                ):
                     return True
 
             elif "*" in pattern_cmd:
@@ -1242,8 +1281,18 @@ def audit_tools(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     project_path: Optional[str] = None,
+    tool_filter: Optional[str] = None,
+    params_filter: Optional[str] = None,
 ) -> ToolAuditReport:
-    """Audit tool calls from conversation history."""
+    """Audit tool calls from conversation history.
+
+    Args:
+        start_date: Filter calls after this date (YYYY-MM-DD)
+        end_date: Filter calls before this date (YYYY-MM-DD)
+        project_path: Custom path to conversation history
+        tool_filter: Regex pattern to filter tool names
+        params_filter: Regex pattern to filter key parameters/contents
+    """
     if project_path:
         projects_dir = Path(project_path)
     else:
@@ -1261,6 +1310,10 @@ def audit_tools(
 
     conv_files = list(projects_dir.rglob("*.jsonl"))
 
+    # Compile filter patterns once
+    tool_pattern = re.compile(tool_filter) if tool_filter else None
+    params_pattern = re.compile(params_filter) if params_filter else None
+
     all_tool_calls = []
     for conv_file in conv_files:
         tool_calls = parse_conversation_file(conv_file)
@@ -1271,6 +1324,15 @@ def audit_tools(
         if not call.was_approved:
             continue
 
+        # Apply tool name filter
+        if tool_pattern and not tool_pattern.search(call.tool_name):
+            continue
+
+        # Apply params filter
+        if params_pattern and not params_pattern.search(call.key_params):
+            continue
+
+        # Apply date filters
         if start_date or end_date:
             call_date = call.timestamp.split("T")[0] if "T" in call.timestamp else ""
             if start_date and call_date < start_date:
@@ -1327,16 +1389,37 @@ def format_audit_rich(report: ToolAuditReport) -> None:
     console.print(f"Unique tool calls: {report.unique_tool_calls}\n")
 
     if not report.tool_calls:
-        console.print("[yellow]No approved tool calls found in date range[/yellow]")
+        console.print("[yellow]No approved tool calls found[/yellow]")
         return
 
-    table = Table(title="Tool Usage Statistics")
-    table.add_column("Tool", style="cyan", no_wrap=True)
-    table.add_column("Parameters", style="dim")
-    table.add_column("Count", justify="right", style="bold")
-    table.add_column("Sessions", justify="right")
-    table.add_column("First Seen", style="dim")
-    table.add_column("Last Seen", style="dim")
+    # Show tool usage summary by tool type
+    tool_summary = {}
+    for call in report.tool_calls:
+        tool_name = call["tool_name"]
+        tool_summary[tool_name] = tool_summary.get(tool_name, 0) + call["count"]
+
+    summary_table = Table(title="Tool Usage Summary")
+    summary_table.add_column("Tool", style="cyan", no_wrap=True)
+    summary_table.add_column("Total Calls", justify="right", style="bold")
+    summary_table.add_column("% of Total", justify="right")
+
+    for tool_name, count in sorted(
+        tool_summary.items(), key=lambda x: x[1], reverse=True
+    ):
+        percentage = (count / report.total_tool_calls) * 100
+        summary_table.add_row(tool_name, str(count), f"{percentage:.1f}%")
+
+    console.print(summary_table)
+    console.print()
+
+    # Show detailed tool calls
+    detail_table = Table(title="Tool Usage Details")
+    detail_table.add_column("Tool", style="cyan", no_wrap=True)
+    detail_table.add_column("Parameters", style="dim")
+    detail_table.add_column("Count", justify="right", style="bold")
+    detail_table.add_column("Sessions", justify="right")
+    detail_table.add_column("First Seen", style="dim")
+    detail_table.add_column("Last Seen", style="dim")
 
     for call in report.tool_calls[:50]:
         params = call["key_params"]
@@ -1354,7 +1437,7 @@ def format_audit_rich(report: ToolAuditReport) -> None:
             else call["last_seen"]
         )
 
-        table.add_row(
+        detail_table.add_row(
             call["tool_name"],
             params,
             str(call["count"]),
@@ -1363,7 +1446,7 @@ def format_audit_rich(report: ToolAuditReport) -> None:
             last_seen,
         )
 
-    console.print(table)
+    console.print(detail_table)
 
     if len(report.tool_calls) > 50:
         console.print(
@@ -1540,6 +1623,18 @@ def check_command(
     help="Custom project path (default: ~/.claude/projects)",
 )
 @click.option(
+    "--tool",
+    "-t",
+    type=str,
+    help="Filter tool calls by tool name (regex pattern, e.g., 'Bash', 'Read|Write', 'mcp__.*')",
+)
+@click.option(
+    "--params",
+    "-p",
+    type=str,
+    help="Filter tool calls by key parameters/contents (regex pattern, e.g., 'git.*', '.*\\.py')",
+)
+@click.option(
     "--suggest-permissions",
     is_flag=True,
     help="Suggest permission patterns for allow list based on approved tool calls",
@@ -1549,6 +1644,8 @@ def audit_tools_command(
     start_date: Optional[str],
     end_date: Optional[str],
     project: Optional[str],
+    tool: Optional[str],
+    params: Optional[str],
     suggest_permissions: bool,
 ):
     """Audit approved tool calls from conversation history.
@@ -1559,20 +1656,34 @@ def audit_tools_command(
 
     Examples:
 
+        # Basic usage
         claude-doctor audit-tools                             # All time
-
         claude-doctor audit-tools --start-date 2026-01-01     # Since date
-
-        claude-doctor audit-tools --start-date -1h            # Last hour
-
-        claude-doctor audit-tools --start-date -12h           # Last 12 hours
-
         claude-doctor audit-tools --start-date -7d            # Last 7 days
 
+        # Time-based filters
+        claude-doctor audit-tools --start-date -1h            # Last hour
+        claude-doctor audit-tools --start-date -12h           # Last 12 hours
         claude-doctor audit-tools --start-date -1w --end-date -1d  # Last week
-
         claude-doctor audit-tools --start-date -1m            # Last month
 
+        # Tool-specific filters
+        claude-doctor audit-tools --tool Bash                 # Only Bash calls
+        claude-doctor audit-tools --tool 'Read|Write'         # Read or Write calls
+        claude-doctor audit-tools --tool 'mcp__.*'            # All MCP tool calls
+
+        # Parameter/content filters
+        claude-doctor audit-tools --params 'git.*'            # Git commands
+        claude-doctor audit-tools --params '.*\\.py'          # Python files
+        claude-doctor audit-tools --tool Bash --params npm    # npm commands
+
+        # Combined filters
+        claude-doctor audit-tools --start-date -7d --tool Bash --params git  # Git commands last week
+
+        # Permission suggestions
+        claude-doctor audit-tools --suggest-permissions       # Suggest patterns for allow list
+
+        # Export
         claude-doctor audit-tools --format json > audit.json  # JSON export
     """
     if start_date:
@@ -1580,7 +1691,13 @@ def audit_tools_command(
     if end_date:
         end_date = parse_relative_date(end_date)
 
-    report = audit_tools(start_date=start_date, end_date=end_date, project_path=project)
+    report = audit_tools(
+        start_date=start_date,
+        end_date=end_date,
+        project_path=project,
+        tool_filter=tool,
+        params_filter=params,
+    )
 
     if suggest_permissions:
         existing_patterns = load_existing_allow_list()

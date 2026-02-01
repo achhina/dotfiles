@@ -2,7 +2,7 @@
 description: Remove obvious and redundant comments from code
 argument-hint: "[--scope changes|codebase] [@path ...]"
 allowed-tools: ["Read", "Edit", "Grep", "Glob", "Bash(git *)"]
-model: claude-haiku-4-20250514
+model: haiku
 ---
 
 # Task
