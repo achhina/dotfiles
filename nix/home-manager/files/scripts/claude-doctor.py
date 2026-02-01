@@ -972,18 +972,15 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        # Skip commands that should never be suggested
         skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source"}
         if cmd in skip_commands:
             return None
 
-        # Check if fine-grained patterns exist for this command
         has_fine_grained = any(
             p.startswith(f"Bash({cmd} ") for p in existing_patterns
         )
 
         if has_fine_grained and len(parts) > 1:
-            # Extract subcommand (skip flags to find the actual subcommand)
             subcommand = None
             for part in parts[1:]:
                 if not part.startswith("-"):
@@ -991,19 +988,16 @@ def generate_permission_pattern(
                     break
 
             if subcommand:
-                # Skip certain git subcommands
                 skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset"}
                 if cmd == "git" and subcommand in skip_git_subcommands:
                     return None
 
-                # Skip certain gh subcommands
                 skip_gh_subcommands = {"pr"}
                 if cmd == "gh" and subcommand in skip_gh_subcommands:
                     return None
 
                 return f"Bash({cmd} {subcommand}:*)"
 
-        # Return simple pattern if no fine-grained variants exist
         return f"Bash({cmd}:*)"
 
     elif tool_name == "Edit":
@@ -1147,7 +1141,6 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                         if not isinstance(message, dict):
                             continue
 
-                        # Use helper to handle both legacy and modern content formats
                         content_items = extract_content_items(message.get("content"))
                         timestamp = entry.get("timestamp", "")
                         session_id = entry.get("sessionId", "")
@@ -1166,13 +1159,11 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                         "session_id": session_id,
                                     }
 
-                    # Extract tool_result entries from user messages to determine approval
                     elif entry_type == "user":
                         message = entry.get("message", {})
                         if not isinstance(message, dict):
                             continue
 
-                        # Use helper to handle both legacy and modern content formats
                         content_items = extract_content_items(message.get("content"))
 
                         for item in content_items:
@@ -1180,7 +1171,6 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                 tool_use_id = item.get("tool_use_id")
                                 tool_result = entry.get("toolUseResult", {})
 
-                                # Ensure tool_result is a dict (handle legacy formats)
                                 if not isinstance(tool_result, dict):
                                     tool_result = {}
 
@@ -1188,7 +1178,6 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                 # If there's an error about user denial, was_approved=False
                                 was_approved = True
                                 if not tool_result.get("success", True):
-                                    # Check if it was explicitly denied
                                     content_text = str(item.get("content", ""))
                                     if (
                                         "doesn't want to proceed" in content_text
@@ -1213,11 +1202,9 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                     )
 
                 except (json.JSONDecodeError, AttributeError, KeyError, TypeError):
-                    # Skip malformed lines or entries with unexpected structure
                     continue
 
     except Exception as e:
-        # Log file-level errors (e.g., file not found, permission denied)
         logger.warning("conversation_file_error", file=str(file_path), error=str(e))
 
     return tool_calls
@@ -1244,16 +1231,13 @@ def audit_tools(
             tool_calls=[],
         )
 
-    # Find all conversation files
     conv_files = list(projects_dir.rglob("*.jsonl"))
 
-    # Parse conversations and collect tool calls
     all_tool_calls = []
     for conv_file in conv_files:
         tool_calls = parse_conversation_file(conv_file)
         all_tool_calls.extend(tool_calls)
 
-    # Filter by date if specified
     filtered_calls = []
     for call in all_tool_calls:
         if not call.was_approved:
@@ -1428,7 +1412,6 @@ def check_command(
 
         claude-doctor check -vvv                     # Maximum verbosity
     """
-    # Configure log level
     if verbose:
         log_level = ["warning", "info", "debug", "debug"][min(verbose, 3)]
 
@@ -1444,26 +1427,22 @@ def check_command(
             logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
         )
 
-    # Get checks to run
     checks = get_checks_by_filter(filter)
 
     if not checks:
         console_err.print(f"[yellow]No checks match filter: {filter}[/yellow]")
         sys.exit(1)
 
-    # Run checks
     results = []
     skipped = set()
     total_checks = len(checks)
 
     for idx, (metadata, check_func) in enumerate(checks, 1):
-        # Show progress (only for rich output, not JSON)
         if format == "rich":
             console_err.print(
                 f"[dim]Running check {idx}/{total_checks}: {metadata.name}[/dim]"
             )
 
-        # Skip if dependency failed
         if any(dep in skipped for dep in metadata.depends_on):
             check_results = [
                 CheckResult(
@@ -1477,7 +1456,6 @@ def check_command(
         else:
             logger.info(f"Running check: {metadata.name}")
             check_results = safe_check_wrapper(metadata, check_func)
-            # Mark as skipped if the main check failed critically
             if any(
                 r.status == CheckStatus.FAIL
                 and r.name == metadata.name
@@ -1488,11 +1466,9 @@ def check_command(
 
         results.extend(check_results)
 
-    # Apply fixes if requested
     if fix:
         results = apply_fixes(results, dry_run)
 
-    # Generate report
     report = DiagnosticReport(
         timestamp=datetime.now().isoformat(),
         checks_run=len(results),
@@ -1503,13 +1479,11 @@ def check_command(
         results=results,
     )
 
-    # Output report
     if format == "json":
         format_json(report)
     else:
         format_rich(report)
 
-    # Exit with error if any checks failed
     if report.failed > 0:
         sys.exit(1)
 
@@ -1573,7 +1547,6 @@ def audit_tools_command(
 
         claude-doctor audit-tools --format json > audit.json  # JSON export
     """
-    # Parse relative date strings (e.g., '-1d', '-7d', '-1w')
     if start_date:
         start_date = parse_relative_date(start_date)
     if end_date:
@@ -1582,25 +1555,20 @@ def audit_tools_command(
     report = audit_tools(start_date=start_date, end_date=end_date, project_path=project)
 
     if suggest_permissions:
-        # Generate permission pattern suggestions
         existing_patterns = load_existing_allow_list()
         pattern_counts: dict[str, int] = {}
 
         # Filter tool calls to only those that would be DENIED by existing patterns
         # Then count occurrences of patterns needed for those denied calls
         for tool_call in report.tool_calls:
-            # Check if this specific tool call would be permitted
             if would_tool_call_be_permitted(
                 tool_call["tool_name"], tool_call["key_params"], existing_patterns
             ):
-                # Skip - already permitted
                 continue
 
-            # Generate pattern for this denied tool call
             pattern = generate_permission_pattern(
                 tool_call["tool_name"], tool_call["key_params"], existing_patterns
             )
-            # Skip None patterns (overly specific or unwanted patterns)
             if pattern is not None:
                 pattern_counts[pattern] = (
                     pattern_counts.get(pattern, 0) + tool_call["count"]
@@ -1611,7 +1579,6 @@ def audit_tools_command(
         console = Console()
 
         if format == "json":
-            # JSON output for suggestions
             suggestions = {
                 "existing_patterns_count": len(existing_patterns),
                 "new_patterns_count": len(new_patterns),
@@ -1624,7 +1591,6 @@ def audit_tools_command(
             }
             console.print_json(data=suggestions)
         else:
-            # Rich table output for suggestions
             console.print(
                 f"\n[bold]Permission Pattern Suggestions[/bold]"
                 f"\nExisting patterns in allow list: {len(existing_patterns)}"
@@ -1650,7 +1616,6 @@ def audit_tools_command(
                     "[green]✓[/green] All approved tool calls are already permitted!"
                 )
     else:
-        # Regular audit output
         if format == "json":
             format_audit_json(report)
         else:
