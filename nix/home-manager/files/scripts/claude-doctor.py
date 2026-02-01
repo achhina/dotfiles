@@ -972,6 +972,11 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
+        # Skip commands that should never be suggested
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd"}
+        if cmd in skip_commands:
+            return None
+
         # Check if fine-grained patterns exist for this command
         has_fine_grained = any(
             p.startswith(f"Bash({cmd} ") for p in existing_patterns
@@ -986,6 +991,11 @@ def generate_permission_pattern(
                     break
 
             if subcommand:
+                # Skip certain git subcommands
+                skip_git_subcommands = {"revert", "restore", "push", "checkout"}
+                if cmd == "git" and subcommand in skip_git_subcommands:
+                    return None
+
                 return f"Bash({cmd} {subcommand}:*)"
 
         # Return simple pattern if no fine-grained variants exist
