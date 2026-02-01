@@ -115,9 +115,9 @@ let
     "Bash(gh api --method=GET *)"
     "Bash(gh api -X GET *)"
     "Bash(gh api -XGET *)"
-    "Bash(gh api search/* *)"              # Search operations
-    "Bash(gh api repos/*/*/issues *)"     # List/view issues (ask prompts if mutating)
-    "Bash(gh api repos/*/*/pulls *)"      # List/view PRs (ask prompts if mutating)
+    "Bash(gh api repos/*/*/issues *)"
+    "Bash(gh api repos/*/*/pulls *)"
+    "Bash(gh api search/* *)"
     "Bash(gh attestation verify *)"
     "Bash(gh auth status *)"
     "Bash(gh browse *)"
@@ -167,12 +167,12 @@ let
     "Bash(grep *)"
     "Bash(head *)"
     "Bash(hexdump *)"
+    "Bash(hm *)"
     "Bash(hm news *)"
     "Bash(hm packages *)"
-    "Bash(hm *)"
+    "Bash(home-manager *)"
     "Bash(home-manager generations *)"
     "Bash(home-manager news *)"
-    "Bash(home-manager *)"
     "Bash(htop *)"
     "Bash(ifconfig *)"
     "Bash(iostat *)"
@@ -188,6 +188,7 @@ let
     "Bash(mkdir *)"
     "Bash(mktemp *)"
     "Bash(mypy *)"
+    "Bash(nix *)"
     "Bash(nix eval *)"
     "Bash(nix flake metadata *)"
     "Bash(nix flake show *)"
@@ -201,11 +202,10 @@ let
     "Bash(nix-prefetch-url *)"
     "Bash(nix-shell *)"
     "Bash(nix-store *)"
-    "Bash(nix *)"
+    "Bash(npm *)"
     "Bash(npm list *)"
     "Bash(npm outdated *)"
     "Bash(npm view *)"
-    "Bash(npm *)"
     "Bash(nvim *)"
     "Bash(pgrep *)"
     "Bash(pip list *)"
@@ -255,8 +255,8 @@ let
     "Bash(which *)"
     "Bash(worktree *)"
     "Bash(yamllint *)"
-    "Bash(yarn list *)"
     "Bash(yarn *)"
+    "Bash(yarn list *)"
     "Bash(zip *)"
     "Bash(~/bin/man *)"
     "Edit(//${lib.removePrefix "/" config.xdg.configHome}/**)"
@@ -286,9 +286,9 @@ let
 
   baseDenyPermissions = [
     # Git safety
-    "Bash(git * --no-verify)"      # Skips hooks
+    "Bash(git * --no-verify)" # Skips hooks
     "Bash(git * --no-verify *)"
-    "Bash(git -C *)"                # Breaks permission patterns
+    "Bash(git -C *)" # Breaks permission patterns
     "Bash(git --git-dir *)"
     "Bash(git --work-tree *)"
   ];
@@ -315,8 +315,8 @@ let
     # GitHub API - body-providing flags (infer POST/PATCH)
     "Bash(gh api * --input *)"
     "Bash(gh api * --field *)"
-    "Bash(gh api * -f *)"          # Shorthand for --field
-    "Bash(gh api * -F *)"          # Shorthand for --field (from file)
+    "Bash(gh api * -f *)" # Shorthand for --field
+    "Bash(gh api * -F *)" # Shorthand for --field (from file)
     "Bash(gh api * --raw-field *)"
   ];
 
@@ -330,8 +330,7 @@ let
     ++ localOverrides.denyPermissions;
 
   finalAskPermissions =
-    (filterOut localOverrides.removeAskPermissions baseAskPermissions)
-    ++ localOverrides.askPermissions;
+    (filterOut localOverrides.removeAskPermissions baseAskPermissions) ++ localOverrides.askPermissions;
 
   # Where skillsDir gets deployed at runtime
   skillsDeployedPath = "$HOME/.claude/skills";
