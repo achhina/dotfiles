@@ -35,7 +35,7 @@ local function set_diagnostics(bufnr, data)
           lnum = loc.line - 1,
           col = 0,
           end_col = -1,
-          severity = vim.diagnostic.severity.HINT,
+          severity = vim.diagnostic.severity.WARN,
           message = string.format(
             "✓ %s/%s#%d resolved - workaround can be removed",
             issue.org,
