@@ -10,6 +10,48 @@
 - Avoid wildcard imports (`from module import *`)
 - One import per line for clarity
 
+### Path and URI Handling
+
+**File Paths**
+
+- Use `pathlib.Path` for all file system operations
+- Provides cross-platform path handling (Windows, macOS, Linux)
+- Object-oriented API is more readable than string concatenation
+- Works seamlessly with most standard library functions
+
+```python
+from pathlib import Path
+
+# Good: pathlib.Path
+config_file = Path("config") / "settings.json"
+if config_file.exists():
+    data = config_file.read_text()
+
+# Bad: string concatenation
+config_file = "config" + "/" + "settings.json"  # Breaks on Windows
+```
+
+**URLs and URIs**
+
+- Use `urllib.parse` for URL/URI manipulation
+- Never use string concatenation for building URLs
+- Use `urljoin()` for combining URL components
+- Use `urlparse()` for parsing and extracting URL components
+
+```python
+from urllib.parse import urljoin, urlparse, urlencode
+
+# Good: urllib.parse
+base_url = "https://api.example.com"
+endpoint = urljoin(base_url, "/users/123")
+params = urlencode({"format": "json", "include": "details"})
+full_url = f"{endpoint}?{params}"
+
+# Parse URLs
+parsed = urlparse("https://example.com/path?query=value")
+print(parsed.scheme, parsed.netloc, parsed.path)  # https example.com /path
+```
+
 ## Type Hints
 
 ### Static Typing
@@ -46,6 +88,85 @@ project/
 
 Use the src/ layout to prevent implicit imports from the current working directory during development. Without src/, Python can accidentally import files and paths from your project root, causing code to work locally but fail when packaged and distributed. The src/ structure enforces proper package installation and ensures your code works the same way in development and production.
 
+#### Resource Loading
+
+When using the src/ layout, the package structure during development differs from the installed wheel structure. Use `importlib.resources` (Python 3.9+) or `importlib_resources` (backport for older versions) to access package data files reliably.
+
+**Why importlib.resources?**
+
+- During development: `src/package_name/data/template.html`
+- After installation: Files are in `site-packages/package_name/data/template.html`
+- The src/ prefix disappears, but importlib.resources abstracts this difference
+- Uses the package name as an anchor point to locate resources
+
+**Loading Package Resources**
+
+```python
+from importlib.resources import files
+
+# Read a data file from your package
+def load_template(name: str) -> str:
+    """Load template file from package data directory."""
+    template_path = files("package_name") / "data" / "templates" / name
+    return template_path.read_text()
+
+# Access binary resources
+def load_image(name: str) -> bytes:
+    """Load image from package resources."""
+    image_path = files("package_name") / "assets" / "images" / name
+    return image_path.read_bytes()
+
+# Get a Path-like object for resources
+def get_config_path() -> Path:
+    """Get path to config file in package."""
+    config_file = files("package_name") / "config" / "default.json"
+    # For temporary file access, use as_file context manager
+    from importlib.resources import as_file
+    with as_file(config_file) as path:
+        return path
+```
+
+**Package Data Configuration**
+
+Include package data in `pyproject.toml`:
+
+```toml
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+package_name = ["data/**/*", "templates/**/*", "config/**/*"]
+```
+
+Or use `include-package-data = true` with a MANIFEST.in file for more complex scenarios.
+
+**Directory Structure Example**
+
+```
+src/
+└── package_name/
+    ├── __init__.py
+    ├── core/
+    │   └── engine.py
+    ├── data/
+    │   ├── __init__.py          # Makes data directory a package
+    │   ├── templates/
+    │   │   ├── __init__.py      # Optional but recommended
+    │   │   └── email.html
+    │   └── defaults.json
+    └── assets/
+        ├── __init__.py          # Makes assets directory a package
+        └── logo.png
+```
+
+**Important Notes**
+
+- Add `__init__.py` (can be empty) to data directories to make them recognizable as packages
+- While optional in Python 3.3+ due to namespace packages, it's best practice for clarity and compatibility
+- Never use `__file__` to locate package data - it breaks with zip imports and some deployment scenarios
+- importlib.resources works with both filesystem and zip-based packages
+- For Python 3.7-3.8, install `importlib-resources` backport: `uv add importlib-resources`
+
 #### Configuration Files
 
 - Use `pyproject.toml` for project metadata and tool configuration
@@ -72,6 +193,7 @@ Use the src/ layout to prevent implicit imports from the current working directo
 ### Advanced Testing Techniques
 
 **Property-Based Testing**
+
 - Use `hypothesis` to automatically generate test cases and find edge cases
 - Define properties that should always hold true
 - Let hypothesis discover inputs that break your assumptions
@@ -86,6 +208,7 @@ def test_addition_commutative(a, b):
 ```
 
 **Performance Testing**
+
 - Use `pytest-benchmark` to track performance over time
 - Detect performance regressions in CI/CD
 - Establish performance baselines for critical code paths
@@ -98,6 +221,7 @@ def test_search_performance(benchmark):
 ```
 
 **Test Data Factories**
+
 - Use `factory_boy` for complex test data generation
 - Create reusable factories instead of manual fixtures
 - Generate realistic test data with Faker integration
@@ -116,6 +240,7 @@ class UserFactory(factory.Factory):
 ```
 
 **Integration Testing**
+
 - Test with real databases, not just mocks
 - Use `pytest-docker` or testcontainers for isolated environments
 - Verify actual system integration, not just unit behavior
@@ -206,18 +331,22 @@ class UserInput(BaseModel):
 Apply SOLID principles for maintainable, scalable Python code:
 
 **Single Responsibility**
+
 - Each class/module should have one reason to change
 - Separate concerns (data access, business logic, presentation)
 
 **Open/Closed**
+
 - Open for extension, closed for modification
 - Use inheritance, composition, or protocols for extensibility
 
 **Liskov Substitution**
+
 - Subtypes must be substitutable for their base types
 - Honor the contract defined by base classes
 
 **Interface Segregation**
+
 - Use `Protocol` for interface definitions
 - Many specific interfaces over one general interface
 
@@ -232,6 +361,7 @@ class Writable(Protocol):
 ```
 
 **Dependency Inversion**
+
 - Depend on abstractions (protocols), not concrete implementations
 - Inject dependencies rather than creating them internally
 
@@ -291,6 +421,7 @@ bus.publish("user.created", user)
 Create extensible systems with plugin patterns:
 
 **Entry Points (setuptools)**
+
 ```python
 # pyproject.toml
 [project.entry-points."myapp.plugins"]
@@ -298,6 +429,7 @@ plugin_name = "myapp.plugins.plugin_module:PluginClass"
 ```
 
 **Dynamic Loading**
+
 ```python
 import importlib.metadata
 
@@ -310,6 +442,7 @@ def load_plugins():
 ### Common Design Patterns
 
 **Factory Pattern**
+
 ```python
 class UserFactory:
     @staticmethod
@@ -322,6 +455,7 @@ class UserFactory:
 ```
 
 **Singleton Pattern (with metaclass)**
+
 ```python
 class Singleton(type):
     _instances = {}
@@ -336,6 +470,7 @@ class Database(metaclass=Singleton):
 ```
 
 **Observer Pattern**
+
 ```python
 class Subject:
     def __init__(self):
@@ -352,6 +487,7 @@ class Subject:
 ### Advanced Python Features
 
 **Context Managers**
+
 ```python
 from contextlib import contextmanager
 
@@ -368,6 +504,7 @@ def database_transaction(db):
 ```
 
 **Descriptors**
+
 ```python
 class Validated:
     def __init__(self, validator):
@@ -415,6 +552,7 @@ async def main():
 ### Async Libraries and Ecosystem
 
 **HTTP Clients**
+
 - Use `aiohttp` for async HTTP requests
 - Prefer `httpx` for compatibility with both sync and async code
 - Handle connection pooling and timeouts properly
@@ -429,6 +567,7 @@ async def fetch_with_aiohttp(url: str) -> dict:
 ```
 
 **Async Database Access**
+
 - Use `SQLAlchemy 2.0+` with async engine for database operations
 - Use `asyncpg` for PostgreSQL (fastest async driver)
 - Use `motor` for async MongoDB access
@@ -445,11 +584,13 @@ async def get_user(user_id: int) -> User:
 ```
 
 **Background Task Processing**
+
 - Use `Celery` with `Redis` for distributed task queues
 - Use `arq` for simpler async task processing
 - Consider `dramatiq` as an alternative to Celery
 
 **WebSockets**
+
 - Use `FastAPI` WebSocket support for real-time communication
 - Use `Django Channels` for WebSocket support in Django
 - Handle connection lifecycle and graceful disconnection
@@ -471,6 +612,7 @@ async def websocket_endpoint(websocket: WebSocket):
 ```
 
 **Alternative Async Frameworks**
+
 - Consider `trio` for structured concurrency and better error handling
 - Use `anyio` for writing code compatible with both asyncio and trio
 
@@ -595,38 +737,99 @@ level_mapping = logging.getLevelNamesMapping()
 
 ### Example (Application Entry Point)
 
-Create a logging utility module for configuration, then configure once at entry point:
+Configure logging once at application entry point using `dictConfig` for structured configuration. Use environment variables to switch between development and production modes.
 
 ```python
 # utils/logging_config.py - Logging configuration module
-import logging
+import logging.config
+import os
+import sys
 
-def configure_logging():
-    """Configure logging for the entire application."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+import structlog
+
+
+def configure_logging(env: str = "development") -> None:
+    """Configure logging for the entire application.
+
+    Parameters
+    ----------
+    env : str
+        Environment mode: "development" or "production"
+    """
+    # Standard library logging configuration
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,  # Important: don't disable existing loggers
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": "DEBUG" if env == "development" else "INFO",
+                "formatter": "standard",
+                "stream": "ext://sys.stdout",  # Log to stdout (12-Factor App)
+            },
+        },
+        "root": {
+            "level": "DEBUG" if env == "development" else "INFO",
+            "handlers": ["console"],
+        },
+    }
+    logging.config.dictConfig(logging_config)
+
+    # Structlog configuration
+    processors = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+    ]
+
+    # Development: pretty console output
+    # Production: JSON for log aggregators
+    if env == "development":
+        processors.append(structlog.dev.ConsoleRenderer())
+    else:
+        processors.append(structlog.processors.JSONRenderer())
+
+    structlog.configure(
+        processors=processors,
+        wrapper_class=structlog.make_filtering_bound_logger(
+            logging.DEBUG if env == "development" else logging.INFO
+        ),
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
     )
-
-    try:
-        import structlog
-        structlog.configure(
-            processors=[
-                structlog.processors.TimeStamper(fmt="iso"),
-                structlog.processors.JSONRenderer(),
-            ],
-            logger_factory=structlog.stdlib.LoggerFactory(),
-        )
-    except ImportError:
-        pass
 ```
 
 ```python
 # main.py - Application entry point
+import os
 from utils.logging_config import configure_logging
 
 if __name__ == "__main__":
-    configure_logging()
+    # Use environment variable to determine mode
+    env = os.getenv("APP_ENV", "development")
+    configure_logging(env=env)
+```
+
+**Usage in modules:**
+
+```python
+import structlog
+
+logger = structlog.get_logger(__name__)
+
+def process_data(user_id: int) -> None:
+    """Process user data with structured logging."""
+    logger.info("processing_started", user_id=user_id)
+    # ... processing logic ...
+    logger.info("processing_completed", user_id=user_id, records_processed=100)
 ```
 
 ## Recommended Libraries
