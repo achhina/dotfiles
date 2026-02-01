@@ -299,6 +299,9 @@ in
       env = {
         BASH_DEFAULT_TIMEOUT_MS = "300000";
         BASH_MAX_TIMEOUT_MS = "600000";
+        # Fallback value when not launched from Neovim to suppress MCP server errors
+        # Neovim will override this with the actual socket path when launching Claude
+        NVIM_MCP_SOCKET = "/dev/null";
       };
 
       includeCoAuthoredBy = false;
@@ -381,6 +384,7 @@ in
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
+        "double-shot-latte@superpowers-marketplace" = true;
         # @upstream-issue: https://github.com/anthropics/claude-code/issues/10113
         # Git-installed marketplace plugins have wrong path resolution causing ENOTDIR errors on skill loading
         "shell-scripting@claude-code-workflows" = true;
@@ -401,7 +405,6 @@ in
         "pyright-lsp@claude-plugins-official" = true;
         "plugin-dev@claude-plugins-official" = true;
         "hookify@claude-plugins-official" = true;
-        "double-shot-latte@claude-plugins-official" = true;
       };
 
       hooks = {
@@ -512,18 +515,24 @@ in
     fi
   '';
 
-  # Install Claude Code via npm if not available
-  # This allows us to get the latest version without waiting for nixpkgs updates
+  # Ensure Claude Code native installation exists
+  # Uses the native installer which manages its own updates
+  # Source: https://code.claude.com/docs/en/setup#installation
   home.activation.installClaude = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    NPM_PREFIX="$HOME/.local/share/npm"
+    CLAUDE_BIN="$HOME/.local/bin/claude"
 
-    # Check if claude command exists in npm global bin directory
-    if ! [ -x "$NPM_PREFIX/bin/claude" ]; then
-      $VERBOSE_ECHO "Claude Code not found, installing via npm..."
-      $DRY_RUN_CMD mkdir -p "$NPM_PREFIX"
-      $DRY_RUN_CMD ${pkgs.nodejs}/bin/npm install -g --prefix "$NPM_PREFIX" @anthropic-ai/claude-code
+    # Check if claude binary exists at expected location
+    if ! [ -x "$CLAUDE_BIN" ]; then
+      $VERBOSE_ECHO "Claude Code not found, installing via native installer..."
+      # Download and run the official installer from claude.ai
+      ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash -s stable
+      # Run claude install to complete setup
+      if [ -x "$CLAUDE_BIN" ]; then
+        $VERBOSE_ECHO "Running claude install to complete setup..."
+        "$CLAUDE_BIN" install || true
+      fi
     else
-      $VERBOSE_ECHO "Claude Code already installed via npm"
+      $VERBOSE_ECHO "Claude Code native installation found at $CLAUDE_BIN"
     fi
   '';
 
