@@ -990,7 +990,7 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open", "exec", "set", "sysctl"}
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open", "exec", "set", "sysctl", "direnv", "openssl", "printf", "#"}
         if cmd in skip_commands:
             return None
 
@@ -1016,6 +1016,10 @@ def generate_permission_pattern(
 
                 skip_docker_subcommands = {"exec", "run", "stop", "rm"}
                 if cmd == "docker" and subcommand in skip_docker_subcommands:
+                    return None
+
+                skip_tmux_subcommands = {"source-file"}
+                if cmd == "tmux" and subcommand in skip_tmux_subcommands:
                     return None
 
                 return f"Bash({cmd} {subcommand}:*)"
