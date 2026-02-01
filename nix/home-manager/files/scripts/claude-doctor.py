@@ -973,7 +973,7 @@ def generate_permission_pattern(
             return None
 
         # Skip commands that should never be suggested
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd"}
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source"}
         if cmd in skip_commands:
             return None
 
@@ -992,8 +992,13 @@ def generate_permission_pattern(
 
             if subcommand:
                 # Skip certain git subcommands
-                skip_git_subcommands = {"revert", "restore", "push", "checkout"}
+                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset"}
                 if cmd == "git" and subcommand in skip_git_subcommands:
+                    return None
+
+                # Skip certain gh subcommands
+                skip_gh_subcommands = {"pr"}
+                if cmd == "gh" and subcommand in skip_gh_subcommands:
                     return None
 
                 return f"Bash({cmd} {subcommand}:*)"
