@@ -51,7 +51,7 @@ Detect and run the appropriate test command for the project:
 
 ### Step 2: Code Review
 
-Invoke the code-review agent to analyze recent changes:
+Invoke the TDD workflows code-reviewer agent to analyze recent changes:
 
 **Determine review scope:**
 ```bash
@@ -60,19 +60,23 @@ git diff --name-only
 ```
 
 **Run code review:**
-Invoke the `/code-review` skill (uses `tdd-workflows:code-reviewer` agent for comprehensive analysis):
+Use the Task tool with `subagent_type="tdd-workflows:code-reviewer"` for comprehensive analysis:
 
 ```
-Use Skill tool: skill="code-review"
+Use Task tool:
+- subagent_type: "tdd-workflows:code-reviewer"
+- prompt: "Review the uncommitted changes for security vulnerabilities, performance issues, code quality, and best practices"
 ```
 
-This provides comprehensive review covering:
-- Security vulnerabilities (OWASP Top 10, injection attacks, secrets)
-- Performance issues (algorithms, database queries, memory management)
-- Code quality (DRY, SOLID, maintainability, complexity)
-- Error handling and resilience
-- Testing and testability
-- Style and conventions
+This elite code reviewer provides comprehensive analysis covering:
+- AI-powered code analysis and modern static analysis tools
+- Security vulnerabilities (OWASP Top 10, injection attacks, secrets, cryptography)
+- Performance issues (algorithms, database queries, memory leaks, caching)
+- Code quality (Clean Code, SOLID, DRY, maintainability, complexity)
+- Error handling and resilience patterns
+- Testing coverage and testability
+- Configuration and infrastructure security
+- Modern development practices (TDD, feature flags, observability)
 
 **On review findings:**
 - Analyze all code review comments and issues identified
