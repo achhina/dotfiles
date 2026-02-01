@@ -280,11 +280,30 @@ let
   ];
 
   baseDenyPermissions = [
+    # Git safety
     "Bash(git * --no-verify)"      # Block --no-verify flag (skips hooks)
     "Bash(git * --no-verify *)"
     "Bash(git -C *)"                # Block -C flag (breaks permission patterns)
     "Bash(git --git-dir *)"         # Block --git-dir flag
     "Bash(git --work-tree *)"       # Block --work-tree flag
+
+    # GitHub API safety - block mutating HTTP methods (anywhere in args)
+    "Bash(gh api * --method POST *)"
+    "Bash(gh api * --method=POST *)"
+    "Bash(gh api * -X POST *)"
+    "Bash(gh api * -XPOST *)"
+    "Bash(gh api * --method PUT *)"
+    "Bash(gh api * --method=PUT *)"
+    "Bash(gh api * -X PUT *)"
+    "Bash(gh api * -XPUT *)"
+    "Bash(gh api * --method DELETE *)"
+    "Bash(gh api * --method=DELETE *)"
+    "Bash(gh api * -X DELETE *)"
+    "Bash(gh api * -XDELETE *)"
+    "Bash(gh api * --method PATCH *)"
+    "Bash(gh api * --method=PATCH *)"
+    "Bash(gh api * -X PATCH *)"
+    "Bash(gh api * -XPATCH *)"
   ];
 
   # Merge base permissions with local overrides
