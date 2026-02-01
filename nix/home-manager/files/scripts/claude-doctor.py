@@ -955,6 +955,10 @@ def generate_permission_pattern(
     if existing_patterns is None:
         existing_patterns = set()
 
+    skip_internal_tools = {"ListMcpResourcesTool", "ReadMcpResourceTool"}
+    if tool_name in skip_internal_tools:
+        return None
+
     if tool_name == "Bash":
         parts = key_params.split()
         cmd = parts[0] if parts else ""
@@ -972,7 +976,7 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose"}
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose", "bash", "node", "zsh", "kill", "uvx", "lua", "open"}
         if cmd in skip_commands:
             return None
 
@@ -988,7 +992,7 @@ def generate_permission_pattern(
                     break
 
             if subcommand:
-                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset"}
+                skip_git_subcommands = {"revert", "restore", "push", "checkout", "reset", "stash"}
                 if cmd == "git" and subcommand in skip_git_subcommands:
                     return None
 
