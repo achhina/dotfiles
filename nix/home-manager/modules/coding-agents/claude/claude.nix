@@ -32,6 +32,7 @@ let
 
   # Base permissions defined here (upstream defaults)
   baseAllowPermissions = [
+          "Bash(actionlint:*)"
           "Bash(awk:*)"
           "Bash(cat:*)"
           "Bash(command:*)"
@@ -108,6 +109,7 @@ let
           "Bash(nvim:*)"
           "Bash(playwright:*)"
           "Bash(pre-commit:*)"
+          "Bash(prettier:*)"
           "Bash(pytest:*)"
           "Bash(python:*)"
           "Bash(refresh-env:*)"
@@ -126,6 +128,7 @@ let
           "Bash(tmux show-:*)"
           "Bash(tmux display:*)"
           "Bash(tmux has-session:*)"
+          "Bash(tmux info:*)"
           "Bash(tmux capture-pane:*)"
           "Bash(tree:*)"
           "Bash(ty:*)"
