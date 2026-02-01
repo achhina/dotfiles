@@ -3,9 +3,8 @@
 
 return {
   {
-    -- Virtual plugin - implemented inline
+    -- Inline plugin for upstream issue tracking
     name = "upstream-issues",
-    dir = vim.fn.stdpath("config") .. "/lua/upstream-issues-impl",
     event = { "BufReadPost", "BufWritePost" },
     cmd = { "UpstreamIssuesCheck", "UpstreamIssuesClearCache" },
     config = function()
