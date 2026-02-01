@@ -21,6 +21,10 @@ let
     builtins.readFile ./hooks/block-file-writing-via-bash.sh
   );
 
+  blockGitCFlag = pkgs.writeShellScript "block-git-c-flag.sh" (
+    builtins.readFile ./hooks/block-git-c-flag.sh
+  );
+
   # Load local overrides if they exist (gitignored file for user customization)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
@@ -450,6 +454,10 @@ in
               {
                 type = "command";
                 command = "${blockFileWritingViaBash}";
+              }
+              {
+                type = "command";
+                command = "${blockGitCFlag}";
               }
             ];
           }
