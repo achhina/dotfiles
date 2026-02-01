@@ -281,6 +281,9 @@ let
   finalDenyPermissions =
     (filterOut localOverrides.removeDenyPermissions baseDenyPermissions)
     ++ localOverrides.denyPermissions;
+
+  # Where skillsDir gets deployed at runtime
+  skillsDeployedPath = "$HOME/.claude/skills";
 in
 {
   programs.claude-code = {
@@ -447,6 +450,26 @@ in
 
     # Deploy hookify rules
     ".claude/hookify.block-file-writing-via-bash.local.md".source = ./hookify-rules/block-file-writing-via-bash.md;
+
+    # Generate issue command with template paths substituted
+    ".claude/commands/issue.md".source = let
+      templatesDir = ./skills/github/templates;
+      templateFiles = builtins.attrNames (builtins.readDir templatesDir);
+      formatTemplateName = name:
+        let
+          withoutExt = builtins.head (builtins.match "(.*)\.md" name);
+          withSpaces = builtins.replaceStrings ["_"] [" "] withoutExt;
+          capitalize = str: builtins.concatStringsSep " "
+            (map (word: "${lib.toUpper (builtins.substring 0 1 word)}${builtins.substring 1 (builtins.stringLength word) word}")
+            (lib.splitString " " withSpaces));
+        in capitalize withSpaces;
+      templateList = builtins.concatStringsSep "\n"
+        (map (name: "- ${formatTemplateName name}: ${skillsDeployedPath}/github/templates/${name}") templateFiles);
+    in pkgs.substituteAll {
+      src = ./slash-commands/issue.md;
+      fallbackTemplates = templateList;
+    };
+  };
   };
 
   # Backup existing mutable settings.json before Home Manager regenerates it

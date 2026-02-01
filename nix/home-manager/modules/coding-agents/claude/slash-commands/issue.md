@@ -7,18 +7,42 @@ argument-hint: "[issue]"
 
 Create a GitHub issue using the github skill.
 
+# Repository Environment
+
+## Git Repository Status
+- Remote: !`git remote -v 2>/dev/null || echo "Not in a git repository"`
+- GitHub CLI: !`gh auth status 2>&1 || echo "Not authenticated"`
+
+## Available Issue Templates
+
+### Project templates
+!`repo=$(git rev-parse --show-toplevel 2>/dev/null) && fd -t f -e md . "$repo/.github" 2>/dev/null | grep -E '(ISSUE_TEMPLATE\.md$|ISSUE_TEMPLATE/)' || echo "None found"`
+
+### Fallback templates
+@fallbackTemplates@
+
+## Available Repository Labels
+!`gh label list --limit 100 2>/dev/null || echo "No labels configured"`
+
 # Instructions
 
 Use the `github` skill to create an issue. The skill will:
 
-1. Validate the environment (git repo, GitHub remote, gh CLI auth)
-2. Discover issue templates (repo templates or fallback)
-3. If multiple templates exist, ask you to choose (bug report, feature request, etc.)
-4. Generate concise issue content based on context
-5. Infer the title format based on discovered templates
-6. Open the draft in your IDE (if connected) for review
-7. Let you edit, regenerate, or submit
-8. Submit via `gh issue create` when you approve
+1. If multiple templates exist, ask you to choose (bug report, feature request, etc.)
+2. Generate concise issue content based on context
+3. Infer the title format based on discovered templates
+4. Suggest appropriate labels from the available repository labels
+5. Open the draft in your IDE (if connected) for review
+6. Let you edit, regenerate, or submit
+7. Submit via `gh issue create` when you approve
+
+Example submission:
+```bash
+gh issue create \
+  --title "Issue title" \
+  --body-file /tmp/issue-draft.md \
+  --label "bug,needs-triage"
+```
 
 The skill enforces concise content:
 - Descriptions: 2-3 sentences max
