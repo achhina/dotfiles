@@ -465,11 +465,9 @@ in
         in capitalize withSpaces;
       templateList = builtins.concatStringsSep "\n"
         (map (name: "- ${formatTemplateName name}: ${skillsDeployedPath}/github/templates/${name}") templateFiles);
-    in pkgs.substituteAll {
-      src = ./slash-commands/issue.md;
+    in pkgs.replaceVars ./slash-commands/issue.md {
       fallbackTemplates = templateList;
     };
-  };
   };
 
   # Backup existing mutable settings.json before Home Manager regenerates it
