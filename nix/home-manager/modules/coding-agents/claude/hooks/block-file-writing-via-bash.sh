@@ -16,11 +16,14 @@ if [[ "$TOOL_NAME" != "Bash" ]]; then
     exit 0
 fi
 
-# Check for file-writing patterns (excluding stderr/stdout redirects)
-# Match: cat > file.txt, echo "text" > file.txt, printf "text" > file.txt
-# Exclude: >&2 (stderr), >&1 (stdout), >> (append in logs), > /dev/null
-if echo "$COMMAND" | grep -qE '(cat|echo|printf)\s+[^>]*>\s*[a-zA-Z0-9_./-]+' && \
-   ! echo "$COMMAND" | grep -qE '>\s*(&[12]|/dev/)'; then
+# Check for file-writing patterns at command start or after && only
+# Match: cat > file.txt (at start) or cd /tmp && cat > file.txt (after &&)
+# Exclude: git commit -m "cat > file.txt" (cat in quoted string)
+FILE_WRITING_PATTERN='(^|&&\s+)(cat|echo|printf)\s+[^>]*>\s*[a-zA-Z0-9_./-]+'
+EXCLUDE_PATTERN='(^|&&\s+).*>\s*(&[12]|/dev/)'
+
+if rg -q "$FILE_WRITING_PATTERN" <<< "$COMMAND" && \
+   ! rg -q "$EXCLUDE_PATTERN" <<< "$COMMAND"; then
     cat >&2 <<'EOF'
 🚫 **File writing via bash detected!**
 

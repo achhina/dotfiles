@@ -16,8 +16,10 @@ if [[ "$TOOL_NAME" != "Bash" ]]; then
     exit 0
 fi
 
-# Check for git directory flags
-if echo "$COMMAND" | grep -qE 'git\s+(-C|--git-dir|--work-tree)'; then
+# Check for git directory flags on first line only
+GIT_DIR_FLAGS_PATTERN='^[^\n]*git\s+(-C|--git-dir|--work-tree)'
+
+if rg -q "$GIT_DIR_FLAGS_PATTERN" <<< "$COMMAND"; then
     cat >&2 <<'EOF'
 🚫 **Git `-C` flag detected!**
 
