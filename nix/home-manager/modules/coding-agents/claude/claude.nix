@@ -381,6 +381,8 @@ in
 
       enabledPlugins = {
         "superpowers@superpowers-marketplace" = true;
+        # @upstream-issue: https://github.com/anthropics/claude-code/issues/10113
+        # Git-installed marketplace plugins have wrong path resolution causing ENOTDIR errors on skill loading
         "shell-scripting@claude-code-workflows" = true;
         "python-development@claude-code-workflows" = false;
         "javascript-typescript@claude-code-workflows" = true;
