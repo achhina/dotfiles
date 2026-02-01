@@ -150,25 +150,7 @@ Some tools support loading configuration from URLs, allowing you to bootstrap se
   ```
 - **Workflow:** Edit the source file (`nix/home-manager/files/tridactylrc`), then run `hm switch` to deploy the symlink locally.
 
-## 7. Git Command Best Practices
-
-**IMPORTANT: Never use `git -C <path>` in this repository.**
-
-The Claude Code bash permissions are configured with specific git subcommand patterns like `Bash(git commit:*)`, which match commands starting with `git commit`. The `-C` flag appears before the subcommand, causing permission mismatches:
-
-- ✗ `git -C /path commit` → doesn't match `Bash(git commit:*)`
-- ✓ `git commit` → matches `Bash(git commit:*)`
-
-Since the working directory is already set to `/Users/achhina/.config`, use plain git commands:
-- `git status`
-- `git add file.txt`
-- `git commit -m "message"`
-
-Do NOT use:
-- `git -C /Users/achhina/.config status`
-- `git -C /Users/achhina/.config add file.txt`
-
-## 8. Package Organization Patterns
+## 7. Package Organization Patterns
 
 Packages in `packages.nix` are organized into functional categories to make platform-specific management clear:
 
