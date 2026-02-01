@@ -1088,6 +1088,8 @@ def would_tool_call_be_permitted(
                 prefix = pattern_cmd[:-2]
                 if key_params == prefix or key_params.startswith(prefix + " "):
                     return True
+                if prefix and not prefix[-1].isalnum() and key_params.startswith(prefix):
+                    return True
 
             elif "*" in pattern_cmd:
                 import re
