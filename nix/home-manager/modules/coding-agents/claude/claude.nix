@@ -13,36 +13,25 @@ let
     builtins.readFile ./hooks/python-project-detector.sh
   );
 
-  # Binds Claude sessions to Neovim persistence sessions
   neovimSessionBinder = pkgs.writeShellScript "neovim-session-binder.sh" (
     builtins.readFile ./hooks/neovim-session-binder.sh
   );
-in
-{
-  programs.claude-code = {
-    enable = true;
-    package = null; # Don't install claude-code via Nix, use npm install instead
 
-    commandsDir = ./slash-commands;
+  # Load local overrides if they exist (gitignored file for user customization)
+  overridesPath = ./claude-overrides.nix;
+  hasOverrides = builtins.pathExists overridesPath;
+  localOverrides = if hasOverrides then import overridesPath else {
+    allowPermissions = [];
+    denyPermissions = [];
+    removeAllowPermissions = [];
+    removeDenyPermissions = [];
+  };
 
-    # User-level memory (personal preferences across all projects)
-    # AGENTS.md is the source file, deployed as CLAUDE.md for Claude Code
-    memory.source = ./context/AGENTS.md;
+  # Helper to filter out items
+  filterOut = itemsToRemove: list: builtins.filter (x: !(builtins.elem x itemsToRemove)) list;
 
-    skillsDir = ./skills;
-
-    agentsDir = ./agents;
-
-    settings = {
-      env = {
-        BASH_DEFAULT_TIMEOUT_MS = "300000";
-        BASH_MAX_TIMEOUT_MS = "600000";
-      };
-
-      includeCoAuthoredBy = false;
-
-      permissions = {
-        allow = [
+  # Base permissions defined here (upstream defaults)
+  baseAllowPermissions = [
           "Bash(awk:*)"
           "Bash(cat:*)"
           "Bash(command:*)"
@@ -266,12 +255,45 @@ in
           "TodoWrite"
           "NotebookEdit"
           "AskUserQuestion"
-        ];
+  ];
 
-        deny = [
-          "Bash(git commit --no-verify:*)"
-        ];
+  baseDenyPermissions = [
+    "Bash(git commit --no-verify:*)"
+  ];
 
+  # Merge base permissions with local overrides
+  finalAllowPermissions =
+    (filterOut localOverrides.removeAllowPermissions baseAllowPermissions)
+    ++ localOverrides.allowPermissions;
+
+  finalDenyPermissions =
+    (filterOut localOverrides.removeDenyPermissions baseDenyPermissions)
+    ++ localOverrides.denyPermissions;
+in
+{
+  programs.claude-code = {
+    enable = true;
+    package = null;
+
+    commandsDir = ./slash-commands;
+
+    memory.source = ./context/AGENTS.md;
+
+    skillsDir = ./skills;
+
+    agentsDir = ./agents;
+
+    settings = {
+      env = {
+        BASH_DEFAULT_TIMEOUT_MS = "300000";
+        BASH_MAX_TIMEOUT_MS = "600000";
+      };
+
+      includeCoAuthoredBy = false;
+
+      permissions = {
+        allow = finalAllowPermissions;
+        deny = finalDenyPermissions;
         defaultMode = "acceptEdits";
 
         additionalDirectories = [
