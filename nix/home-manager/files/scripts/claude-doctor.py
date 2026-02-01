@@ -1139,8 +1139,6 @@ def would_tool_call_be_permitted(
                     return True
 
             elif "*" in pattern_cmd:
-                import re
-
                 regex_pattern = "^" + re.escape(pattern_cmd).replace(r"\*", ".*") + "$"
                 if re.match(regex_pattern, key_params):
                     return True
@@ -1241,8 +1239,6 @@ def parse_conversation_file(file_path: Path) -> list[ToolCall]:
                                 if not isinstance(tool_result, dict):
                                     tool_result = {}
 
-                                # Check if tool was approved (success=True means it ran)
-                                # If there's an error about user denial, was_approved=False
                                 was_approved = True
                                 if not tool_result.get("success", True):
                                     content_text = str(item.get("content", ""))
@@ -1310,7 +1306,6 @@ def audit_tools(
 
     conv_files = list(projects_dir.rglob("*.jsonl"))
 
-    # Compile filter patterns once
     tool_pattern = re.compile(tool_filter) if tool_filter else None
     params_pattern = re.compile(params_filter) if params_filter else None
 
@@ -1324,15 +1319,12 @@ def audit_tools(
         if not call.was_approved:
             continue
 
-        # Apply tool name filter
         if tool_pattern and not tool_pattern.search(call.tool_name):
             continue
 
-        # Apply params filter
         if params_pattern and not params_pattern.search(call.key_params):
             continue
 
-        # Apply date filters
         if start_date or end_date:
             call_date = call.timestamp.split("T")[0] if "T" in call.timestamp else ""
             if start_date and call_date < start_date:
@@ -1392,7 +1384,6 @@ def format_audit_rich(report: ToolAuditReport) -> None:
         console.print("[yellow]No approved tool calls found[/yellow]")
         return
 
-    # Show tool usage summary by tool type
     tool_summary = {}
     for call in report.tool_calls:
         tool_name = call["tool_name"]
@@ -1412,7 +1403,6 @@ def format_audit_rich(report: ToolAuditReport) -> None:
     console.print(summary_table)
     console.print()
 
-    # Show detailed tool calls
     detail_table = Table(title="Tool Usage Details")
     detail_table.add_column("Tool", style="cyan", no_wrap=True)
     detail_table.add_column("Parameters", style="dim")
@@ -1457,9 +1447,6 @@ def format_audit_rich(report: ToolAuditReport) -> None:
 def format_audit_json(report: ToolAuditReport) -> None:
     """Format tool audit report as JSON."""
     print(report.model_dump_json(indent=2))
-
-
-# CLI
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -1703,8 +1690,6 @@ def audit_tools_command(
         existing_patterns = load_existing_allow_list()
         pattern_counts: dict[str, int] = {}
 
-        # Filter tool calls to only those that would be DENIED by existing patterns
-        # Then count occurrences of patterns needed for those denied calls
         for tool_call in report.tool_calls:
             if would_tool_call_be_permitted(
                 tool_call["tool_name"], tool_call["key_params"], existing_patterns
@@ -1719,7 +1704,6 @@ def audit_tools_command(
                     pattern_counts.get(pattern, 0) + tool_call["count"]
                 )
 
-        # All patterns in pattern_counts are for tool calls that would be denied
         new_patterns = pattern_counts
         console = Console()
 
