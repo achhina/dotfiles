@@ -16,7 +16,7 @@ Create a GitHub issue using the github skill.
 ## Available Issue Templates
 
 ### Project templates
-!`repo=$(git rev-parse --show-toplevel 2>/dev/null) && fd -t f -e md . "$repo/.github" 2>/dev/null | grep -E '(ISSUE_TEMPLATE\.md$|ISSUE_TEMPLATE/)' || echo "None found"`
+!`fd -t f -e md . .github 2>/dev/null | grep -E '(ISSUE_TEMPLATE\.md$|ISSUE_TEMPLATE/)' || echo "None found"`
 
 ### Fallback templates
 @fallbackTemplates@
