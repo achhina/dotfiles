@@ -17,6 +17,10 @@ let
     builtins.readFile ./hooks/neovim-session-binder.sh
   );
 
+  blockFileWritingViaBash = pkgs.writeShellScript "block-file-writing-via-bash.sh" (
+    builtins.readFile ./hooks/block-file-writing-via-bash.sh
+  );
+
   # Load local overrides if they exist (gitignored file for user customization)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
@@ -439,6 +443,17 @@ in
             ];
           }
         ];
+        PreToolUse = [
+          {
+            matcher = "Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "${blockFileWritingViaBash}";
+              }
+            ];
+          }
+        ];
       };
     };
   };
@@ -457,9 +472,6 @@ in
     # Deploy additional context files for progressive disclosure
     ".claude/SOFTWARE_PRINCIPLES.md".source = ./context/SOFTWARE_PRINCIPLES.md;
     ".claude/PYTHON.md".source = ./context/PYTHON.md;
-
-    # Deploy hookify rules
-    ".claude/hookify.block-file-writing-via-bash.local.md".source = ./hookify-rules/block-file-writing-via-bash.md;
 
     # Generate issue command with template paths substituted
     ".claude/commands/issue.md".source = let
