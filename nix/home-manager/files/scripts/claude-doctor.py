@@ -972,7 +972,7 @@ def generate_permission_pattern(
         if "=" in cmd:
             return None
 
-        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source"}
+        skip_commands = {"python3", "npx", "for", "mv", "rm", "cp", "pkill", "cd", "curl", "chmod", "source", "claude", "nix-env", "docker-compose"}
         if cmd in skip_commands:
             return None
 
