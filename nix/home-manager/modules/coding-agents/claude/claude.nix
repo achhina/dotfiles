@@ -365,6 +365,9 @@ in
     # Deploy additional context files for progressive disclosure
     ".claude/SOFTWARE_PRINCIPLES.md".source = ./context/SOFTWARE_PRINCIPLES.md;
     ".claude/PYTHON.md".source = ./context/PYTHON.md;
+
+    # Deploy hookify rules
+    ".claude/hookify.block-file-writing-via-bash.local.md".source = ./hookify-rules/block-file-writing-via-bash.md;
   };
 
   # Backup existing mutable settings.json before Home Manager regenerates it
