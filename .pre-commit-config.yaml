@@ -17,14 +17,6 @@ repos:
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
-  - repo: 'https://github.com/lunarmodules/luacheck'
-    rev: v1.2.0
-    hooks:
-      - id: luacheck
-        args:
-          - '--globals'
-          - 'vim'
-          - '--'
   - repo: 'https://github.com/JohnnyMorganz/StyLua'
     rev: v2.1.0
     hooks:

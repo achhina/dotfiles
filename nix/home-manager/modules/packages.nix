@@ -64,7 +64,6 @@ let
   # Language servers for general use (also used outside editor)
   languageServers = with pkgs; [
     gopls                            # Go LSP (used with go tools)
-    # rust-analyzer provided by rustup
     nil                              # Nix LSP (used for nix evaluation)
     pyright                          # Python LSP (provides pyright-langserver)
     just-lsp                         # Just LSP (justfile language server)
@@ -88,7 +87,12 @@ let
     go                       # Go compiler and tools
 
     # Rust
-    rustup                   # Rust toolchain installer (includes rustc, cargo, rustfmt)
+    rustup
+    (lib.hiPrio cargo)
+    (lib.hiPrio rustc)
+    (lib.hiPrio rustfmt)
+    (lib.hiPrio clippy)
+    (lib.hiPrio rust-analyzer)
 
     # JavaScript/TypeScript
     nodejs                   # Node.js runtime
