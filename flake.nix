@@ -22,6 +22,7 @@
             stylua
             luaPackages.luacheck
             ruff
+            nodePackages.prettier
             just
           ];
         };
