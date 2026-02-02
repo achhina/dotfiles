@@ -20,17 +20,6 @@
           buildInputs = with pkgs; [
             prek
           ];
-
-          shellHook = ''
-            echo "🔧 Dotfiles development environment loaded"
-            echo "📁 Repository: $(pwd)"
-            echo "🏠 Home Manager flake: ./nix/flake.nix"
-            echo ""
-            echo "Available commands:"
-            echo "  hm switch    - Apply Home Manager configuration"
-            echo "  nix flake update - Update flake inputs"
-            echo "  nix develop ./nix# - Enter Home Manager devshells"
-          '';
         };
       }
     );
