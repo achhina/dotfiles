@@ -1,6 +1,7 @@
 ---
 name: mermaid
-description: Create, edit, update, modify, and customize mermaid diagrams and architecture diagrams. Always use when working with mermaid diagrams, architecture diagrams, flowcharts, sequence diagrams, or when creating/editing/updating/customizing mermaid diagrams in markdown files.
+description: This skill should be used when the user asks to "create a mermaid diagram", "draw a flowchart", "make a sequence diagram", "update diagram theme", "customize diagram colors", "add icons to architecture diagram", or mentions working with architecture diagrams, state diagrams, gantt charts, timelines, mindmaps, entity relationships, sankey diagrams, or user journeys. Always use when creating, editing, or customizing mermaid diagrams in markdown files.
+version: 0.1.0
 ---
 
 # Mermaid Diagrams
@@ -13,7 +14,7 @@ All diagram customization uses frontmatter at the top of the diagram:
 %%{init: {'theme':'dark'}}%%
 ```
 
-For details on all configuration options, see `configuration.md` and `styling.md`.
+For details on all configuration options, see `references/configuration.md` and `references/styling.md`.
 
 ## Workflow Selection
 
@@ -52,18 +53,18 @@ If the user's request doesn't clearly indicate which diagram type or theme to us
 - **Dark** - Dark mode websites, presentations on dark backgrounds
 - **Forest** - Softer, nature-inspired aesthetic
 
-Reference the selection flowchart below to guide your questions, or consult `diagrams/` for detailed examples of each type.
+Reference the selection flowchart below to guide your questions, or consult `references/diagrams/` for detailed examples of each type.
 
 ### 2. Create the Diagram
 
-1. **Read the diagram type reference** in `diagrams/` for syntax examples and conventions
+1. **Read the diagram type reference** in `references/diagrams/` for syntax examples and conventions
 2. Apply the selected theme using frontmatter: `%%{init: {'theme':'selected-theme'}}%%`
 3. Create the diagram in a markdown file
 
 **Common Issues:**
-- If encountering syntax errors or special character issues, read `conventions.md`
-- For custom colors or theme variables, read `styling.md`
-- For diagram-specific configuration options, read `configuration.md`
+- If encountering syntax errors or special character issues, read `references/conventions.md`
+- For custom colors or theme variables, read `references/styling.md`
+- For diagram-specific configuration options, read `references/configuration.md`
 
 ## Diagram Type Selection Guide
 
@@ -117,10 +118,10 @@ Determine what the user wants to modify:
 
 ### 3. Apply Changes Based on Type
 
-- **Theme/Styling** - Read `styling.md` for theme options, color customization, and theme variables
-- **Configuration** - Read `configuration.md` for diagram settings, frontmatter syntax, and options
-- **Content** - Read the diagram type reference in `diagrams/` for syntax
-- **Icons** - Read `configuration.md` "Icon Registration" section (architecture diagrams only)
+- **Theme/Styling** - Read `references/styling.md` for theme options, color customization, and theme variables
+- **Configuration** - Read `references/configuration.md` for diagram settings, frontmatter syntax, and options
+- **Content** - Read the diagram type reference in `references/diagrams/` for syntax
+- **Icons** - Read `references/configuration.md` "Icon Registration" section (architecture diagrams only)
 
 ### 4. Make the Edit
 
@@ -128,19 +129,19 @@ Use the Edit tool to update the diagram file with the changes, preserving the ex
 
 ---
 
-## Reference Files
+## Additional Resources
+
+### Reference Files
+
+For detailed documentation, consult:
+- **`references/configuration.md`** - Complete configuration options, frontmatter syntax, icon registration. Read when user wants to modify diagram settings, add icons, or change configuration.
+- **`references/styling.md`** - Theming capabilities, all theme variables, color customization, examples. Read when user wants to change colors, themes, or visual appearance.
+- **`references/conventions.md`** - Syntax guide, escaping special characters, layout best practices, performance tips, accessibility. Read when encountering syntax issues or layout problems.
 
 ### Diagram Type References
 
-Located in `diagrams/`, each file includes use cases, complete examples with themes, and conventions:
-
-- **Process & Flow**: `flowchart.md`, `sequence.md`, `state.md`, `sankey.md`
-- **System Design**: `architecture.md`, `entity-relationship.md`
-- **Planning & Timeline**: `gantt.md`, `timeline.md`
-- **Conceptual**: `mindmap.md`, `user-journey.md`
-
-### Configuration & Styling
-
-- **`configuration.md`** - Complete configuration options, frontmatter syntax, icon registration. Read when user wants to modify diagram settings, add icons, or change configuration.
-- **`styling.md`** - Theming capabilities, all theme variables, color customization, examples. Read when user wants to change colors, themes, or visual appearance.
-- **`conventions.md`** - Syntax guide, escaping special characters, layout best practices, performance tips, accessibility. Read when encountering syntax issues or layout problems.
+Located in `references/diagrams/`, each file includes use cases, complete examples with themes, and conventions:
+- **Process & Flow**: flowchart.md, sequence.md, state.md, sankey.md
+- **System Design**: architecture.md, entity-relationship.md
+- **Planning & Timeline**: gantt.md, timeline.md
+- **Conceptual**: mindmap.md, user-journey.md
