@@ -39,21 +39,6 @@ return {
 			end
 		end
 
-		local function get_python_path()
-			local venv_path = os.getenv("VIRTUAL_ENV")
-			if venv_path then
-				return venv_path .. "/bin/python3"
-			end
-
-			local cwd = vim.fn.getcwd()
-			local local_venv = cwd .. "/.venv/bin/python3"
-			if vim.fn.executable(local_venv) == 1 then
-				return local_venv
-			end
-
-			return vim.fn.exepath("python3") or vim.fn.exepath("python")
-		end
-
 		---@diagnostic disable-next-line: deprecated
 		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers["textDocument/hover"], {
 			border = "rounded",
