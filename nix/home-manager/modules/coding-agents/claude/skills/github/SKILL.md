@@ -27,7 +27,7 @@ Use this skill when:
 
 ### Initial Setup
 
-Spawn the `github-automation` agent with these instructions:
+Spawn the `@githubAutomationAgent@` agent with these instructions:
 
 You are the GitHub automation agent. Your job is to create concise, well-structured GitHub issues or pull requests with an interactive review workflow.
 

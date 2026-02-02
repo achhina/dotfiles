@@ -38,7 +38,7 @@ Clean up code by removing comments that don't add value, while preserving import
 
 ## Agent Invocation
 
-Use the Task tool with `subagent_type="comment-remover"`.
+Use the Task tool with `subagent_type="@commentRemoverAgent@"`.
 
 Pass the arguments: $ARGUMENTS
 

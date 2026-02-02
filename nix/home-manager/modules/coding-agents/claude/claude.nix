@@ -355,12 +355,31 @@ in
     # Skills: mix of paths (static) and inline (templated)
     skills = {
       # Static skills from directory
-      comments = ./skills/comments;
       commit-message = ./skills/commit-message;
-      github = ./skills/github;
       learn = ./skills/learn;
       mermaid = ./skills/mermaid;
       update-docs = ./skills/update-docs;
+
+      # Dynamic skills with agent substitution
+      github =
+        let
+          githubAutomationAgent = "github-automation";
+          skillTemplate = builtins.readFile ./skills/github/SKILL.md;
+        in
+        builtins.replaceStrings
+          [ "@githubAutomationAgent@" ]
+          [ githubAutomationAgent ]
+          skillTemplate;
+
+      comments =
+        let
+          commentRemoverAgent = "comment-remover";
+          skillTemplate = builtins.readFile ./skills/comments/SKILL.md;
+        in
+        builtins.replaceStrings
+          [ "@commentRemoverAgent@" ]
+          [ commentRemoverAgent ]
+          skillTemplate;
 
       # Dynamic skill with plugin and skill substitution
       finalize =
