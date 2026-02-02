@@ -18,21 +18,7 @@
           name = "dotfiles-dev";
 
           buildInputs = with pkgs; [
-            # Nix development
-            nil # Nix language server
-            nixfmt # Nix formatter
-            nix-tree # Visualize Nix dependencies
-
-            # Shell tooling
-            shellcheck # Shell script linter
-            shfmt # Shell script formatter
-
-            # Documentation
-            mdformat # Markdown formatter
-
-            # Git tooling
-            git
-            gh # GitHub CLI
+            prek
           ];
 
           shellHook = ''
