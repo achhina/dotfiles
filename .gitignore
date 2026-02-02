@@ -33,6 +33,7 @@ tmux/plugins/
 # Artifacts
 .DS_Store
 .ruff_cache/
+.direnv/
 zsh/zsh-autocomplete
 
 # Home Manager generated files and symlinks
