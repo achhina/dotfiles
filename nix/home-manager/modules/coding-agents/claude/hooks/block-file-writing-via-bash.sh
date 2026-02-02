@@ -43,9 +43,9 @@ You're attempting to write file content using bash commands (cat <<EOF, echo >, 
 
 **Example:**
 Instead of:
-  cat > file.txt << 'EOF'
+  cat > file.txt <<END
   content here
-EOF
+END
 
 Use:
   Write tool with:

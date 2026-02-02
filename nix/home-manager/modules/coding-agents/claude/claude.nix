@@ -380,53 +380,7 @@ in
       mermaid = ./skills/mermaid;
       update-docs = ./skills/update-docs;
 
-      # Dynamic skills with agent substitution
-      github =
-        let
-          githubAutomationAgent = "github-automation";
-          skillTemplate = builtins.readFile ./skills/github/SKILL.md;
-        in
-        builtins.replaceStrings
-          [ "@githubAutomationAgent@" ]
-          [ githubAutomationAgent ]
-          skillTemplate;
-
-      comments =
-        let
-          commentRemoverAgent = "comment-remover";
-          skillTemplate = builtins.readFile ./skills/comments/SKILL.md;
-        in
-        builtins.replaceStrings
-          [ "@commentRemoverAgent@" ]
-          [ commentRemoverAgent ]
-          skillTemplate;
-
-      # Dynamic skill with plugin and skill substitution
-      finalize =
-        let
-          # Validate plugin dependencies at build time
-          tddWorkflowsAgent =
-            if enabledPlugins."tdd-workflows@claude-code-workflows" or false then
-              "tdd-workflows:code-reviewer"
-            else
-              throw "finalize skill requires tdd-workflows plugin to be enabled";
-
-          superpowersDebugging =
-            if enabledPlugins."superpowers@superpowers-marketplace" or false then
-              "superpowers:systematic-debugging"
-            else
-              throw "finalize skill requires superpowers plugin to be enabled";
-
-          # Custom skill references (can be renamed without breaking finalize)
-          commentsSkill = "comments";
-          commitSkill = "commit";
-
-          skillTemplate = builtins.readFile ./skills/finalize/SKILL.md;
-        in
-        builtins.replaceStrings
-          [ "@tddWorkflowsAgent@" "@superpowersDebugging@" "@commentsSkill@" "@commitSkill@" ]
-          [ tddWorkflowsAgent superpowersDebugging commentsSkill commitSkill ]
-          skillTemplate;
+      # Dynamic skills handled via home.file below due to Home Manager module limitations
     };
 
     settings = {
@@ -631,6 +585,44 @@ in
       pkgs.replaceVars ./commands/issue.md {
         fallbackTemplates = templateList;
       };
+
+    # Deploy templated skills as directory structures (workaround for Home Manager module limitation)
+    ".claude/skills/finalize/SKILL.md".text =
+      let
+        tddWorkflowsAgent =
+          if enabledPlugins."tdd-workflows@claude-code-workflows" or false then
+            "tdd-workflows:code-reviewer"
+          else
+            throw "finalize skill requires tdd-workflows plugin to be enabled";
+        superpowersDebugging =
+          if enabledPlugins."superpowers@superpowers-marketplace" or false then
+            "superpowers:systematic-debugging"
+          else
+            throw "finalize skill requires superpowers plugin to be enabled";
+        commentsSkill = "comments";
+        commitSkill = "commit";
+        skillTemplate = builtins.readFile ./skills/finalize/SKILL.md;
+      in
+      builtins.replaceStrings
+        [ "@tddWorkflowsAgent@" "@superpowersDebugging@" "@commentsSkill@" "@commitSkill@" ]
+        [ tddWorkflowsAgent superpowersDebugging commentsSkill commitSkill ]
+        skillTemplate;
+
+    ".claude/skills/comments/SKILL.md".text =
+      let
+        commentRemoverAgent = "comment-remover";
+        skillTemplate = builtins.readFile ./skills/comments/SKILL.md;
+      in
+      builtins.replaceStrings [ "@commentRemoverAgent@" ] [ commentRemoverAgent ] skillTemplate;
+
+    ".claude/skills/github/SKILL.md".text =
+      let
+        githubAutomationAgent = "github-automation";
+        skillTemplate = builtins.readFile ./skills/github/SKILL.md;
+      in
+      builtins.replaceStrings [ "@githubAutomationAgent@" ] [ githubAutomationAgent ] skillTemplate;
+
+    ".claude/skills/github/templates".source = ./skills/github/templates;
   };
 
   # Backup existing mutable settings.json before Home Manager regenerates it
