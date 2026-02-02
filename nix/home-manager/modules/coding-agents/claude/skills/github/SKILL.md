@@ -1,19 +1,12 @@
 ---
 name: github
-description: Create GitHub issues and pull requests with template discovery, concise content generation, and interactive refinement
+description: This skill should be used when the user asks to "create a GitHub issue", "create a pull request", "make a PR", "open an issue", "file a bug report", or mentions creating GitHub issues or PRs. Automates GitHub content creation with template discovery, concise generation, and interactive refinement before submission.
+version: 0.1.0
 ---
 
 # GitHub Issue and PR Creation
 
-This skill automates GitHub issue and pull request creation with template discovery, concise content generation, and interactive refinement.
-
-## When to Use This Skill
-
-Use this skill when:
-- Creating a GitHub issue
-- Creating a GitHub pull request
-- You need standardized, concise GitHub content
-- You want to review before submitting
+Automate creation of GitHub issues and pull requests with intelligent template discovery, structured content generation, and an interactive review workflow that ensures quality before submission.
 
 ## How It Works
 
@@ -44,7 +37,7 @@ Check prerequisites:
 For pull requests:
 
 1. Run `git status`
-2. If uncommitted changes exist, run `/commit` slash command to create a commit
+2. If uncommitted changes exist, invoke the commit skill to create a well-formatted commit
 3. Continue after commit is created
 
 For issues, skip this step.
@@ -215,3 +208,15 @@ This skill includes fallback templates in the `templates/` subdirectory:
 10. User selects "Submit as-is"
 11. Agent runs `gh pr create --title "Add authentication" --body-file /tmp/...`
 12. Displays PR URL
+
+## Additional Resources
+
+### Template Files
+
+Fallback templates in `templates/` directory, used when repository lacks its own templates in `.github/`:
+
+- **`templates/pull_request.md`** - Standard PR template with description, type of change, testing steps, and checklist sections
+- **`templates/bug_report.md`** - Bug issue template with environment, reproduction steps, and expected behavior
+- **`templates/feature_request.md`** - Feature request template with problem statement, proposed solution, and alternatives
+
+These templates provide consistent structure across projects while respecting repository-specific templates when they exist.
