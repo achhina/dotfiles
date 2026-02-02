@@ -21,10 +21,9 @@ repos:
     hooks:
       - id: luacheck
         name: Luacheck
-        entry: luacheck
+        entry: bash -c 'luacheck --globals vim -- "$@"' --
         language: system
         types: [lua]
-        args: ['--globals', 'vim']
       - id: stylua
         name: StyLua
         entry: stylua

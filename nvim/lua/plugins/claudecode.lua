@@ -5,7 +5,7 @@ local function is_file_backed()
 	return filepath ~= "" and vim.fn.filereadable(filepath) == 1
 end
 
-local function create_context_header(bufname, display_name, ext, line_range)
+local function create_context_header(bufname, _display_name, _ext, line_range)
 	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
 
 	local header_lines = {
@@ -19,7 +19,10 @@ local function create_context_header(bufname, display_name, ext, line_range)
 	table.insert(header_lines, string.format("  Buffer: %s", bufname ~= "" and bufname or "unnamed buffer"))
 
 	if line_range then
-		table.insert(header_lines, string.format("  Lines: %d-%d (visual selection)", line_range.start, line_range.stop))
+		table.insert(
+			header_lines,
+			string.format("  Lines: %d-%d (visual selection)", line_range.start, line_range.stop)
+		)
 	else
 		table.insert(header_lines, "  Lines: entire buffer")
 	end
@@ -62,10 +65,7 @@ local function send_buffer_to_claude(lines, line_range)
 	vim.fn.setfperm(temp_file, "rw-r--r--")
 	track_temp_file(temp_file)
 
-	vim.notify(
-		string.format("[Claude] Sending unsaved buffer '%s' via temp file", display_name),
-		vim.log.levels.INFO
-	)
+	vim.notify(string.format("[Claude] Sending unsaved buffer '%s' via temp file", display_name), vim.log.levels.INFO)
 
 	local ok, err = pcall(function()
 		vim.cmd(string.format("ClaudeCodeAdd %s", vim.fn.fnameescape(temp_file)))
@@ -76,16 +76,13 @@ local function send_buffer_to_claude(lines, line_range)
 			vim.cmd("ClaudeCodeFocus")
 		end)
 	else
-		vim.notify(
-			string.format("[Claude] Failed to add buffer: %s", err),
-			vim.log.levels.ERROR
-		)
+		vim.notify(string.format("[Claude] Failed to add buffer: %s", err), vim.log.levels.ERROR)
 	end
 end
 
 local function send_selection()
 	local mode = vim.fn.mode()
-	local is_visual = mode:match('[vV\x16]')
+	local is_visual = mode:match("[vV\x16]")
 	local bufnr = vim.api.nvim_get_current_buf()
 
 	local lines, line_range
@@ -108,14 +105,14 @@ local function send_selection()
 		lines = vim.api.nvim_buf_get_lines(bufnr, start_coords.lnum - 1, end_coords.lnum, false)
 		line_range = {
 			start = start_coords.lnum,
-			stop = end_coords.lnum
+			stop = end_coords.lnum,
 		}
 	else
 		local lnum = vim.api.nvim_win_get_cursor(0)[1]
 		lines = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)
 		line_range = {
 			start = lnum,
-			stop = lnum
+			stop = lnum,
 		}
 	end
 
@@ -123,11 +120,11 @@ local function send_selection()
 		local ok, err = pcall(function()
 			if is_visual then
 				vim.cmd("ClaudeCodeSend")
-				vim.cmd('normal! \\<Esc>')
+				vim.cmd("normal! \\<Esc>")
 			else
-				vim.cmd('normal! V')
+				vim.cmd("normal! V")
 				vim.cmd("ClaudeCodeSend")
-				vim.cmd('normal! \\<Esc>')
+				vim.cmd("normal! \\<Esc>")
 			end
 		end)
 
@@ -136,14 +133,11 @@ local function send_selection()
 				vim.cmd("ClaudeCodeFocus")
 			end)
 		else
-			vim.notify(
-				string.format("[Claude] Failed to send: %s", err),
-				vim.log.levels.ERROR
-			)
+			vim.notify(string.format("[Claude] Failed to send: %s", err), vim.log.levels.ERROR)
 		end
 	else
 		if is_visual then
-			vim.cmd('normal! \\<Esc>')
+			vim.cmd("normal! \\<Esc>")
 		end
 		send_buffer_to_claude(lines, line_range)
 	end
@@ -160,10 +154,7 @@ local function add_buffer()
 				vim.cmd("ClaudeCodeFocus")
 			end)
 		else
-			vim.notify(
-				string.format("[Claude] Failed to add buffer: %s", err),
-				vim.log.levels.ERROR
-			)
+			vim.notify(string.format("[Claude] Failed to add buffer: %s", err), vim.log.levels.ERROR)
 		end
 		return
 	end
@@ -201,7 +192,7 @@ return {
 		{ "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
 		{ "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
 
-		{ "<leader>as", send_selection, mode = {"n", "v"}, desc = "Send to Claude" },
+		{ "<leader>as", send_selection, mode = { "n", "v" }, desc = "Send to Claude" },
 		{ "<leader>ab", add_buffer, mode = "n", desc = "Add current buffer to Claude" },
 		{
 			"<leader>as",

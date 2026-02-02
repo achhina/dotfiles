@@ -32,5 +32,4 @@ return {
 			require("mini.bufremove").setup()
 		end,
 	},
-
 }

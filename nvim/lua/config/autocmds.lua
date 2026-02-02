@@ -225,15 +225,17 @@ function M.load_autocmds()
 
 			-- Only open a test file if no tests discovered yet
 			if not has_tests then
-				local test_file = vim.fn.system({
-					"fd",
-					"-t",
-					"f",
-					"-e",
-					"py",
-					"(^test_|_test\\.py$)",
-					git_root,
-				}):match("^[^\n]*")
+				local test_file = vim.fn
+					.system({
+						"fd",
+						"-t",
+						"f",
+						"-e",
+						"py",
+						"(^test_|_test\\.py$)",
+						git_root,
+					})
+					:match("^[^\n]*")
 
 				if test_file ~= "" and vim.fn.filereadable(test_file) == 1 then
 					vim.cmd("edit " .. vim.fn.fnameescape(test_file))
