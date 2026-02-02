@@ -20,7 +20,7 @@
           buildInputs = with pkgs; [
             # Nix development
             nil # Nix language server
-            nixfmt-rfc-style # Nix formatter
+            nixfmt # Nix formatter
             nix-tree # Visualize Nix dependencies
 
             # Shell tooling
