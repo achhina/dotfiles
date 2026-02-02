@@ -15,7 +15,7 @@ repos:
         name: Prettier
         entry: prettier --write --ignore-unknown
         language: system
-        types: [text]
+        types_or: [text, markdown]
       - id: ruff
         name: Ruff
         entry: ruff check
