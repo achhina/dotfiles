@@ -21,6 +21,7 @@
             prek
             stylua
             luaPackages.luacheck
+            just
           ];
         };
       }
