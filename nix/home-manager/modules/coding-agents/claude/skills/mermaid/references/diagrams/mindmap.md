@@ -3,6 +3,7 @@
 ## When to Use
 
 Use mindmaps for:
+
 - Brainstorming and idea organization
 - Hierarchical concept mapping
 - Knowledge structure visualization

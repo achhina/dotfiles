@@ -21,6 +21,7 @@ When you launch Claude Code from within Neovim using `claudecode.nvim`, the inte
 4. Socket is automatically cleaned up when Neovim exits
 
 **Usage:**
+
 ```vim
 <leader>ac  " Launch Claude Code (automatically connects to this Neovim instance)
 ```
@@ -56,9 +57,7 @@ Add to your settings if needed:
 ```json
 {
   "permissions": {
-    "allow": [
-      "mcp__plugin_neovim-integration_neovim__*"
-    ]
+    "allow": ["mcp__plugin_neovim-integration_neovim__*"]
   }
 }
 ```

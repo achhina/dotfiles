@@ -3,6 +3,7 @@
 ## When to Use
 
 Use state diagrams for:
+
 - State machines and workflows
 - Object lifecycle management
 - System mode transitions

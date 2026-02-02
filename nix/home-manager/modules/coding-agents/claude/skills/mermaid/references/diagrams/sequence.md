@@ -3,6 +3,7 @@
 ## When to Use
 
 Use sequence diagrams for:
+
 - Time-ordered interactions between actors/components
 - API request/response flows
 - Message passing between systems
@@ -60,6 +61,7 @@ sequenceDiagram
 Define actors in the sequence. Participants appear in the order declared or first used.
 
 **Explicit Declaration:**
+
 ```
 participant Client
 participant API
@@ -67,12 +69,14 @@ participant Database as DB
 ```
 
 **Actor Symbol:**
+
 ```
 actor User
 participant System
 ```
 
 **Specialized Symbols:**
+
 ```
 participant B as Boundary
 participant C as Control
@@ -87,12 +91,14 @@ participant Col as Collections
 Ten arrow types for different interaction patterns.
 
 **Synchronous (solid line):**
+
 ```
 Alice->>Bob: Synchronous call
 Alice->Bob: Solid line without arrow
 ```
 
 **Asynchronous (dotted line):**
+
 ```
 Alice-->>Bob: Response
 Alice-->Bob: Dotted without arrow
@@ -100,6 +106,7 @@ Alice--)Bob: Async with open arrow
 ```
 
 **Special:**
+
 ```
 Alice-xBob: Call with cross (rejection)
 Alice<<->>Bob: Bidirectional arrows
@@ -110,6 +117,7 @@ Alice<<->>Bob: Bidirectional arrows
 Show when a participant is actively processing.
 
 **Using activate/deactivate:**
+
 ```
 Alice->>Bob: Request
 activate Bob
@@ -118,12 +126,14 @@ deactivate Bob
 ```
 
 **Using +/- suffix:**
+
 ```
 Alice->>+Bob: Request
 Bob-->>-Alice: Response
 ```
 
 **Stacked activations:**
+
 ```
 Alice->>+Bob: First call
 Bob->>+Bob: Self call
@@ -134,6 +144,7 @@ Bob-->>-Alice: Complete first
 ### Control Flow
 
 **Loop:**
+
 ```
 loop Every minute
     Service->>API: Health check
@@ -142,6 +153,7 @@ end
 ```
 
 **Alt/Else (conditional):**
+
 ```
 alt Successful case
     API-->>Client: 200 OK
@@ -151,6 +163,7 @@ end
 ```
 
 **Opt (optional):**
+
 ```
 opt Cache available
     API->>Cache: Get data
@@ -159,6 +172,7 @@ end
 ```
 
 **Parallel:**
+
 ```
 par Request to Service A
     Client->>ServiceA: Call A
@@ -168,6 +182,7 @@ end
 ```
 
 **Critical Region:**
+
 ```
 critical Establish connection
     Service->>DB: Connect
@@ -177,6 +192,7 @@ end
 ```
 
 **Break:**
+
 ```
 loop Process items
     Service->>Queue: Get item
@@ -191,6 +207,7 @@ end
 Add explanatory text to diagrams.
 
 **Positioned notes:**
+
 ```
 Note right of Alice: Text on right
 Note left of Bob: Text on left
@@ -198,11 +215,13 @@ Note over Alice: Text above Alice
 ```
 
 **Spanning notes:**
+
 ```
 Note over Alice,Bob: Text spanning both
 ```
 
 **Multi-line notes:**
+
 ```
 Note over Alice: Line 1<br/>Line 2<br/>Line 3
 ```
@@ -212,6 +231,7 @@ Note over Alice: Line 1<br/>Line 2<br/>Line 3
 Add colored rectangles around sections.
 
 **Basic:**
+
 ```
 rect rgb(200, 220, 240)
     Alice->>Bob: Inside colored box
@@ -220,6 +240,7 @@ end
 ```
 
 **With label:**
+
 ```
 rect rgba(0, 255, 0, 0.1)
     note right of Alice: Authentication Flow
@@ -232,6 +253,7 @@ end
 Automatically number messages.
 
 **Auto-numbering:**
+
 ```
 sequenceDiagram
     autonumber
@@ -244,6 +266,7 @@ sequenceDiagram
 Show lifecycle of participants (v10.3.0+).
 
 **Creation:**
+
 ```
 Alice->>Bob: Request
 create participant Service
@@ -251,6 +274,7 @@ Bob->>Service: Initialize
 ```
 
 **Destruction:**
+
 ```
 Service->>Bob: Complete
 destroy Service

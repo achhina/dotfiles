@@ -15,6 +15,7 @@ Mermaid supports three hierarchical configuration levels:
 Use YAML frontmatter at the top of diagrams to override configuration. This is the current standard method for diagram-specific settings (since v10.5.0).
 
 **Syntax:**
+
 ```
 ---
 config:
@@ -25,6 +26,7 @@ config:
 ```
 
 **Basic Example:**
+
 ```mermaid
 ---
 config:
@@ -36,6 +38,7 @@ flowchart TD
 ```
 
 **With Diagram-Specific Config:**
+
 ```mermaid
 ---
 config:
@@ -48,6 +51,7 @@ sequenceDiagram
 ```
 
 **With Theme Variables:**
+
 ```mermaid
 ---
 config:
@@ -64,18 +68,19 @@ flowchart TD
 Use `mermaid.initialize()` to set defaults for all diagrams. Called once during setup.
 
 **Example:**
+
 ```javascript
-import mermaid from 'mermaid';
+import mermaid from "mermaid";
 
 mermaid.initialize({
   startOnLoad: true,
-  theme: 'default',
-  logLevel: 'info',
-  securityLevel: 'loose',
+  theme: "default",
+  logLevel: "info",
+  securityLevel: "loose",
   flowchart: {
     useMaxWidth: true,
-    htmlLabels: true
-  }
+    htmlLabels: true,
+  },
 });
 ```
 
@@ -94,6 +99,7 @@ mermaid.initialize({
 Each diagram type supports specific configuration under its key:
 
 **Flowchart:**
+
 ```javascript
 {
   flowchart: {
@@ -106,6 +112,7 @@ Each diagram type supports specific configuration under its key:
 ```
 
 **Sequence:**
+
 ```javascript
 {
   sequence: {
@@ -119,6 +126,7 @@ Each diagram type supports specific configuration under its key:
 ```
 
 **Gantt:**
+
 ```javascript
 {
   gantt: {
@@ -135,6 +143,7 @@ Each diagram type supports specific configuration under its key:
 **Important:** Directive syntax (`%%{init}%%`) is deprecated as of v10.5.0. Use YAML frontmatter with the `config` key instead.
 
 **Deprecated directive syntax (still works but avoid):**
+
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 flowchart TD
@@ -142,6 +151,7 @@ flowchart TD
 ```
 
 **Current YAML frontmatter syntax (use this):**
+
 ```mermaid
 ---
 config:
@@ -152,11 +162,13 @@ flowchart TD
 ```
 
 **Ancient directive syntax (removed, don't use):**
+
 ```
 %%{initialize: {'theme': 'dark'}}%%
 ```
 
 The YAML frontmatter method is preferred because it:
+
 - Separates configuration from diagram content
 - Provides clearer document structure
 - Aligns with modern documentation practices
@@ -183,9 +195,9 @@ Use `initialize()` for site-wide defaults:
 
 ```javascript
 mermaid.initialize({
-  theme: 'default',
+  theme: "default",
   startOnLoad: true,
-  securityLevel: 'strict'
+  securityLevel: "strict",
 });
 ```
 
@@ -201,6 +213,7 @@ Secure configuration keys can only be set via `initialize()` and cannot be overr
 ## Complete Configuration Schema
 
 For the complete list of all available configuration options, see:
+
 - [Mermaid Config Schema Documentation](https://mermaid.js.org/config/schema-docs/config.html)
 - [Configuration Guide](https://mermaid.js.org/config/configuration.html)
 
@@ -209,33 +222,36 @@ For the complete list of all available configuration options, see:
 Register custom icon packs to use in diagrams (available for architecture diagrams).
 
 **Using CDN:**
+
 ```javascript
 mermaid.registerIconPacks([
   {
-    name: 'logos',
+    name: "logos",
     loader: () =>
-      fetch('https://unpkg.com/@iconify-json/logos@1/icons.json')
-        .then((res) => res.json()),
+      fetch("https://unpkg.com/@iconify-json/logos@1/icons.json").then((res) =>
+        res.json(),
+      ),
   },
 ]);
 ```
 
 **Using npm package (with lazy loading):**
+
 ```javascript
-import mermaid from 'mermaid';
+import mermaid from "mermaid";
 
 mermaid.registerIconPacks([
   {
-    name: 'logos',
-    loader: () =>
-      import('@iconify-json/logos').then((module) => module.icons),
+    name: "logos",
+    loader: () => import("@iconify-json/logos").then((module) => module.icons),
   },
 ]);
 ```
 
 **Direct import:**
+
 ```javascript
-import { icons } from '@iconify-json/logos';
+import { icons } from "@iconify-json/logos";
 
 mermaid.registerIconPacks([
   {
@@ -246,6 +262,7 @@ mermaid.registerIconPacks([
 ```
 
 **Using icons in diagrams:**
+
 ```mermaid
 architecture-beta
     service api[API Server] (logos:nodejs)

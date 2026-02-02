@@ -11,6 +11,7 @@ Update project documentation (README, AGENTS.md, CLAUDE.md) with pertinent infor
 ## 1. Review Current Session
 
 Analyze the conversation history to identify:
+
 - **New patterns or approaches** discovered
 - **Configuration changes** made (Nix modules, Home Manager, etc.)
 - **Commands or workflows** established
@@ -26,6 +27,7 @@ Analyze the conversation history to identify:
 **Read the file first**, then update:
 
 ### Add New Information:
+
 - New architectural patterns (e.g., "Declarative First" if discovered)
 - New dependency tiers (e.g., how packages are managed)
 - New workflows or change protocols
@@ -33,12 +35,14 @@ Analyze the conversation history to identify:
 - Module organization changes
 
 ### Remove Obsolete Information:
+
 - Outdated workarounds no longer needed
 - Deprecated tools or approaches
 - Incorrect assumptions or patterns
 - Stale examples that no longer apply
 
 ### Guidelines:
+
 - Keep the document's existing structure and voice
 - Be concise but comprehensive
 - Include specific examples and file paths
@@ -51,6 +55,7 @@ Analyze the conversation history to identify:
 **Read both files first**, then update:
 
 ### Add New Information:
+
 - New user preferences discovered (coding style, commit format, etc.)
 - New tools or commands the user prefers
 - Workflow preferences (e.g., "ALWAYS use symlinks, not copying")
@@ -58,11 +63,13 @@ Analyze the conversation history to identify:
 - Git workflow preferences
 
 ### Remove Obsolete Information:
+
 - Outdated tool versions or approaches
 - Superseded preferences
 - Contradictory instructions (keep the most recent)
 
 ### Guidelines:
+
 - Preserve the user's voice and instruction style
 - Keep instructions clear and imperative
 - Organize by category (Tools, Workflow, Git, etc.)
@@ -75,18 +82,21 @@ Analyze the conversation history to identify:
 **Read relevant files first**, then update:
 
 ### Add New Information:
+
 - New features or capabilities added this session
 - Configuration changes users should know about
 - New commands or scripts available
 - Updated installation or setup steps
 
 ### Remove Obsolete Information:
+
 - Features that were removed
 - Deprecated configuration options
 - Outdated setup instructions
 - Incorrect or superseded information
 
 ### Guidelines:
+
 - Match the existing documentation style
 - Keep README concise, link to detailed docs
 - Update examples to reflect current state
@@ -95,6 +105,7 @@ Analyze the conversation history to identify:
 ## 5. Verification
 
 After updates:
+
 - Read through changes to ensure coherence
 - Verify no critical information was lost
 - Check that examples and paths are accurate
@@ -103,6 +114,7 @@ After updates:
 ## 6. Summary
 
 Provide a clear summary:
+
 - **Files updated:** List all files modified
 - **Key additions:** Major new information added
 - **Information pruned:** What was removed and why
@@ -119,6 +131,7 @@ Provide a clear summary:
 # Example Session Learnings
 
 If this session discovered:
+
 - "Claude Code can now read symlinks" → Update AGENTS.md to remove workaround section
 - "User prefers atomic commits" → Add to CLAUDE.md Git Guidelines
 - "New slash commands added" → Update README with command list
@@ -130,30 +143,40 @@ If this session discovered:
 ## Documentation Updates
 
 ### AGENTS.md
+
 **Added:**
+
 - Section on [new pattern]
 - Example of [new workflow]
 
 **Removed:**
+
 - Outdated workaround for [old problem]
 - Deprecated [old approach]
 
 ### CLAUDE.md
+
 **Added:**
+
 - Preference: [new preference]
 - Workflow: [new workflow]
 
 **Removed:**
+
 - Contradictory instruction about [topic]
 
 ### README.md
+
 **Added:**
+
 - Documentation for [new feature]
 
 **Updated:**
+
 - Installation steps to reflect [change]
 
 ### Recommendations
+
 - Consider adding section on [topic]
 - Example code in [file] could use update
 ```

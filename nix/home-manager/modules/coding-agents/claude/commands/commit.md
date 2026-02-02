@@ -9,10 +9,12 @@ Launch the commit agent to review changes, remove obvious comments, generate a c
 # Instructions
 
 Use the Task tool with the following parameters:
+
 - `subagent_type`: "@commitAgent@"
 - `prompt`: "Create a commit for the current changes"
 
 The commit agent will:
+
 1. Review uncommitted changes with `git status` and `git diff`
 2. Clean up obvious and redundant comments from changed files
 3. Stage changes with `git add`
@@ -34,6 +36,7 @@ The commit-message skill will generate messages in conventional commit format:
 **Types:** feat, fix, docs, style, refactor, perf, test, chore, ci, build
 
 **Examples:**
+
 - `feat: add user authentication with JWT`
 - `fix: prevent race condition in data loader`
 - `docs: update API endpoint documentation`
@@ -44,12 +47,14 @@ The commit-message skill will generate messages in conventional commit format:
 The agent removes redundant comments but keeps important ones:
 
 **Remove:**
+
 - Comments that restate code: `// Calculate elapsed time` above `elapsed = end - start`
 - Edit history: "added", "removed", "changed", "updated"
 - Commented-out code
 - Obvious explanations: `// User ID` above `userId`
 
 **Keep:**
+
 - TODO, FIXME, HACK, NOTE markers
 - "Why" explanations
 - Important context not obvious from code

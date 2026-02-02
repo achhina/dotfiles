@@ -21,6 +21,7 @@ Use the `github` skill to create a pull request. The skill will:
 8. Submit via `gh pr create` when you approve
 
 The skill enforces concise content:
+
 - Descriptions: 2-3 sentences max
 - Bullet points: Complete thoughts, not paragraphs
 - Test plans: Specific steps only

@@ -3,6 +3,7 @@
 ## When to Use
 
 Use user journey diagrams for:
+
 - Mapping user experience flows
 - Identifying pain points and opportunities
 - Documenting user interactions

@@ -3,6 +3,7 @@
 ## When to Use
 
 Use flowcharts for:
+
 - Decision trees and branching logic
 - Algorithm visualization
 - Process flows without timing constraints

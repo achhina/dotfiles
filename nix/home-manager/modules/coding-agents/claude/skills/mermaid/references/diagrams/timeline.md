@@ -3,6 +3,7 @@
 ## When to Use
 
 Use timelines for:
+
 - Chronological event sequences
 - Product roadmap visualization
 - Historical milestones

@@ -3,6 +3,7 @@
 ## When to Use
 
 Use entity relationship diagrams for:
+
 - Database schema design
 - Data model documentation
 - Table relationships

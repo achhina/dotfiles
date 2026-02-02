@@ -3,6 +3,7 @@
 ## When to Use
 
 Use Sankey diagrams for:
+
 - Flow quantities and value relationships
 - Resource allocation visualization
 - Traffic flow analysis

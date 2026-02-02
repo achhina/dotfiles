@@ -15,6 +15,7 @@ When you solve a problem that required multiple attempts, discover non-obvious s
 ## When to Use
 
 Claude should invoke this skill when:
+
 - A problem required 3+ attempts to solve
 - A CLI command failed initially and needed debugging
 - Ordering requirements or prerequisites were discovered through trial and error
@@ -27,6 +28,7 @@ Claude should invoke this skill when:
 ### 1. Review Recent Conversation
 
 Look for problems that exhibited these patterns:
+
 - Multiple attempts to get a command right
 - Specific ordering requirements (A must happen before B)
 - Prerequisites that weren't obvious
@@ -37,12 +39,14 @@ Look for problems that exhibited these patterns:
 ### 2. Determine What to Document
 
 Ask yourself:
+
 - Will this problem likely occur again?
 - Is the solution non-obvious?
 - Did this waste significant time to figure out?
 - Does this contradict common assumptions?
 
 **Do NOT document:**
+
 - Obvious or standard procedures
 - One-off commands that won't be needed again
 - Common knowledge or easily googleable information
@@ -63,6 +67,7 @@ Add a new section with this format:
 [Explanation of what works]
 
 **Key details:**
+
 - [Important detail 1]
 - [Important detail 2]
 

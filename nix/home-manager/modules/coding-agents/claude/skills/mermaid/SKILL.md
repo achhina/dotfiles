@@ -39,6 +39,7 @@ Follow this workflow when creating new Mermaid diagrams:
 If the user's request doesn't clearly indicate which diagram type or theme to use, **use the AskUserQuestion tool once** to ask both questions:
 
 **Question 1 - Diagram Type:**
+
 - **Flowchart** - Decision trees, algorithms, process flows
 - **Sequence** - Time-ordered interactions between actors/components
 - **State** - State machines, workflows, state transitions
@@ -51,6 +52,7 @@ If the user's request doesn't clearly indicate which diagram type or theme to us
 - **Sankey** - Flow quantities and value relationships
 
 **Question 2 - Theme:**
+
 - **Default** - The default theme for all diagrams
 - **Neutral** - Great for black and white documents that will be printed
 - **Dark** - Goes well with dark-colored elements or dark-mode
@@ -66,6 +68,7 @@ Reference the selection flowchart below to guide your questions, or consult `ref
 3. Create the diagram in a markdown file
 
 **Common Issues:**
+
 - If encountering syntax errors or special character issues, read `references/conventions.md`
 - For custom colors or theme variables, read `references/styling.md`
 - For diagram-specific configuration options, read `references/configuration.md`
@@ -99,7 +102,6 @@ flowchart TD
     Question6 -->|Concepts/Ideas| Mindmap[Mindmap]
     Question6 -->|User experience| UserJourney[User Journey]
 ```
-
 
 ---
 
@@ -138,6 +140,7 @@ Use the Edit tool to update the diagram file with the changes, preserving the ex
 ### Reference Files
 
 For detailed documentation, consult:
+
 - **`references/configuration.md`** - Complete configuration options, frontmatter syntax, icon registration. Read when user wants to modify diagram settings, add icons, or change configuration.
 - **`references/styling.md`** - Theming capabilities, all theme variables, color customization, examples. Read when user wants to change colors, themes, or visual appearance.
 - **`references/conventions.md`** - Syntax guide, escaping special characters, layout best practices, performance tips, accessibility. Read when encountering syntax issues or layout problems.
@@ -145,6 +148,7 @@ For detailed documentation, consult:
 ### Diagram Type References
 
 Located in `references/diagrams/`, each file includes use cases, complete examples with themes, and conventions:
+
 - **Process & Flow**: flowchart.md, sequence.md, state.md, sankey.md
 - **System Design**: architecture.md, entity-relationship.md
 - **Planning & Timeline**: gantt.md, timeline.md

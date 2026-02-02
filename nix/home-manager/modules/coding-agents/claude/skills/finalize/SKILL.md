@@ -54,16 +54,19 @@ All gates must pass before committing:
 ## Process Guidelines
 
 **Determine test command:**
+
 - Check for test scripts in package.json, pytest.ini, go.mod, Cargo.toml, or Makefile
 - Run the detected test command
 - If tests fail, analyze errors and fix root causes
 
 **Code review approach:**
+
 - For significant changes, use Task tool with subagent_type="@tddWorkflowsAgent@"
 - Focus on security vulnerabilities, logic errors, and maintainability
 - Apply fixes and re-run tests to verify
 
 **Flexibility:**
+
 - Adapt the workflow based on what changed
 - Small typo fixes don't need full code review
 - If tests are already passing, verify and move on
@@ -72,6 +75,7 @@ All gates must pass before committing:
 ## Stop Conditions
 
 Halt the workflow if:
+
 - Tests fail after debugging attempt
 - Critical security or logic issues cannot be auto-fixed
 - No changes to commit (report this as successful completion)
@@ -80,6 +84,7 @@ Halt the workflow if:
 ## Success Criteria
 
 Work is ready to commit when:
+
 - All tests pass
 - No critical code quality issues remain
 - Spurious comments are removed

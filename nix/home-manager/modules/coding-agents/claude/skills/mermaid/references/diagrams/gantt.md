@@ -3,6 +3,7 @@
 ## When to Use
 
 Use Gantt charts for:
+
 - Project schedules and timelines
 - Task dependencies and sequencing
 - Resource planning

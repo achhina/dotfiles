@@ -31,6 +31,7 @@ Document tricky problems and their solutions in `CLAUDE.local.md` so knowledge p
    - Use code blocks for commands and configuration
 
 4. **Format:**
+
    ```markdown
    ## [Topic/Problem]
 
@@ -40,6 +41,7 @@ Document tricky problems and their solutions in `CLAUDE.local.md` so knowledge p
    [Explanation of what works]
 
    **Key details:**
+
    - [Important detail 1]
    - [Important detail 2]
 

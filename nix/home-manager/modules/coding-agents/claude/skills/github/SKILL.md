@@ -56,6 +56,7 @@ Collect information for content generation:
 **For Pull Requests:**
 
 Search in priority order:
+
 1. `.github/pull_request_template.md`
 2. `.github/PULL_REQUEST_TEMPLATE/*.md` (if multiple, list and ask user to choose)
 3. `docs/pull_request_template.md`
@@ -64,16 +65,19 @@ Search in priority order:
 **For Issues:**
 
 Search in priority order:
+
 1. `.github/ISSUE_TEMPLATE/*.md` or `.github/ISSUE_TEMPLATE/*.yml`
 2. `.github/issue_template.md`
 3. `docs/issue_template.md`
 4. Root directory `issue_template.md`
 
 If multiple issue templates found:
+
 - List available templates with descriptions
 - Use AskUserQuestion to let user choose (bug report, feature request, etc.)
 
 If no repo templates found:
+
 - If user didn't specify type, use AskUserQuestion to ask: bug report or feature request?
 - Use appropriate fallback from `templates/bug_report.md` or `templates/feature_request.md`
 
@@ -106,6 +110,7 @@ You must be concise. Follow these strict rules:
 
 1. **Present Summary:**
    Display concise summary in terminal:
+
    ```
    Generated PR draft: /tmp/github-pr-1234567890.md
 
@@ -137,11 +142,13 @@ You must be concise. Follow these strict rules:
 When user selects "Submit as-is":
 
 **For Pull Requests:**
+
 ```bash
 gh pr create --title "[title]" --body-file /tmp/github-pr-[timestamp].md
 ```
 
 **For Issues:**
+
 ```bash
 gh issue create --title "[title]" --body-file /tmp/github-issue-[timestamp].md
 ```
@@ -161,24 +168,29 @@ gh issue create --title "[title]" --body-file /tmp/github-issue-[timestamp].md
 ### Error Handling
 
 **No changes for PR:**
+
 - If `git diff main...HEAD` shows no changes: "No changes detected. Create commits first."
 - Exit gracefully
 
 **Not in git repository:**
+
 - "Not in a git repository. GitHub issues/PRs require a repository context."
 - Exit gracefully
 
 **Not on GitHub:**
+
 - "This repository doesn't use GitHub. These commands only work with GitHub repositories."
 - Exit gracefully
 
 **gh not authenticated:**
+
 - "GitHub CLI not authenticated. Run: gh auth login"
 - Exit gracefully
 
 ## Templates Location
 
 This skill includes fallback templates in the `templates/` subdirectory:
+
 - `pull_request.md` - Standard PR template
 - `bug_report.md` - Bug issue template
 - `feature_request.md` - Feature request template
@@ -196,6 +208,7 @@ This skill includes fallback templates in the `templates/` subdirectory:
 **User runs:** `/pr "Add authentication"`
 
 **Agent flow:**
+
 1. Validates environment
 2. Commits any uncommitted changes
 3. Gathers git context

@@ -26,6 +26,7 @@ flowchart TD
 ## Reserved Words
 
 Certain words can break diagrams:
+
 - **"end"** - Breaks flowcharts and sequence diagrams. Wrap in quotes: `"end"`
 - Nested node shapes confuse the renderer - use quotation marks as a solution
 
@@ -48,6 +49,7 @@ Mermaid requires escaping for certain characters:
 - Hash: Use `#35;` for `#`
 
 Example:
+
 ```mermaid
 graph TD
     A[User #quot;admin#quot;] --> B[Process #91;1#93;]
@@ -58,6 +60,7 @@ graph TD
 ### Direction
 
 Specify diagram direction:
+
 - `TB` or `TD` - Top to Bottom
 - `BT` - Bottom to Top
 - `LR` - Left to Right
@@ -116,6 +119,7 @@ graph TD
 ### Edge Crossing
 
 Automatic layout may create edge crossings. Workarounds:
+
 - Reorder node definitions
 - Use subgraphs to group related nodes
 - Switch direction (TB vs LR)
@@ -141,11 +145,13 @@ graph TD
 ## Browser Compatibility
 
 Mermaid requires modern browsers with:
+
 - SVG support
 - ES6 JavaScript support
 - CSS3 support
 
 Works best in:
+
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+

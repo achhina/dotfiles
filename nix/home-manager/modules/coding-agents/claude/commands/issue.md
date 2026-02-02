@@ -10,18 +10,22 @@ Create a GitHub issue using the github skill.
 # Repository Environment
 
 ## Git Repository Status
+
 - Remote: !`git remote -v 2>/dev/null || echo "Not in a git repository"`
 - GitHub CLI: !`gh auth status 2>&1 || echo "Not authenticated"`
 
 ## Available Issue Templates
 
 ### Project templates
+
 !`fd -t f -e md . .github 2>/dev/null | grep -E '(ISSUE_TEMPLATE\.md$|ISSUE_TEMPLATE/)' || echo "None found"`
 
 ### Fallback templates
+
 @fallbackTemplates@
 
 ## Available Repository Labels
+
 !`gh label list --limit 100 2>/dev/null || echo "No labels configured"`
 
 # Instructions
@@ -37,6 +41,7 @@ Use the `github` skill to create an issue. The skill will:
 7. Submit via `gh issue create` when you approve
 
 Example submission:
+
 ```bash
 gh issue create \
   --title "Issue title" \
@@ -45,6 +50,7 @@ gh issue create \
 ```
 
 The skill enforces concise content:
+
 - Descriptions: 2-3 sentences max
 - Bullet points: Complete thoughts, not paragraphs
 - Context: Only non-obvious information

@@ -18,10 +18,12 @@ Clean up code by removing comments that don't add value, while preserving import
 ## Arguments
 
 **Scope** (what to analyze):
+
 - `--scope changes` (default) - uncommitted changes only
 - `--scope codebase` - entire codebase
 
 **File Targeting** (which files):
+
 - Use `@` prefix to target specific files or directories
 - Multiple paths supported: `@src/ @tests/ @utils.py`
 - No `@` paths = process all files in scope
@@ -43,11 +45,13 @@ Use the Task tool with `subagent_type="@commentRemoverAgent@"`.
 Pass the arguments: $ARGUMENTS
 
 The agent must parse the arguments to extract:
+
 - `--scope` flag: `changes` (default) or `codebase`
 - File/directory paths: Any arguments prefixed with `@`
 - If no paths specified: process all files in scope
 
 The agent will:
+
 1. Parse `$ARGUMENTS` to determine scope and file targeting
 2. For `changes` scope: use git diff to identify modified files (or filter to specified @ paths)
 3. For `codebase` scope: process all files (or filter to specified @ paths)

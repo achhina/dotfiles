@@ -3,6 +3,7 @@
 ## When to Use
 
 Use architecture diagrams for:
+
 - System component relationships
 - High-level service topology
 - Microservices architecture

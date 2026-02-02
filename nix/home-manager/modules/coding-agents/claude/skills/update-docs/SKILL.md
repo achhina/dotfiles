@@ -14,6 +14,7 @@ After making significant changes or discovering new patterns, documentation shou
 ## When to Use
 
 Claude should invoke this skill when:
+
 - A session involved significant architectural changes
 - New patterns or approaches were discovered
 - Configuration was substantially modified
@@ -27,6 +28,7 @@ Claude should invoke this skill when:
 ### 1. Review Current Session
 
 Analyze the conversation history to identify:
+
 - **New patterns or approaches** discovered
 - **Configuration changes** made (Nix modules, Home Manager, etc.)
 - **Commands or workflows** established
@@ -42,6 +44,7 @@ Analyze the conversation history to identify:
 Read the file first (create if it doesn't exist), then update:
 
 #### Add New Information:
+
 - New architectural patterns discovered
 - New dependency management approaches
 - New workflows or change protocols
@@ -50,12 +53,14 @@ Read the file first (create if it doesn't exist), then update:
 - Project-specific conventions
 
 #### Remove Obsolete Information:
+
 - Outdated workarounds no longer needed
 - Deprecated tools or approaches
 - Incorrect assumptions or patterns
 - Stale examples that no longer apply
 
 #### Guidelines:
+
 - Keep the document's existing structure and voice
 - Be concise but comprehensive
 - Include specific examples and file paths
@@ -69,6 +74,7 @@ Read the file first (create if it doesn't exist), then update:
 Read the file first (create if it doesn't exist), then update:
 
 #### Add New Information:
+
 - New user preferences discovered (coding style, commit format, etc.)
 - New tools or commands the user prefers
 - Workflow preferences
@@ -76,11 +82,13 @@ Read the file first (create if it doesn't exist), then update:
 - Git workflow preferences
 
 #### Remove Obsolete Information:
+
 - Outdated tool versions or approaches
 - Superseded preferences
 - Contradictory instructions (keep the most recent)
 
 #### Guidelines:
+
 - Preserve the user's voice and instruction style
 - Keep instructions clear and imperative
 - Organize by category (Tools, Workflow, Git, etc.)
@@ -93,18 +101,21 @@ Read the file first (create if it doesn't exist), then update:
 Only update these if session changes affect user-facing documentation:
 
 #### Add New Information:
+
 - New features or capabilities added this session
 - Configuration changes users should know about
 - New commands or scripts available
 - Updated installation or setup steps
 
 #### Remove Obsolete Information:
+
 - Features that were removed
 - Deprecated configuration options
 - Outdated setup instructions
 - Incorrect or superseded information
 
 #### Guidelines:
+
 - Match the existing documentation style
 - Keep README concise, link to detailed docs
 - Update examples to reflect current state
@@ -113,6 +124,7 @@ Only update these if session changes affect user-facing documentation:
 ### 5. Verification
 
 After updates:
+
 - Read through changes to ensure coherence
 - Verify no critical information was lost
 - Check that examples and paths are accurate
@@ -121,6 +133,7 @@ After updates:
 ### 6. Summary
 
 Provide a clear summary:
+
 - **Files updated:** List all files modified
 - **Key additions:** Major new information added
 - **Information pruned:** What was removed and why
@@ -137,6 +150,7 @@ Provide a clear summary:
 ## Example Session Learnings
 
 If this session discovered:
+
 - "Slash commands merged into skills" → Add to AGENTS.local.md
 - "User prefers atomic commits" → Add to CLAUDE.local.md
 - "New `/learn` skill added" → Update README with command list
@@ -148,28 +162,38 @@ If this session discovered:
 ## Documentation Updates
 
 ### AGENTS.local.md
+
 **Added:**
+
 - Section on [new pattern]
 - Example of [new workflow]
 
 **Removed:**
+
 - Outdated workaround for [old problem]
 
 ### CLAUDE.local.md
+
 **Added:**
+
 - Preference: [new preference]
 - Workflow: [new workflow]
 
 **Removed:**
+
 - Contradictory instruction about [topic]
 
 ### README.md (if applicable)
+
 **Added:**
+
 - Documentation for [new feature]
 
 **Updated:**
+
 - Installation steps to reflect [change]
 
 ### Recommendations
+
 - Consider adding section on [topic]
 ```

@@ -10,6 +10,7 @@ This skill generates clear, conventional commit messages from git diffs by analy
 ## When to Use This Skill
 
 Use this skill when:
+
 - Writing a commit message for staged changes
 - Reviewing what to commit
 - Need a well-formatted conventional commit message
@@ -33,7 +34,9 @@ Follow this strict format:
 ```
 
 ### Type (required)
+
 Choose the most specific type:
+
 - **feat**: New feature
 - **fix**: Bug fix
 - **docs**: Documentation only
@@ -46,6 +49,7 @@ Choose the most specific type:
 - **build**: Build system or dependencies
 
 ### Subject (required)
+
 - Present tense (Add, Fix, Update, not Added, Fixed, Updated)
 - No period at the end
 - 50 characters or less
@@ -53,6 +57,7 @@ Choose the most specific type:
 - Describe what changed and why, not how
 
 ### Body (optional)
+
 - Use only when the subject needs additional context
 - Wrap at 72 characters
 - Explain motivation and contrast with previous behavior
@@ -60,6 +65,7 @@ Choose the most specific type:
 ## Guidelines
 
 **Subject Rules:**
+
 - ✓ `feat: add user authentication with JWT`
 - ✓ `fix: prevent race condition in data loader`
 - ✓ `docs: update API endpoint documentation`
@@ -68,16 +74,19 @@ Choose the most specific type:
 - ✗ `Update stuff` (too vague)
 
 **Be Specific:**
+
 - ✓ `refactor: extract validation logic to separate module`
 - ✗ `refactor: improve code`
 
 **Single Responsibility:**
+
 - If changes span multiple types, prefer the most significant one
 - If truly mixed, consider suggesting multiple commits
 
 ## Process
 
 1. **Run git commands:**
+
    ```bash
    git diff --staged
    git log -5 --oneline
@@ -103,12 +112,14 @@ Choose the most specific type:
 ## Examples
 
 **Example 1: Simple feature**
+
 ```
 Staged: New login component
 Message: feat: add JWT-based login component
 ```
 
 **Example 2: Bug fix with context**
+
 ```
 Staged: Fix in error handler
 Message: fix: prevent null pointer in async error handler
@@ -118,12 +129,14 @@ crashes when error object is malformed.
 ```
 
 **Example 3: Refactoring**
+
 ```
 Staged: Extract functions
 Message: refactor: extract database queries to repository layer
 ```
 
 **Example 4: Documentation**
+
 ```
 Staged: README updates
 Message: docs: add installation instructions for Windows
