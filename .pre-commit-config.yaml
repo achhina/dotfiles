@@ -17,10 +17,23 @@ repos:
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
-  - repo: 'https://github.com/JohnnyMorganz/StyLua'
-    rev: v2.1.0
+  - repo: local
     hooks:
+      - id: luacheck
+        name: luacheck
+        entry: luacheck
+        language: system
+        types: [lua]
+        args:
+          - '--globals'
+          - 'vim'
       - id: stylua
+        name: stylua
+        entry: stylua
+        language: system
+        types: [lua]
+        args:
+          - '--check'
   - repo: 'https://github.com/google/yamlfmt'
     rev: v0.17.2
     hooks:
