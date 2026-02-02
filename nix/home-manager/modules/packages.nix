@@ -88,11 +88,6 @@ let
 
     # Rust
     rustup
-    (lib.hiPrio cargo)
-    (lib.hiPrio rustc)
-    (lib.hiPrio rustfmt)
-    (lib.hiPrio clippy)
-    (lib.hiPrio rust-analyzer)
 
     # JavaScript/TypeScript
     nodejs                   # Node.js runtime
