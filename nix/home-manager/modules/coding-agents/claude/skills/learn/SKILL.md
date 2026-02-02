@@ -1,7 +1,8 @@
 ---
 name: learn
-description: Document tricky solutions in CLAUDE.local.md for future sessions. Use when a problem required multiple attempts, non-obvious solutions were found, or specific ordering/prerequisites were discovered.
+description: This skill should be used when documenting tricky solutions for future sessions, after a problem required multiple attempts to solve, non-obvious solutions were discovered, specific ordering/prerequisites were found through trial and error, or workarounds for bugs were developed. Updates CLAUDE.local.md with persistent knowledge about command failures, configuration quirks, and domain-specific solutions.
 argument-hint: "[topic]"
+version: 0.1.0
 ---
 
 # Document Learnings
@@ -14,14 +15,14 @@ When you solve a problem that required multiple attempts, discover non-obvious s
 
 ## When to Use
 
-Claude should invoke this skill when:
+Invoke this skill after solving problems that exhibit these patterns:
 
-- A problem required 3+ attempts to solve
-- A CLI command failed initially and needed debugging
-- Ordering requirements or prerequisites were discovered through trial and error
-- Non-obvious solutions or workarounds were found
-- Configuration deviated from defaults in surprising ways
-- Solutions required domain knowledge not easily googleable
+- Required 3+ attempts to solve
+- CLI commands that failed initially and needed debugging
+- Ordering requirements or prerequisites discovered through trial and error
+- Non-obvious solutions or workarounds
+- Configuration deviations from defaults in surprising ways
+- Solutions requiring domain knowledge not easily googleable
 
 ## Instructions
 
@@ -38,7 +39,7 @@ Look for problems that exhibited these patterns:
 
 ### 2. Determine What to Document
 
-Ask yourself:
+Evaluate whether documentation is needed:
 
 - Will this problem likely occur again?
 - Is the solution non-obvious?
@@ -79,7 +80,7 @@ Add a new section with this format:
 
 ### 4. Confirm
 
-Show what was added to CLAUDE.local.md and explain why this knowledge is worth preserving.
+Display what was added to CLAUDE.local.md and explain why this knowledge is worth preserving.
 
 ## Example
 
