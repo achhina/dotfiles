@@ -550,6 +550,27 @@ in
       pkgs.replaceVars ./commands/issue.md {
         fallbackTemplates = templateList;
       };
+
+    # Generate finalize skill with dynamic plugin references
+    ".claude/skills/finalize/SKILL.md".source =
+      let
+        # Validate plugin dependencies at build time
+        tddWorkflowsAgent =
+          if settings.enabledPlugins."tdd-workflows@claude-code-workflows" or false then
+            "tdd-workflows:code-reviewer"
+          else
+            throw "finalize skill requires tdd-workflows plugin to be enabled";
+
+        superpowersDebugging =
+          if settings.enabledPlugins."superpowers@superpowers-marketplace" or false then
+            "superpowers:systematic-debugging"
+          else
+            throw "finalize skill requires superpowers plugin to be enabled";
+      in
+      pkgs.replaceVars ./skills/finalize/SKILL.md.template {
+        TDD_WORKFLOWS_AGENT = tddWorkflowsAgent;
+        SUPERPOWERS_DEBUGGING = superpowersDebugging;
+      };
   };
 
   # Backup existing mutable settings.json before Home Manager regenerates it
