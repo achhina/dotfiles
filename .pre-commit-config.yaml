@@ -20,20 +20,17 @@ repos:
   - repo: local
     hooks:
       - id: luacheck
-        name: luacheck
+        name: Luacheck
         entry: luacheck
         language: system
         types: [lua]
-        args:
-          - '--globals'
-          - 'vim'
+        args: ['--globals', 'vim']
       - id: stylua
-        name: stylua
+        name: StyLua
         entry: stylua
         language: system
         types: [lua]
-        args:
-          - '--check'
+        args: ['--check']
   - repo: 'https://github.com/google/yamlfmt'
     rev: v0.17.2
     hooks:

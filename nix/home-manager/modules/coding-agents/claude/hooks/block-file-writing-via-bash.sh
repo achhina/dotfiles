@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse hook to block file writing via bash commands
 # Blocks patterns like: cat <<EOF, echo >, printf >
+# shellcheck disable=SC1073,SC1072,SC1009
 
 set -euo pipefail
 
@@ -44,7 +45,7 @@ You're attempting to write file content using bash commands (cat <<EOF, echo >, 
 Instead of:
   cat > file.txt << 'EOF'
   content here
-  EOF
+EOF
 
 Use:
   Write tool with:
