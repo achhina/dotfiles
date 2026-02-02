@@ -334,6 +334,12 @@ let
 
   # Where skillsDir gets deployed at runtime
   skillsDeployedPath = "$HOME/.claude/skills";
+
+  # Plugin configuration for dynamic skill generation
+  enabledPlugins = {
+    "superpowers@superpowers-marketplace" = true;
+    "tdd-workflows@claude-code-workflows" = true;
+  };
 in
 {
   programs.claude-code = {
@@ -344,9 +350,45 @@ in
 
     memory.source = ./context/AGENTS.md;
 
-    skillsDir = ./skills;
-
     agentsDir = ./agents;
+
+    # Skills: mix of paths (static) and inline (templated)
+    skills = {
+      # Static skills from directory
+      comments = ./skills/comments;
+      commit-message = ./skills/commit-message;
+      github = ./skills/github;
+      learn = ./skills/learn;
+      mermaid = ./skills/mermaid;
+      update-docs = ./skills/update-docs;
+
+      # Dynamic skill with plugin and skill substitution
+      finalize =
+        let
+          # Validate plugin dependencies at build time
+          tddWorkflowsAgent =
+            if enabledPlugins."tdd-workflows@claude-code-workflows" or false then
+              "tdd-workflows:code-reviewer"
+            else
+              throw "finalize skill requires tdd-workflows plugin to be enabled";
+
+          superpowersDebugging =
+            if enabledPlugins."superpowers@superpowers-marketplace" or false then
+              "superpowers:systematic-debugging"
+            else
+              throw "finalize skill requires superpowers plugin to be enabled";
+
+          # Custom skill references (can be renamed without breaking finalize)
+          commentsSkill = "comments";
+          commitSkill = "commit";
+
+          skillTemplate = builtins.readFile ./skills/finalize/SKILL.md;
+        in
+        builtins.replaceStrings
+          [ "@tddWorkflowsAgent@" "@superpowersDebugging@" "@commentsSkill@" "@commitSkill@" ]
+          [ tddWorkflowsAgent superpowersDebugging commentsSkill commitSkill ]
+          skillTemplate;
+    };
 
     settings = {
       env = {
@@ -549,27 +591,6 @@ in
       in
       pkgs.replaceVars ./commands/issue.md {
         fallbackTemplates = templateList;
-      };
-
-    # Generate finalize skill with dynamic plugin references
-    ".claude/skills/finalize/SKILL.md".source =
-      let
-        # Validate plugin dependencies at build time
-        tddWorkflowsAgent =
-          if settings.enabledPlugins."tdd-workflows@claude-code-workflows" or false then
-            "tdd-workflows:code-reviewer"
-          else
-            throw "finalize skill requires tdd-workflows plugin to be enabled";
-
-        superpowersDebugging =
-          if settings.enabledPlugins."superpowers@superpowers-marketplace" or false then
-            "superpowers:systematic-debugging"
-          else
-            throw "finalize skill requires superpowers plugin to be enabled";
-      in
-      pkgs.replaceVars ./skills/finalize/SKILL.md.template {
-        TDD_WORKFLOWS_AGENT = tddWorkflowsAgent;
-        SUPERPOWERS_DEBUGGING = superpowersDebugging;
       };
   };
 

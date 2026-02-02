@@ -3,10 +3,10 @@ name: finalize
 description: Prepare development work for commit with quality gates
 disable-model-invocation: true
 allowed-tools:
-  - Task(@TDD_WORKFLOWS_AGENT@)
-  - Skill(@SUPERPOWERS_DEBUGGING@)
-  - Skill(comments)
-  - Skill(commit)
+  - Task(@tddWorkflowsAgent@)
+  - Skill(@superpowersDebugging@)
+  - Skill(@commentsSkill@)
+  - Skill(@commitSkill@)
   - Bash(git *)
   - Bash(npm *)
   - Bash(pytest *)
@@ -34,21 +34,21 @@ All gates must pass before committing:
 1. **Tests Pass**
    - Run the appropriate test command for this project
    - Fix any failures before proceeding
-   - If debugging is needed, use the @SUPERPOWERS_DEBUGGING@ skill
+   - If debugging is needed, use the @superpowersDebugging@ skill
 
 2. **Code Quality**
    - Review changes for security, performance, and best practices
-   - Use the @TDD_WORKFLOWS_AGENT@ agent if significant changes were made
+   - Use the @tddWorkflowsAgent@ agent if significant changes were made
    - Address critical issues; document minor issues for later
 
 3. **Clean Comments**
    - Remove obvious and redundant comments
-   - Use the /comments skill if code has spurious comments
+   - Use the /@commentsSkill@ skill if code has spurious comments
    - Skip if comments are already clean
 
 4. **Meaningful Commit**
    - Create a descriptive commit message focused on "why"
-   - Use the /commit skill
+   - Use the /@commitSkill@ skill
    - Follow conventional commit format
 
 ## Process Guidelines
@@ -59,7 +59,7 @@ All gates must pass before committing:
 - If tests fail, analyze errors and fix root causes
 
 **Code review approach:**
-- For significant changes, use Task tool with subagent_type="@TDD_WORKFLOWS_AGENT@"
+- For significant changes, use Task tool with subagent_type="@tddWorkflowsAgent@"
 - Focus on security vulnerabilities, logic errors, and maintainability
 - Apply fixes and re-run tests to verify
 
