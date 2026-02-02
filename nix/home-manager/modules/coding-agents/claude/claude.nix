@@ -346,7 +346,27 @@ in
     enable = true;
     package = null;
 
-    commandsDir = ./commands;
+    # Commands: inline content (required format, not paths)
+    commands = {
+      # Static commands (inline content)
+      comments = builtins.readFile ./commands/comments.md;
+      conflicts = builtins.readFile ./commands/conflicts.md;
+      issue = builtins.readFile ./commands/issue.md;
+      learn = builtins.readFile ./commands/learn.md;
+      pr = builtins.readFile ./commands/pr.md;
+      update-docs = builtins.readFile ./commands/update-docs.md;
+
+      # Dynamic command with agent substitution
+      commit =
+        let
+          commitAgent = "commit";
+          commandTemplate = builtins.readFile ./commands/commit.md;
+        in
+        builtins.replaceStrings
+          [ "@commitAgent@" ]
+          [ commitAgent ]
+          commandTemplate;
+    };
 
     memory.source = ./context/AGENTS.md;
 

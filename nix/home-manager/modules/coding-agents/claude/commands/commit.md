@@ -9,7 +9,7 @@ Launch the commit agent to review changes, remove obvious comments, generate a c
 # Instructions
 
 Use the Task tool with the following parameters:
-- `subagent_type`: "commit"
+- `subagent_type`: "@commitAgent@"
 - `prompt`: "Create a commit for the current changes"
 
 The commit agent will:
