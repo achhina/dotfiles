@@ -19,6 +19,7 @@ This repository treats the entire development environment as a unified, version-
 Understanding where dependencies come from is critical for updating, using, and debugging this system. The management is layered as follows:
 
 ### Tier 1: The Declarative Foundation (Nix + Home Manager)
+
 This is the primary, system-level package manager and the single source of truth for what software is available on the system.
 
 - **Role:** To declaratively manage and install system-level packages, applications, and even other package managers.
@@ -26,11 +27,12 @@ This is the primary, system-level package manager and the single source of truth
   - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.nix`: The entry point that defines all inputs.
   - `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix`: **The master list** of all software managed by Nix.
 - **How to Update:**
-    - Run the `update` command. This will update the Nix flake inputs and apply the new generation.
-    - Run the `hm switch` OR `home-manager switch` after EVERY change to a nix module.
+  - Run the `update` command. This will update the Nix flake inputs and apply the new generation.
+  - Run the `hm switch` OR `home-manager switch` after EVERY change to a nix module.
 - **How to Debug:** If a package is missing or the wrong version, check `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/modules/packages.nix` and the `${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake.lock` file.
 
 ### Tier 1.5: Homebrew (macOS System-Level Packages)
+
 On macOS, Homebrew complements Nix for packages that require system-level integration or have Nix compatibility issues.
 
 - **Role:** Manages macOS applications and system-level PAM modules that need stable paths.
@@ -43,6 +45,7 @@ On macOS, Homebrew complements Nix for packages that require system-level integr
 - **Why not Nix?** Some packages (like Firefox) have gtk+3 build failures on macOS, and PAM modules need stable paths that don't change with Nix store hashes
 
 ### Tier 2: Application-Specific Managers
+
 These managers operate within a specific application, handling its internal ecosystem of plugins and extensions. They are installed by Home Manager.
 
 - **Neovim Plugins (`lazy.nvim`):**
@@ -77,26 +80,31 @@ Many application configurations are managed through Home Manager modules in `${X
 All modifications to this repository must follow this protocol to ensure changes are small, verifiable, and atomic.
 
 **1. Plan the Atomic Change**
+
 - **Define a single, clear goal.** What is the one thing that should be different after this change?
 - **Identify the responsible component.** Using Section 2, determine which management tier (Nix, Neovim's `lazy.nvim`, etc.) controls this component.
 
 **2. Establish a Verifiable Baseline**
+
 - **Capture the "before" state.** Before making any edits, run commands to prove the current state.
-- *Example:* If adding a package, prove it's not installed (`command -v my-package` should fail).
+- _Example:_ If adding a package, prove it's not installed (`command -v my-package` should fail).
 
 **3. Execute the Idempotent Change**
+
 - **Modify only the necessary files** for the single planned change.
 - **Apply the change** using the correct tier-specific command (`hm`, `:Lazy sync`, etc.). An idempotent change should be safely repeatable.
 
 **4. Verify the Outcome**
-- **Capture the "after" state.** Run the *exact same commands* from Step 2.
+
+- **Capture the "after" state.** Run the _exact same commands_ from Step 2.
 - **Confirm success.** The output must match the goal defined in Step 1.
 - **Check for regressions.** Ensure no other parts of the system were negatively affected.
 
 **5. Commit Atomically**
+
 - **Commit the single, verified change.** The commit must be self-contained.
-- **Write a clear commit message.** Describe the *why* behind the change, not just the *what*.
-- *Example:* A Nix package addition must include the change to `packages.nix` and the resulting `flake.lock` in the same commit.
+- **Write a clear commit message.** Describe the _why_ behind the change, not just the _what_.
+- _Example:_ A Nix package addition must include the change to `packages.nix` and the resulting `flake.lock` in the same commit.
 
 This protocol is mandatory for all changes, from adding a shell alias to updating a Neovim plugin.
 
@@ -113,6 +121,7 @@ This setup uses **Nix flakes exclusively** - no channels. Key inspection command
 When working with Home Manager modules, discovering available configuration options can be challenging with flakes. Here are the proven methods, ranked by effectiveness:
 
 ### Method 1: Local Manual (Most Reliable)
+
 Man pages use special formatting that can interfere with grep. Use `col -b` to strip formatting codes for clean searching:
 
 ```bash
@@ -126,13 +135,16 @@ man home-configuration.nix | grep -C 10 "modulename"
 **Why `col -b`?** Man pages use backspace sequences to create bold/underlined text (e.g., `pprrooggrraammss..bbttoopp` for `programs.btop`). The `col -b` command strips these formatting codes, making the output grep-friendly.
 
 ### Method 2: GitHub Source Code (Most Detailed)
+
 For complex modules or when you need implementation details:
+
 ```bash
 # Navigate to: https://github.com/nix-community/home-manager/tree/master/modules/
 # Find the module file (e.g., services/jankyborders.nix)
 ```
 
 ### What Doesn't Work with Flakes:
+
 - `home-manager option` commands (flake configurations not supported)
 - `apropos` (searches system man pages, not Home Manager options)
 - Auto-generated documentation builds (not exposed by default in flakes)
@@ -142,6 +154,7 @@ For complex modules or when you need implementation details:
 Some tools support loading configuration from URLs, allowing you to bootstrap settings on new machines without cloning the entire repository.
 
 ### Tridactyl Browser Extension
+
 - **Source File:** `${XDG_CONFIG_HOME:-$HOME/.config}/nix/home-manager/files/tridactylrc` (declaratively managed)
 - **Deployed File:** `${XDG_CONFIG_HOME:-$HOME/.config}/tridactyl/tridactylrc` (symlink, ignored in git)
 - **Remote Loading:** Tridactyl can load configuration directly from GitHub:

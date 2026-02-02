@@ -3,6 +3,7 @@
 Personal dotfiles managed with Nix flakes and Home Manager for reproducible development environments across macOS and Linux.
 
 ## Table of Contents
+
 - [🚀 First Time Setup](#-first-time-setup)
   - [Quick Bootstrap](#quick-bootstrap-recommended)
   - [Manual Installation](#manual-installation-for-debugging-or-understanding-the-process)
@@ -27,6 +28,7 @@ bash <(curl -L https://raw.githubusercontent.com/achhina/dotfiles/main/scripts/b
 ```
 
 The script handles:
+
 - Architecture detection and migration warnings (Intel ↔ Apple Silicon)
 - Broken symlink cleanup from previous installations
 - Pre-existing Nix backup file detection and removal
@@ -47,11 +49,13 @@ If you prefer to run commands manually or the bootstrap script fails, follow the
 #### 1. Install Nix
 
 **macOS:**
+
 ```bash
 sh <(curl -L https://nixos.org/nix/install)
 ```
 
 **Linux:**
+
 ```bash
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
@@ -70,6 +74,7 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 **⚠️ ~/.config COLLISION GOTCHA:** You can't clone into an existing directory with contents.
 
 **Option A: Backup and clean clone**
+
 ```bash
 # Backup existing config if needed
 mv ~/.config ~/.config.backup
@@ -78,6 +83,7 @@ git clone https://github.com/achhina/dotfiles.git ~/.config
 ```
 
 **Option B: Initialize in place**
+
 ```bash
 cd ~/.config
 git init
@@ -91,11 +97,13 @@ git reset --hard origin/main  # ⚠️ WARNING: Overwrites local files
 **⚠️ FIRST-RUN GOTCHA:** Aliases aren't configured yet, use full command:
 
 **macOS:**
+
 ```bash
 nix run home-manager/master -- switch --flake ~/.config/nix#$(scutil --get LocalHostName)
 ```
 
 **Linux:**
+
 ```bash
 nix run home-manager/master -- switch --flake ~/.config/nix#$(hostname)
 ```
@@ -115,11 +123,13 @@ Quick reference for common tasks (assumes working setup).
 ### Updating the System
 
 Update flake inputs and rebuild:
+
 ```bash
 update
 ```
 
 Update and clean old generations (garbage collection):
+
 ```bash
 update -c
 ```
@@ -127,11 +137,13 @@ update -c
 ### Adding Packages
 
 Edit the package list:
+
 ```bash
 nvim ~/.config/nix/home-manager/modules/packages.nix
 ```
 
 Apply changes:
+
 ```bash
 hm switch
 ```
@@ -139,6 +151,7 @@ hm switch
 The `hm` alias automatically points to your flake (`~/.config/nix`).
 
 Verify package available:
+
 ```bash
 command -v package-name
 ```
@@ -165,6 +178,7 @@ hm switch
 ### Development Shells
 
 Enter isolated development environment:
+
 ```bash
 nix develop .#python    # Python environment
 nix develop .#node      # Node.js environment
@@ -181,11 +195,13 @@ Available shells defined in: `~/.config/nix/modules/devshells.nix`
 If you encounter problems during setup or migration:
 
 **Bootstrap script automatically handles:**
+
 - Broken symlinks from previous installations
 - Pre-existing Nix backup files
 - Architecture-specific warnings (Intel ↔ Apple Silicon)
 
 **For manual intervention required:**
+
 - See [docs/troubleshooting.md](docs/troubleshooting.md) for comprehensive edge case coverage
 - PAM/Touch ID configuration for Apple Silicon
 - Docker architecture setup

@@ -23,12 +23,14 @@ All specific testing commands, observability tools, and debugging workflows are 
 For every configuration change, document:
 
 1. **What should change:**
+
    ```
    Expected: Copilot LSP server should not appear in :LspInfo
    Expected: vim.highlight deprecation warning should disappear
    ```
 
 2. **How to verify:**
+
    ```
    Test: nvim --headless LSP client check
    Test: nvim --headless deprecation warning scan
@@ -50,6 +52,7 @@ When tests fail:
 4. **Revert changes if verification fails**
 
 Example investigation:
+
 ```bash
 # If LSP test fails, investigate why
 nvim --headless -c 'lua

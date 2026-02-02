@@ -18,6 +18,7 @@ parse-claude-tools --current --today --json | \
 ```
 
 **What it does:**
+
 1. Extracts all Bash commands Claude executed in today's sessions for the current project
 2. Pipes those commands into the shell history parser
 3. Combines with your actual zsh/bash history files
@@ -84,6 +85,7 @@ parse-history --file ~/.bash_history --shell-type bash
 ## Working with these recipes
 
 Both `parse-history` and `parse-claude-tools` are declaratively managed scripts deployed via Home Manager. Source files are located in:
+
 - `~/.config/nix/home-manager/files/scripts/parse-history`
 - `~/.config/nix/home-manager/files/scripts/parse-claude-tools`
 

@@ -7,6 +7,7 @@ Diagnostic and audit tool for Claude Code installations.
 `claude-doctor` provides two main functions:
 
 **Diagnostic Checks** - Comprehensive health checks across your Claude Code environment:
+
 - Environment setup (Claude CLI, Node.js)
 - Configuration files (settings.json, CLAUDE.md)
 - Plugin system (marketplaces, cache, symlinks)
@@ -16,6 +17,7 @@ Diagnostic and audit tool for Claude Code installations.
 - Hooks
 
 **Tool Audit** - Analyze approved tool calls from conversation history:
+
 - Extract unique tool usage patterns
 - Filter by date range
 - Group by tool name and key parameters
@@ -75,16 +77,19 @@ claude-doctor -vvv
 ## Check Categories
 
 ### Environment (Critical)
+
 - `environment.claude_installed`: Verify Claude Code CLI
 - `environment.claude_version`: Check version
 - `environment.node_version`: Verify Node.js
 
 ### Configuration (Critical/High)
+
 - `config.settings_file`: Validate settings.json
 - `config.settings_writable`: Check write permissions
 - `config.memory_file`: Verify CLAUDE.md
 
 ### Plugins (Medium)
+
 - `plugin.marketplace_dir`: Check marketplaces directory
 - `plugin.cache_dir`: Verify cache accessibility
 - `plugin.broken_symlinks`: Find broken links

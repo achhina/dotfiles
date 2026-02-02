@@ -16,23 +16,24 @@ pkill nvim; nvim --clean
 
 ## Quick Diagnosis (2 minutes)
 
-| Problem | Command | Look For |
-|---------|---------|----------|
-| General issues | `:checkhealth` | ❌ and ⚠️ |
-| Plugin errors | `:messages` | "Error", stack traces |
-| Autocmd errors (E36, etc) | `:set verbose=9` + `:messages` | Execution trace |
-| Error source identification | `:verbose autocmd [event]` | Where defined |
-| Startup autocmd issues | `nvim -V9verbose.log` | Detailed execution log |
-| LSP not working | `:LspInfo` | Server status |
-| Keymaps broken | `:verbose nmap <key>` | Source conflicts |
-| Terminal mode issues | `:tmap` + `:lua print(vim.fn.mode())` | Missing terminal mappings |
-| Buffer keymap conflicts | `:lua vim.print(vim.api.nvim_buf_get_keymap(0,'t'))` | Buffer-local vs global |
-| Mode transition problems | `:autocmd ModeChanged` | Stuck in wrong mode |
-| Slow startup | `nvim --startuptime /tmp/startup.log` | >50ms items |
+| Problem                     | Command                                              | Look For                  |
+| --------------------------- | ---------------------------------------------------- | ------------------------- |
+| General issues              | `:checkhealth`                                       | ❌ and ⚠️                 |
+| Plugin errors               | `:messages`                                          | "Error", stack traces     |
+| Autocmd errors (E36, etc)   | `:set verbose=9` + `:messages`                       | Execution trace           |
+| Error source identification | `:verbose autocmd [event]`                           | Where defined             |
+| Startup autocmd issues      | `nvim -V9verbose.log`                                | Detailed execution log    |
+| LSP not working             | `:LspInfo`                                           | Server status             |
+| Keymaps broken              | `:verbose nmap <key>`                                | Source conflicts          |
+| Terminal mode issues        | `:tmap` + `:lua print(vim.fn.mode())`                | Missing terminal mappings |
+| Buffer keymap conflicts     | `:lua vim.print(vim.api.nvim_buf_get_keymap(0,'t'))` | Buffer-local vs global    |
+| Mode transition problems    | `:autocmd ModeChanged`                               | Stuck in wrong mode       |
+| Slow startup                | `nvim --startuptime /tmp/startup.log`                | >50ms items               |
 
 ## Core Debugging Commands
 
 ### Interactive Debugging
+
 ```vim
 " Live inspection - use this first
 :lua vim.print(vim.lsp.get_clients())
@@ -45,6 +46,7 @@ pkill nvim; nvim --clean
 ```
 
 ### System State Check
+
 ```bash
 # Configuration test
 nvim --headless -c 'checkhealth' -c 'qa'
@@ -59,6 +61,7 @@ nvim --headless -c 'lua vim.defer_fn(function() print("LSP clients:", #vim.lsp.g
 ## Problem Classes & Solutions
 
 ### Plugin Issues
+
 ```bash
 # 1. Check if plugin loaded
 :lua vim.print(require('lazy').plugins()['plugin-name'])
@@ -77,6 +80,7 @@ rm -rf ~/.local/share/nvim/lazy/plugin-name
 ```
 
 ### LSP Problems
+
 ```bash
 # 1. Check server status
 :LspInfo
@@ -94,6 +98,7 @@ which typescript-language-server
 ```
 
 ### Performance Issues
+
 ```bash
 # 1. Profile startup
 nvim --startuptime /tmp/startup.log
@@ -112,6 +117,7 @@ sort -k2 -nr /tmp/startup.log | head -10
 ```
 
 ### Configuration Conflicts
+
 ```bash
 # 1. Check for duplicate setups
 grep -r "setup" ~/.config/nvim/lua/ | grep -v "^--" | sort
@@ -224,6 +230,7 @@ Based on the breadcrumbs.lua E36 issue pattern:
 ## Systematic Debugging Process
 
 ### Step 1: Reproduce & Isolate
+
 ```bash
 # Can you reproduce in clean config?
 nvim --clean
@@ -236,6 +243,7 @@ echo 'vim.cmd("colorscheme default"); require("plugin")' > /tmp/test.lua
 ```
 
 ### Step 2: Gather Information
+
 ```bash
 # Capture baseline state
 nvim --headless -c 'checkhealth' -c 'qa' > /tmp/health.txt
@@ -244,6 +252,7 @@ nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
 ```
 
 ### Step 3: Test Solutions
+
 ```bash
 # Test one change at a time
 # Document what you tried
@@ -251,6 +260,7 @@ nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
 ```
 
 ### Step 4: Verify Fix
+
 ```bash
 # Restart nvim completely
 # Run same health checks
@@ -279,6 +289,7 @@ nvim --headless -c 'LspInfo' -c 'qa' > /tmp/lsp.txt
 ## Advanced Techniques (When Basic Fixes Fail)
 
 ### Configuration Bisection
+
 ```bash
 # When you don't know what broke
 git log --oneline -10
@@ -289,6 +300,7 @@ git bisect good <last-working-commit>
 ```
 
 ### Deep LSP Debugging
+
 ```vim
 # Enable debug logging
 :lua vim.lsp.set_log_level("DEBUG")
@@ -305,6 +317,7 @@ end
 ```
 
 ### Memory Leak Detection
+
 ```bash
 # Track memory over time
 for i in {1..10}; do
@@ -314,6 +327,7 @@ done
 ```
 
 ### User Interaction Testing
+
 ```vim
 # Simulate key sequences for debugging
 :lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), 'x', false)
@@ -323,6 +337,7 @@ nvim --headless -c 'lua require("fzf-lua").files()' -c 'qa'
 ```
 
 ### Environment Testing
+
 ```bash
 # Test in different environments
 SSH_CONNECTION=test nvim    # Simulate remote
@@ -334,6 +349,7 @@ TMUX= nvim                 # Test outside tmux
 ## Quick Reference
 
 ### Must-Know Commands
+
 - `:checkhealth` - First line of defense
 - `:messages` - See what broke
 - `:LspInfo` - LSP status
@@ -343,6 +359,7 @@ TMUX= nvim                 # Test outside tmux
 - `:Mason` - LSP server manager
 
 ### Common Fixes
+
 - Restart Neovim completely (don't just `:source`)
 - Clear plugin cache: `rm -rf ~/.local/share/nvim/lazy` (backup first!)
 - Reset LSP: `:LspRestart`
@@ -351,6 +368,7 @@ TMUX= nvim                 # Test outside tmux
 - Update plugins: `:Lazy sync`
 
 ### When to Escalate
+
 - Basic commands don't reveal the issue
 - Problem only occurs in specific environments
 - Need to understand complex plugin interactions
@@ -358,4 +376,4 @@ TMUX= nvim                 # Test outside tmux
 
 ---
 
-*Focus: Find the problem fast → Fix it → Verify it works*
+_Focus: Find the problem fast → Fix it → Verify it works_

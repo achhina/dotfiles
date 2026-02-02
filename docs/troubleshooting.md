@@ -3,6 +3,7 @@
 This guide covers common issues and edge cases when setting up or migrating your dotfiles. These are problems that can't be systematically prevented and require manual intervention. The bootstrap script handles many issues automatically, but this guide documents the failures it can't address and how to resolve them manually.
 
 ## Table of Contents
+
 - [Machine Migration](#machine-migration)
   - [Pre-Migration Checklist](#pre-migration-checklist)
   - [Using macOS Migration Assistant](#using-macos-migration-assistant)
@@ -76,12 +77,14 @@ brew list --cask > ~/Documents/brew-casks.txt
 ### Using macOS Migration Assistant
 
 ### What Transfers Well
+
 - Application data and preferences
 - Documents and media files
 - Bitwarden/1Password data
 - Git repository contents (including `.git` directories)
 
 ### What Causes Issues
+
 - **Nix store** - Contains architecture-specific binaries
 - **Home Manager symlinks** - Point to old Nix store paths
 - **Cache directories** - Contain compiled binaries for wrong architecture
@@ -132,16 +135,19 @@ When migrating from Intel (x86_64) to Apple Silicon (arm64):
 After Migration Assistant, grant required permissions:
 
 **System Settings → Privacy & Security → Accessibility:**
+
 - BetterTouchTool
 - Logi Options++
 - Aerospace (after Home Manager runs)
 - Borders/jankyborders (after Home Manager runs)
 
 **System Settings → Privacy & Security → Screen Recording:**
+
 - BetterTouchTool
 - Any recording/streaming apps
 
 **System Settings → Privacy & Security → Input Monitoring:**
+
 - Karabiner-Elements
 
 ##### 2. Fix PAM for sudo (If You Use Touch ID with tmux)
@@ -149,6 +155,7 @@ After Migration Assistant, grant required permissions:
 If you get `sudo: unable to initialize PAM: Undefined error: 0`:
 
 **Temporary Fix (restore sudo functionality):**
+
 ```bash
 # Open /etc/pam.d in Finder to modify protected files
 open /etc/pam.d/
@@ -164,6 +171,7 @@ sudo echo "test"
 ```
 
 **Permanent Fix (restore Touch ID):**
+
 ```bash
 # Install Apple Silicon Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -202,6 +210,7 @@ rm -rf ~/.local/share/nvim  # Neovim plugins will reinstall
 ##### 4. Run Bootstrap
 
 Now run the bootstrap script. It will automatically:
+
 - Detect arm64 architecture and warn about migration considerations
 - Check for broken symlinks and offer to remove them
 - Check for old Nix backup files and offer to remove them
@@ -317,6 +326,7 @@ Manual step that Migration Assistant doesn't preserve:
 ### Issue: `builtins.currentSystem` Error in Flake
 
 **Symptom:**
+
 ```
 error: flake 'path:/Users/user/.config/nix' does not provide attribute 'packages.aarch64-darwin.homeConfigurations."MacBook-Pro".activationPackage'
 ```
@@ -324,6 +334,7 @@ error: flake 'path:/Users/user/.config/nix' does not provide attribute 'packages
 **Cause:** Flake hostname doesn't match `scutil --get LocalHostName` or architecture is wrong.
 
 **Solution:**
+
 ```bash
 # Check your hostname
 scutil --get LocalHostName
@@ -338,6 +349,7 @@ nix run home-manager/master -- switch --flake ~/.config/nix#achhina
 ### Issue: Nix Wants to Build for Wrong Architecture
 
 **Symptom:**
+
 ```
 error: Cannot build '/nix/store/....drv'.
        Reason: required system or feature not available
@@ -348,6 +360,7 @@ error: Cannot build '/nix/store/....drv'.
 **Cause:** Some package in your configuration is explicitly pinned to x86_64.
 
 **Solution:**
+
 ```bash
 # Search packages.nix for platform-specific conditionals
 cd ~/.config/nix/home-manager/modules
@@ -362,11 +375,13 @@ grep -n "x86_64" packages.nix
 ### Issue: "File Would Be Clobbered" During Home Manager Activation
 
 **Symptom:**
+
 ```
 Existing file '/Users/user/.config/nix/nix.conf' would be clobbered
 ```
 
 **Solution:**
+
 ```bash
 # Use backup flag
 nix run home-manager/master -- switch --flake ~/.config/nix#$(scutil --get LocalHostName) -b backup
@@ -388,6 +403,7 @@ See [Reinstall Neovim Plugins](#6-reinstall-neovim-plugins) in the Architecture 
 ### Pre-commit Hook Failures
 
 **Symptom:**
+
 ```bash
 gitleaks: cannot execute binary file: Exec format error
 ```
@@ -395,6 +411,7 @@ gitleaks: cannot execute binary file: Exec format error
 **Cause:** Migrated x86_64 binaries in cache.
 
 **Solution:**
+
 ```bash
 rm -rf ~/.cache/pre-commit
 # Hooks will reinstall on next commit
@@ -403,11 +420,13 @@ rm -rf ~/.cache/pre-commit
 ### markdown-preview.nvim Won't Install
 
 **Symptom:**
+
 ```
 Vim:E117: Unknown function: mkdp#util#install
 ```
 
 **Solution:**
+
 ```bash
 # This plugin requires manual npm install
 cd ~/.local/share/nvim/lazy/markdown-preview.nvim

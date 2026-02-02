@@ -18,6 +18,7 @@ Each namespace section follows this template:
 Distributions are selected based on GitHub stars (>=10k) with the `neovim-configuration` topic.
 
 **GitHub Query:**
+
 ```bash
 gh search repos 'topic:neovim-configuration' \
   --stars '>=10000' \
@@ -40,12 +41,12 @@ gh search repos 'topic:neovim-configuration' \
 
 **Current results (2025-12-06):**
 
-| Distribution | Stars |
-|--------------|-------|
+| Distribution   | Stars  |
+| -------------- | ------ |
 | kickstart.nvim | 28,483 |
-| NvChad | 27,553 |
-| LazyVim | 24,153 |
-| AstroNvim | 13,937 |
+| NvChad         | 27,553 |
+| LazyVim        | 24,153 |
+| AstroNvim      | 13,937 |
 
 ## Diagnostics and Quickfix
 
@@ -58,12 +59,12 @@ The `q` mnemonic represents "quickfix". This namespace centralizes all quickfix-
 
 **Distribution comparison:**
 
-| Distribution | `<leader>q` Usage |
-|--------------|-------------------|
-| kickstart.nvim | Populates location list with diagnostics (`vim.diagnostic.setloclist`) |
-| NvChad | `<leader>ds` for diagnostic location list (v2.5+); previously `<leader>q` (v2.0) |
-| LazyVim | `<leader>qq` for "Quit All" only; rest of namespace unused |
-| AstroNvim | Not used for diagnostics or quickfix operations |
+| Distribution   | `<leader>q` Usage                                                                |
+| -------------- | -------------------------------------------------------------------------------- |
+| kickstart.nvim | Populates location list with diagnostics (`vim.diagnostic.setloclist`)           |
+| NvChad         | `<leader>ds` for diagnostic location list (v2.5+); previously `<leader>q` (v2.0) |
+| LazyVim        | `<leader>qq` for "Quit All" only; rest of namespace unused                       |
+| AstroNvim      | Not used for diagnostics or quickfix operations                                  |
 
 ### `<leader>x` - Direct Diagnostic Viewing
 
@@ -74,9 +75,9 @@ The `x` mnemonic represents "problems/diagnostics/issues". This namespace is ide
 
 **Distribution comparison:**
 
-| Distribution | `<leader>x` Usage |
-|--------------|-------------------|
-| kickstart.nvim | Not used |
-| NvChad | Closes current buffer (not diagnostic-related) |
-| LazyVim | Primary diagnostic namespace for workspace/buffer diagnostics, quickfix, and location lists |
-| AstroNvim | Diagnostic operations with Trouble integration |
+| Distribution   | `<leader>x` Usage                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| kickstart.nvim | Not used                                                                                    |
+| NvChad         | Closes current buffer (not diagnostic-related)                                              |
+| LazyVim        | Primary diagnostic namespace for workspace/buffer diagnostics, quickfix, and location lists |
+| AstroNvim      | Diagnostic operations with Trouble integration                                              |
