@@ -11,7 +11,10 @@ Use user journey diagrams for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+---
+config:
+  theme: neutral
+---
 journey
     title Online Shopping User Journey
     section Discovery

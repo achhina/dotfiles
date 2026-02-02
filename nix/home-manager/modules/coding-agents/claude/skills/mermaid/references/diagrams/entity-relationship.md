@@ -11,7 +11,10 @@ Use entity relationship diagrams for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+---
+config:
+  theme: neutral
+---
 erDiagram
     USER ||--o{ ORDER : places
     USER {

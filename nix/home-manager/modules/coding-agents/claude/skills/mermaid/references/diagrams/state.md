@@ -11,7 +11,10 @@ Use state diagrams for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+---
+config:
+  theme: dark
+---
 stateDiagram-v2
     [*] --> Draft
     Draft --> Submitted: Submit

@@ -11,7 +11,10 @@ Use Gantt charts for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+---
+config:
+  theme: dark
+---
 gantt
     title Web Application Development
     dateFormat YYYY-MM-DD

@@ -11,7 +11,10 @@ Use sequence diagrams for:
 ## Complete Example
 
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+---
+config:
+  theme: neutral
+---
 sequenceDiagram
     autonumber
     actor User

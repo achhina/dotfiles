@@ -11,8 +11,12 @@ Use Sankey diagrams for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'forest'}}%%
-%%{init: {'theme':'forest', 'themeVariables': { 'fontSize': '16px'}}}%%
+---
+config:
+  theme: forest
+  themeVariables:
+    fontSize: '16px'
+---
 sankey-beta
 
 Website Traffic,Direct,500

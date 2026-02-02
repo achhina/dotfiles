@@ -8,10 +8,13 @@ version: 0.1.0
 
 ## Basic Frontmatter Syntax
 
-All diagram customization uses frontmatter at the top of the diagram:
+All diagram customization uses YAML frontmatter at the top of the diagram:
 
 ```
-%%{init: {'theme':'dark'}}%%
+---
+config:
+  theme: dark
+---
 ```
 
 For details on all configuration options, see `references/configuration.md` and `references/styling.md`.
@@ -48,17 +51,18 @@ If the user's request doesn't clearly indicate which diagram type or theme to us
 - **Sankey** - Flow quantities and value relationships
 
 **Question 2 - Theme:**
-- **Default** - Most use cases, web documentation
-- **Neutral** - Black and white printing or high contrast needs
-- **Dark** - Dark mode websites, presentations on dark backgrounds
-- **Forest** - Softer, nature-inspired aesthetic
+- **Default** - The default theme for all diagrams
+- **Neutral** - Great for black and white documents that will be printed
+- **Dark** - Goes well with dark-colored elements or dark-mode
+- **Forest** - Contains shades of green
+- **Base** - The only theme that can be modified with custom colors
 
 Reference the selection flowchart below to guide your questions, or consult `references/diagrams/` for detailed examples of each type.
 
 ### 2. Create the Diagram
 
 1. **Read the diagram type reference** in `references/diagrams/` for syntax examples and conventions
-2. Apply the selected theme using frontmatter: `%%{init: {'theme':'selected-theme'}}%%`
+2. Apply the selected theme using YAML frontmatter at the top of the diagram
 3. Create the diagram in a markdown file
 
 **Common Issues:**

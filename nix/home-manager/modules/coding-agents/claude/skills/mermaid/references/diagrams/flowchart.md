@@ -11,7 +11,10 @@ Use flowcharts for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'default'}}%%
+---
+config:
+  theme: default
+---
 flowchart TD
     Start[User Request] --> Auth{Authenticated?}
     Auth -->|Yes| CheckRole{Has Permission?}

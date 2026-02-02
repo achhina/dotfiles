@@ -11,7 +11,10 @@ Use mindmaps for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'default'}}%%
+---
+config:
+  theme: default
+---
 mindmap
   root((Web Application Architecture))
     Frontend

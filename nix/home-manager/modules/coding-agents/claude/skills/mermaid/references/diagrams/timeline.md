@@ -11,7 +11,10 @@ Use timelines for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'forest'}}%%
+---
+config:
+  theme: forest
+---
 timeline
     title Product Evolution Timeline
     section 2023

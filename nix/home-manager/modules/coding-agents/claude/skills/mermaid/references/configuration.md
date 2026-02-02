@@ -10,32 +10,51 @@ Mermaid supports three hierarchical configuration levels:
 
 **Priority Order:** Frontmatter > Site config > Default config
 
-## Frontmatter Configuration (Recommended)
+## YAML Frontmatter Configuration (Recommended)
 
-Use frontmatter at the top of diagrams to override configuration. This is the preferred method for diagram-specific settings.
+Use YAML frontmatter at the top of diagrams to override configuration. This is the current standard method for diagram-specific settings (since v10.5.0).
 
 **Syntax:**
 ```
-%%{init: {'key': 'value', 'nested': {'key': 'value'}}}%%
+---
+config:
+  key: value
+  nested:
+    key: value
+---
 ```
 
 **Basic Example:**
 ```mermaid
-%%{init: {'theme':'dark', 'logLevel':'info'}}%%
+---
+config:
+  theme: dark
+  logLevel: info
+---
 flowchart TD
     A-->B
 ```
 
 **With Diagram-Specific Config:**
 ```mermaid
-%%{init: {'theme':'neutral', 'sequence': {'mirrorActors': true}}}%%
+---
+config:
+  theme: neutral
+  sequence:
+    mirrorActors: true
+---
 sequenceDiagram
     Alice->>Bob: Hello
 ```
 
 **With Theme Variables:**
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ff0000'}}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#ff0000'
+---
 flowchart TD
     A-->B
 ```
@@ -113,26 +132,47 @@ Each diagram type supports specific configuration under its key:
 
 ## Directives (Deprecated)
 
-**Note:** Directives are deprecated since v10.5.0. Use frontmatter with the `init` key instead.
+**Important:** Directive syntax (`%%{init}%%`) is deprecated as of v10.5.0. Use YAML frontmatter with the `config` key instead.
 
-**Old directive syntax (don't use):**
+**Deprecated directive syntax (still works but avoid):**
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+flowchart TD
+    A-->B
+```
+
+**Current YAML frontmatter syntax (use this):**
+```mermaid
+---
+config:
+  theme: dark
+---
+flowchart TD
+    A-->B
+```
+
+**Ancient directive syntax (removed, don't use):**
 ```
 %%{initialize: {'theme': 'dark'}}%%
 ```
 
-**New frontmatter syntax (use this):**
-```
-%%{init: {'theme': 'dark'}}%%
-```
+The YAML frontmatter method is preferred because it:
+- Separates configuration from diagram content
+- Provides clearer document structure
+- Aligns with modern documentation practices
+- Is more readable and maintainable
 
 ## Configuration Best Practices
 
 ### For Diagram Authors
 
-**Always use frontmatter** unless you're setting up site-wide defaults:
+**Always use YAML frontmatter** unless you're setting up site-wide defaults:
 
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+---
+config:
+  theme: neutral
+---
 flowchart TD
     Start-->End
 ```

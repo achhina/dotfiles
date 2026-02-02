@@ -11,7 +11,10 @@ Use architecture diagrams for:
 ## Example
 
 ```mermaid
-%%{init: {'theme':'default'}}%%
+---
+config:
+  theme: default
+---
 architecture-beta
     group cloud(cloud)[Cloud Infrastructure]
 

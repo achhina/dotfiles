@@ -12,12 +12,15 @@ Mermaid provides five built-in themes:
 
 ## Applying Themes
 
-### Diagram-Level (Frontmatter - Recommended)
+### Diagram-Level (YAML Frontmatter - Recommended)
 
-Apply themes to individual diagrams using frontmatter:
+Apply themes to individual diagrams using YAML frontmatter:
 
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+---
+config:
+  theme: neutral
+---
 flowchart TD
     A-->B
 ```
@@ -42,7 +45,13 @@ mermaid.initialize({
 ### Basic Customization
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ff6b6b', 'secondaryColor':'#4ecdc4'}}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#ff6b6b'
+    secondaryColor: '#4ecdc4'
+---
 flowchart TD
     A[Primary Node]-->B[Secondary Node]
 ```
@@ -50,20 +59,20 @@ flowchart TD
 ### Advanced Customization
 
 ```mermaid
-%%{init: {
-  'theme':'base',
-  'themeVariables': {
-    'primaryColor': '#2e86de',
-    'primaryTextColor': '#ffffff',
-    'primaryBorderColor': '#1e3799',
-    'lineColor': '#686de0',
-    'secondaryColor': '#54a0ff',
-    'tertiaryColor': '#48dbfb',
-    'background': '#f5f6fa',
-    'fontSize': '18px',
-    'fontFamily': 'arial'
-  }
-}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#2e86de'
+    primaryTextColor: '#ffffff'
+    primaryBorderColor: '#1e3799'
+    lineColor: '#686de0'
+    secondaryColor: '#54a0ff'
+    tertiaryColor: '#48dbfb'
+    background: '#f5f6fa'
+    fontSize: '18px'
+    fontFamily: 'arial'
+---
 flowchart TD
     A-->B
 ```
@@ -190,21 +199,21 @@ Many colors are automatically calculated from base colors:
 ### Dark Mode Theme
 
 ```mermaid
-%%{init: {
-  'theme':'base',
-  'themeVariables': {
-    'darkMode': true,
-    'background': '#1e1e1e',
-    'primaryColor': '#4a9eff',
-    'primaryTextColor': '#ffffff',
-    'primaryBorderColor': '#2980b9',
-    'lineColor': '#95a5a6',
-    'secondaryColor': '#e74c3c',
-    'tertiaryColor': '#2ecc71',
-    'textColor': '#ecf0f1',
-    'fontSize': '16px'
-  }
-}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    darkMode: true
+    background: '#1e1e1e'
+    primaryColor: '#4a9eff'
+    primaryTextColor: '#ffffff'
+    primaryBorderColor: '#2980b9'
+    lineColor: '#95a5a6'
+    secondaryColor: '#e74c3c'
+    tertiaryColor: '#2ecc71'
+    textColor: '#ecf0f1'
+    fontSize: '16px'
+---
 flowchart LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action 1]
@@ -214,17 +223,17 @@ flowchart LR
 ### High Contrast Theme
 
 ```mermaid
-%%{init: {
-  'theme':'base',
-  'themeVariables': {
-    'primaryColor': '#000000',
-    'primaryTextColor': '#ffffff',
-    'primaryBorderColor': '#ffffff',
-    'lineColor': '#000000',
-    'background': '#ffffff',
-    'textColor': '#000000'
-  }
-}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#000000'
+    primaryTextColor: '#ffffff'
+    primaryBorderColor: '#ffffff'
+    lineColor: '#000000'
+    background: '#ffffff'
+    textColor: '#000000'
+---
 sequenceDiagram
     Alice->>Bob: Message
     Bob-->>Alice: Response
@@ -233,19 +242,19 @@ sequenceDiagram
 ### Branded Theme
 
 ```mermaid
-%%{init: {
-  'theme':'base',
-  'themeVariables': {
-    'primaryColor': '#FF6B35',
-    'primaryTextColor': '#FFFFFF',
-    'primaryBorderColor': '#C44536',
-    'secondaryColor': '#004E89',
-    'tertiaryColor': '#1A659E',
-    'background': '#F7F7FF',
-    'fontFamily': 'Helvetica, Arial, sans-serif',
-    'fontSize': '14px'
-  }
-}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#FF6B35'
+    primaryTextColor: '#FFFFFF'
+    primaryBorderColor: '#C44536'
+    secondaryColor: '#004E89'
+    tertiaryColor: '#1A659E'
+    background: '#F7F7FF'
+    fontFamily: 'Helvetica, Arial, sans-serif'
+    fontSize: '14px'
+---
 flowchart TD
     A[Brand Element] --> B[Feature 1]
     A --> C[Feature 2]
@@ -253,12 +262,17 @@ flowchart TD
 
 ## Best Practices
 
-### Use Frontmatter for Diagram-Specific Styling
+### Use YAML Frontmatter for Diagram-Specific Styling
 
-Always use frontmatter configuration unless setting site-wide defaults:
+Always use YAML frontmatter configuration unless setting site-wide defaults:
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#custom'}}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#custom'
+---
 ```
 
 ### Start with Base Theme for Customization
@@ -266,7 +280,12 @@ Always use frontmatter configuration unless setting site-wide defaults:
 Only the `base` theme accepts `themeVariables`:
 
 ```
-%%{init: {'theme':'base', 'themeVariables': {...}}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    # custom variables here
+---
 ```
 
 ### Use Hex Colors Only
@@ -296,7 +315,10 @@ Preview diagrams in the actual context (light/dark mode, print) to ensure readab
 Change only theme without variables:
 
 ```
-%%{init: {'theme':'dark'}}%%
+---
+config:
+  theme: dark
+---
 ```
 
 ### Single Color Adjustment
@@ -304,7 +326,12 @@ Change only theme without variables:
 Modify one color, let others derive:
 
 ```
-%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#2ecc71'}}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#2ecc71'
+---
 ```
 
 ### Full Custom Theme
@@ -312,15 +339,15 @@ Modify one color, let others derive:
 Override multiple variables for complete control:
 
 ```
-%%{init: {
-  'theme':'base',
-  'themeVariables': {
-    'primaryColor': '#custom1',
-    'secondaryColor': '#custom2',
-    'background': '#custom3',
-    'lineColor': '#custom4'
-  }
-}}%%
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#custom1'
+    secondaryColor: '#custom2'
+    background: '#custom3'
+    lineColor: '#custom4'
+---
 ```
 
 ## Troubleshooting
@@ -332,7 +359,7 @@ Override multiple variables for complete control:
 - **Solution:** Use hex format (`#ff0000`) instead of names (`red`)
 
 **Issue:** Theme not applying to specific diagram
-- **Solution:** Check frontmatter syntax, ensure `init` key is used
+- **Solution:** Check YAML frontmatter syntax, ensure `config` key is used with proper indentation
 
 **Issue:** Site-wide theme conflicts with diagram theme
 - **Solution:** Diagram frontmatter overrides site config - this is expected behavior
