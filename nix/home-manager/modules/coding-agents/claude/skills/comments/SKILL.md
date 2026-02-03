@@ -2,8 +2,7 @@
 name: comments
 description: Remove obvious and redundant comments from code
 argument-hint: "[--scope changes|codebase] [@path ...]"
-disable-model-invocation: true
-allowed-tools: ["Read", "Edit", "Grep", "Glob", "Bash(git *)"]
+allowed-tools: ["Task", "Read", "Grep", "Glob", "Bash(git *)"]
 model: haiku
 ---
 

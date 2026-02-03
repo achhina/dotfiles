@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, pkgs-bat-extras, config, ... }:
 
 let
   cfg = config.programs.tmux;
@@ -322,7 +322,13 @@ in
         '';
       }
       {
-        plugin = fingers;
+        # @upstream-issue: Pinned to older nixpkgs due to llvm/crystal build failure in tmux-fingers dependency
+        # Current nixpkgs (eb8d947, 2026-02-01) has llvm 22.1.0-rc2 test failures:
+        # FAILED: CMakeFiles/check-all (1 of 72511 tests failed)
+        # This blocks crystal 1.19.1 build, which blocks tmux-fingers 2.5.1
+        # Related: https://github.com/NixOS/nixpkgs/issues/395168 (LLVM ppc64le build failure)
+        # TODO: Monitor nixpkgs-unstable and remove pinning when fixed
+        plugin = pkgs-bat-extras.tmuxPlugins.fingers;
         extraConfig = ''
           # tmux-fingers configuration
           set -g @fingers-key f
