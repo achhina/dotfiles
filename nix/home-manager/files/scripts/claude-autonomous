@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Wrapper to run Claude in autonomous mode
+# Prevents permission prompts by blocking tools that would require them
+
+set -euo pipefail
+
+cat <<'EOF'
+🤖 Claude Autonomous Mode
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This mode prevents permission prompts to enable autonomous operation.
+
+Tools requiring permissions will be BLOCKED with a message suggesting
+alternatives. Claude will adapt and use allowed tools instead.
+
+Best for:
+  ✓ Long-running tasks while you're away
+  ✓ Repetitive operations with known tool sets
+  ✓ Testing permission configurations
+
+Not recommended for:
+  ✗ First-time tasks (may need new permissions)
+  ✗ Complex operations requiring user decisions
+  ✗ Security-sensitive work requiring approval
+
+Press Ctrl+C to exit autonomous mode
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EOF
+
+# Set environment variable to enable the hook
+export CLAUDE_AUTONOMOUS_MODE=true
+
+# Run Claude with all arguments
+exec claude "$@"

@@ -336,6 +336,11 @@ in
     executable = true;
   };
 
+  home.file."bin/claude-autonomous" = {
+    source = ../files/scripts/claude-autonomous;
+    executable = true;
+  };
+
   home.file."bin/parse-history" = {
     source = ../files/scripts/parse-history;
     executable = true;

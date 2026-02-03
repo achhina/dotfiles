@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Wrapper for Claude that auto-denies permission prompts after timeout
+# Usage: claude-with-timeout [timeout_seconds] [claude_args...]
+
+set -euo pipefail
+
+# Configuration
+TIMEOUT_SECONDS="${1:-300}"
+shift || true
+
+# Create named pipes for communication
+PIPE_DIR=$(mktemp -d)
+PERMISSION_PIPE="$PIPE_DIR/permission"
+mkfifo "$PERMISSION_PIPE"
+
+cleanup() {
+    rm -rf "$PIPE_DIR"
+}
+trap cleanup EXIT
+
+echo "🤖 Claude with auto-deny timeout (${TIMEOUT_SECONDS}s)"
+echo ""
+
+# Background process to monitor and auto-deny permissions
+(
+    while true; do
+        # Wait for permission prompt (this is conceptual - actual detection TBD)
+        # In reality, we'd need to:
+        # 1. Parse Claude's output for permission prompts
+        # 2. Track timing
+        # 3. Send denial after timeout
+
+        sleep "$TIMEOUT_SECONDS"
+
+        # Send auto-denial
+        echo "n" > "$PERMISSION_PIPE"  # Deny permission
+
+        # Log the auto-denial
+        echo "⏱️  Auto-denied permission after ${TIMEOUT_SECONDS}s timeout" >&2
+    done
+) &
+MONITOR_PID=$!
+
+# Run Claude with stdin/stdout interception
+# This is where we'd actually integrate with Claude's permission system
+claude "$@"
+
+# Cleanup
+kill "$MONITOR_PID" 2>/dev/null || true

@@ -22,6 +22,10 @@ let
     builtins.readFile ./hooks/block-file-writing-via-bash.sh
   );
 
+  preventPermissionPrompts = pkgs.writeShellScript "prevent-permission-prompts.sh" (
+    builtins.readFile ./hooks/prevent-permission-prompts.sh
+  );
+
   # Load local overrides if they exist (separate file to simplify rebasing)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
@@ -531,6 +535,18 @@ in
               {
                 type = "command";
                 command = "${blockFileWritingViaBash}";
+              }
+            ];
+          }
+          {
+            # Autonomous mode hook - prevents permission prompts
+            # Enable by setting: export CLAUDE_AUTONOMOUS_MODE=true
+            # Or use: claude-autonomous command
+            matcher = "*";
+            hooks = [
+              {
+                type = "command";
+                command = "${preventPermissionPrompts}";
               }
             ];
           }
