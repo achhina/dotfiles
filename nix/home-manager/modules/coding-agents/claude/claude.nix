@@ -26,6 +26,10 @@ let
     builtins.readFile ./hooks/prevent-permission-prompts.sh
   );
 
+  helpfulPermissionDenial = pkgs.writeShellScript "helpful-permission-denial.sh" (
+    builtins.readFile ./hooks/helpful-permission-denial.sh
+  );
+
   # Load local overrides if they exist (separate file to simplify rebasing)
   overridesPath = ./claude-overrides.nix;
   hasOverrides = builtins.pathExists overridesPath;
@@ -402,7 +406,7 @@ in
         allow = finalAllowPermissions;
         deny = finalDenyPermissions;
         ask = finalAskPermissions;
-        defaultMode = "acceptEdits";
+        defaultMode = "dontAsk";
 
         additionalDirectories = [
           "~/docs"
@@ -423,7 +427,7 @@ in
 
       theme = "dark";
 
-      defaultPermissionMode = "acceptEdits";
+      defaultPermissionMode = "dontAsk";
 
       agents = [
         {
@@ -506,7 +510,7 @@ in
         "agent-sdk-dev@claude-plugins-official" = true;
         "pyright-lsp@claude-plugins-official" = true;
         "plugin-dev@claude-plugins-official" = true;
-        "hookify@claude-plugins-official" = true;
+        "hookify@claude-plugins-official" = false;
       };
 
       hooks = {
@@ -547,6 +551,17 @@ in
               {
                 type = "command";
                 command = "${preventPermissionPrompts}";
+              }
+            ];
+          }
+          {
+            # Helpful permission denial - provides guidance when tools are denied
+            # Shows allowed tools and suggests alternatives in dontAsk mode
+            matcher = "*";
+            hooks = [
+              {
+                type = "command";
+                command = "${helpfulPermissionDenial}";
               }
             ];
           }

@@ -99,6 +99,7 @@ let
     luaPackages.luarocks     # Lua package manager
 
     # Python
+    python312                                    # Python interpreter (required for plugin hooks)
     # @upstream-issue: https://github.com/ipython/ipython/issues/14532
     python312Packages.black                      # Code formatter for IPython (ruff workaround)
     python312Packages.ipython                    # Enhanced Python REPL
