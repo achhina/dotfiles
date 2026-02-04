@@ -267,7 +267,7 @@ let
     "Bash(yarn list *)"
     "Bash(zip *)"
     "Bash(~/bin/man *)"
-    "Edit(//${lib.removePrefix "/" config.xdg.configHome}/**)"
+    "Edit"
     "EnterPlanMode"
     "ExitPlanMode"
     "Glob"
@@ -370,10 +370,7 @@ in
           commitAgent = "commit";
           commandTemplate = builtins.readFile ./commands/commit.md;
         in
-        builtins.replaceStrings
-          [ "@commitAgent@" ]
-          [ commitAgent ]
-          commandTemplate;
+        builtins.replaceStrings [ "@commitAgent@" ] [ commitAgent ] commandTemplate;
     };
 
     memory.source = ./context/AGENTS.md;
