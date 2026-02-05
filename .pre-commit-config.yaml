@@ -1,12 +1,12 @@
 repos:
   - repo: "https://github.com/pre-commit/pre-commit-hooks"
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
   - repo: local
@@ -40,14 +40,14 @@ repos:
         types: [lua]
         args: ["--check"]
   - repo: "https://github.com/google/yamlfmt"
-    rev: v0.17.2
+    rev: v0.21.0
     hooks:
       - id: yamlfmt
   - repo: "https://github.com/gitleaks/gitleaks"
-    rev: v8.27.2
+    rev: v8.30.0
     hooks:
       - id: gitleaks
   - repo: "https://github.com/mrtazz/checkmake.git"
-    rev: 0.2.2
+    rev: v0.3.2
     hooks:
       - id: checkmake
