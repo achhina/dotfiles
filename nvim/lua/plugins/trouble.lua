@@ -97,6 +97,23 @@ return {
 			desc = "Quickfix List (Trouble)",
 		},
 
+		-- Override built-in Neovim 0.11 LSP keymaps to use Trouble
+		{
+			"grr",
+			"<cmd>Trouble lsp_references<cr>",
+			desc = "LSP References (Trouble)",
+		},
+		{
+			"gri",
+			"<cmd>Trouble lsp_implementations<cr>",
+			desc = "LSP Implementations (Trouble)",
+		},
+		{
+			"gO",
+			"<cmd>Trouble lsp_document_symbols<cr>",
+			desc = "LSP Document Symbols (Trouble)",
+		},
+
 		-- Trouble navigation (when in Trouble window)
 		{
 			"]t",
